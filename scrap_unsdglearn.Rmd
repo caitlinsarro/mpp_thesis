@@ -1,0 +1,309 @@
+---
+title: "Web Scraping"
+subtitle: "UNSDGLEARN: Capacity Building"
+author: "Caitlin Sarro"
+date: "2/9/2022"
+output: 
+  html_document:
+    toc: TRUE
+    df_print: paged
+    number_sections: FALSE
+    highlight: tango
+    theme: lumen
+    toc_depth: 3
+    toc_float: true
+    css: custom.css 
+    self_contained: false
+    includes:
+      after_body: footer.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+***
+CONTEXT TEXT
+
+In general, remember, the basic **workflow for scraping static webpages** is the following.
+
+**Step 1.** Load the packages
+
+```{r, message=F}
+#install.packages("")
+library(RSelenium)
+library(tidyverse)
+library(rvest)
+library(stringr)
+library(readr)
+library(shiny)
+
+library(reshape2)
+library(dplyr)
+
+library(purrr)
+library(tibble)
+```
+
+
+
+```{r}
+#Capacity Building https://www.unsdglearn.org/courses/?_sf_s=capacity%20building
+#Breaking the Silos https://www.unsdglearn.org/courses/?_sfm_sdg=5
+
+
+```
+
+# Scraping multiple pages `r emo::ji("robot")`
+
+Whenever you want to really understand what's going on within the functions of a new R package, it is very likely that there is a relevant article published in the [Journal of Statistical Software](https://www.jstatsoft.org/index). Let's say you are interested in how the journal was doing over the past years.
+
+**Step 1.** Inspect the source. Basically, follow steps to extract the Xpath information.
+```{r, eval=F}
+#browseURL("https://www.unsdglearn.org/courses/?_sf_s=capacity%20building")
+```
+
+**Step 2.** Parse the page source.
+
+```{r}
+#UN SDGLearn Parsing 
+#start RSelenium
+remDr <- remoteDriver(
+        remoteServerAdd = "localhost",
+        port = 4445L,
+        browser = "chrome"
+)
+
+remDr$open()
+
+#navigate to your page
+remDr$navigate("https://www.unsdglearn.org/courses/?_sf_s=capacity%20building")
+
+#scroll down 5 times, waiting for the page to load at each time
+for(i in 1:5){      
+remDr$executeScript(paste("scroll(0,",i*10000,");"))
+Sys.sleep(3)    
+}
+
+#get the page html
+page_source <-remDr$getPageSource()
+
+#pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
+
+unsdglearn <- read_html(page_source[[1]])
+
+
+#parse it
+#html(page_source[[1]]) %>% html_nodes(".product-itm-price-new") %>%
+#  html_text()
+
+
+
+#unsdglearn <- read_html("https://www.unsdglearn.org/courses/?sf_data=results&_sf_s=capacity%20building&sf_paged=2")
+
+#unsdglearn
+```
+
+
+**Step 3.** Extract information.
+
+```{r}
+parsed_nodes <- html_nodes(unsdglearn, 
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-title-course", " " ))]//a')
+titles <- html_text(parsed_nodes)
+titles
+
+
+
+parsed_nodes2 <- html_nodes(unsdglearn, 
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-institutions", " " ))]//span')
+authors <- html_text(parsed_nodes2)
+authors
+
+parsed_nodes2 <- html_nodes(unsdglearn, 
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " )) and (((count(preceding-sibling::*) + 1) = 1) and parent::*)]')
+SDGs <- html_text(parsed_nodes2)
+SDGs <-gsub('[\n\t\t\t\t\t\t\t\t\t\t\t\t\t]', ',', SDGs)
+
+SDGs
+```
+
+```{r}
+parsed_nodes2 <- html_nodes(unsdglearn, 
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " )) and (((count(preceding-sibling::*) + 1) = 2) and parent::*)]')
+tags <- html_text(parsed_nodes2)
+tags
+
+parsed_nodes2 <- html_nodes(unsdglearn, 
+                           xpath = '//*~[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " ))]')
+lang <- html_text(parsed_nodes2)
+lang
+
+```
+
+```{r}
+#extract the links
+
+weblink <- unsdglearn  %>% html_nodes("div.card-content > h4 > a") %>% html_attr("href")
+
+
+
+```
+
+
+```{r}
+chart_df <- data.frame(titles, authors, tags, SDGs, weblink)
+
+knitr::kable(chart_df  %>% head(10))
+
+chart_df <- tibble::rowid_to_column(chart_df, "id")
+
+```
+
+
+
+```{r}
+
+#unsdglearn_subpage <- read_html("https://www.unsdglearn.org/courses/unido-industrial-analytics-platform-iap/")
+```
+
+```{r}
+#old code
+#keywords_nodes <- html_nodes(unsdglearn_subpage, 
+#                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", #"keyword", " " ))]')
+#keywords <- html_text(keywords_nodes)
+#keywords
+
+
+#audience_nodes <- html_nodes(unsdglearn_subpage, 
+#                           xpath = '//*[(@id = "content")]//li')
+#audience <- html_text(audience_nodes)
+#audience
+
+urls_list <- weblink
+urls_list[1:5]
+
+urls_list <- as.list(weblink,)
+is.list(urls_list)
+
+```
+
+
+
+
+**Step 3** Scrapping the Sub-pages, set up directory
+```{r, eval=F}
+tempwd <- ("data/capcourses_UNSDGLEARN")
+dir.create(tempwd)
+setwd(tempwd)
+```
+
+**Step 4** Download the pages. Note that we did not do this step last time, when we were only scraping one page. (DOESN"T WORK YET)
+```{r, eval=F}
+folder <- "data/capcourses_UNSDGLEARN/html_courses/"
+dir.create(folder)
+
+for (i in 1:length(urls_list)) {
+  # only update, don't replace
+    if (!file.exists(paste0(folder, names[i]))) {  
+  # skip article when we run into an error   
+      tryCatch( 
+        download.file(urls_list[i], destfile = paste0(folder, names[i])),
+        error = function(e) e
+      )
+  # don't kill their server --> be polite!  
+      Sys.sleep(runif(1, 0, 1)) 
+        
+} }
+```
+
+**Step 5** Import files and parse out information. A loop is helpful here! (NOT USED YET)
+```{r, eval=F}
+# define output first
+keywords <- character()
+audience <- character()
+
+
+# then run the loop
+for (i in 1:length(list_files_path)) {
+  html_out <- read_html(list_files_path[i])
+    
+  authors[i] <- html_text(html_nodes(html_out , xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "authors_long", " " ))]//strong'))
+    
+  title[i] <- html_text(html_nodes(html_out , xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "page-header", " " ))]'))
+    
+}
+
+# inspect data
+keywords[1:3]
+audience[1:2]
+
+# create a data frame
+dat <- data.frame(authors = authors, title = title, datePublish = datePublish)
+dim(dat)
+```
+
+
+
+
+```{r}
+
+# Define the KEYWORDS worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "keyword", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "keywords")
+}
+
+# Iterate over the urls, applying the function each time
+keywords <- map_dfr(weblink, scraper, .id = "id")
+
+```
+
+
+```{r}
+
+# Define the AUDIENCE worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "resource-contentblock", " " )) and (((count(preceding-sibling::*) + 1) = 3) and parent::*)]//*[contains(concat( " ", @class, " " ), concat( " ", "wrapper", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "audience")
+}
+
+# Iterate over the urls, applying the function each time
+audience <- map_dfr(weblink, scraper, .id = "id")
+audience
+
+
+```
+
+
+```{r}
+
+#Combine into single columns
+
+keywords_combined <- keywords %>%
+ group_by(id) %>%
+ summarize(keywords = str_c(keywords, collapse = ", "))
+
+#df3 <- merge(audience, keywords_combined, by = "id")
+
+chart_df <- merge(chart_df, keywords_combined, by = "id")
+combined <- merge(chart_df, audience, by = "id", all = TRUE)
+
+write.csv(combined,"C:/Users/caitl/Documents/GitHub/thesis/exports/unsdglearn.csv", row.names = TRUE)
+
+
+```
+
+```{r}
+#not working?
+#system("sudo docker pull selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#system("sudo docker run -d -p 4445:4444 selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#remDr <- remoteDriver(port=4445L, browserName="chrome")
+#Sys.sleep(15)
+#remDr$open()
+

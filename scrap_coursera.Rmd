@@ -1,0 +1,256 @@
+---
+title: "Web Scraping"
+subtitle: "UNSDGLEARN: Capacity Building"
+author: "Caitlin Sarro"
+date: "2/9/2022"
+output: 
+  html_document:
+    toc: TRUE
+    df_print: paged
+    number_sections: FALSE
+    highlight: tango
+    theme: lumen
+    toc_depth: 3
+    toc_float: true
+    css: custom.css 
+    self_contained: false
+    includes:
+      after_body: footer.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+***
+CONTEXT TEXT
+
+In general, remember, the basic **workflow for scraping static webpages** is the following.
+
+**Step 1.** Load the packages
+
+```{r, message=F}
+#install.packages("")
+library(RSelenium)
+library(tidyverse)
+library(rvest)
+library(stringr)
+library(readr)
+library(shiny)
+
+library(reshape2)
+library(dplyr)
+
+library(purrr)
+library(tibble)
+
+```
+
+
+```{r}
+#Import list from scrap_unfccc.Rmd
+coursera <- read_csv("exports/coursera.csv")
+
+weblinks_coursera <- coursera$weblink
+```
+
+```{r}
+#
+#start RSelenium
+
+system('docker kill $(docker ps -q)')
+Sys.sleep(2)
+system('docker run -d -p 4445:4444 selenium/standalone-chrome-debug:latest')
+Sys.sleep(2)
+system('docker container ls')
+
+#rstudioapi::terminalExecute('java -Dwebdriver.chrome.driver="C:/Users/caitl/Documents/R #Files/selenium/chromedriver.exe" -jar "C:/Users/caitl/Documents/R #Files/selenium/selenium-server-standalone-3.141.59.jar" -port 4567')
+#standalone-chrome-debug:latest
+
+
+remDr <- remoteDriver(
+        remoteServerAdd = "localhost",
+        port = 4445L,
+        browser = "chrome" 
+)
+
+remDr$open()
+
+#navigate to your page
+#remDr$navigate("https://sdgacademy.org/courses/")
+
+#scroll down 5 times, waiting for the page to load at each time
+#for(i in 1:5){      
+#remDr$executeScript(paste("scroll(0,",i*10000,");"))
+#Sys.sleep(3)    
+#}
+
+#get the page html
+#page_source <-remDr$getPageSource()
+
+#pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
+
+#sdgacademy <- read_html(page_source[[1]])
+
+
+```
+```{r}
+
+
+# Remove broken link (closing unused connection 3 (https://www.coursera.org/learn/biological-diversity))
+weblinks_coursera <- weblinks_coursera[- 3] 
+
+
+
+# Define the TITLES worker function
+scraper <- function(weblinks_coursera) { tryCatch(
+  read_html(weblinks_coursera) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "banner-title-without--subtitle", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "titles"),
+    error = function(cond) return(NULL))
+}
+
+
+# Iterate over the urls, applying the function each time
+titles_coursera <- map_dfr(weblinks_coursera, scraper, .id = "id")
+
+titles_coursera
+
+
+
+```
+
+```{r}
+
+
+# Define the KEYWORDS worker function
+scraper <- function(weblinks_coursera) { tryCatch(
+  read_html(weblinks_coursera) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "description", " " ))]//p') %>% 
+    html_text() %>% 
+    enframe("id", "keywords"),
+    error = function(cond) return(NULL))
+}
+
+
+# Iterate over the urls, applying the function each time
+keywords_coursera <- map_dfr(weblinks_coursera, scraper, .id = "id")
+
+keywords_coursera
+
+#Combine into single columns
+
+keywords_coursera <- keywords_coursera %>%
+ group_by(id) %>%
+ summarize(keywords = str_c(keywords, collapse = ", "))
+
+
+keywords_coursera$id <- as.numeric(keywords_coursera$id)
+
+keywords_coursera[order(keywords_coursera$id, decreasing = FALSE),] 
+
+
+keywords <- as.vector(keywords_coursera$keywords)
+
+```
+
+```{r}
+
+# Define the AUTHORS worker function
+scraper <- function(weblinks_coursera) { tryCatch(
+  read_html(weblinks_coursera) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "rc-Partner__title", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "author"),
+    error = function(cond) return(NULL))
+}
+
+
+# Iterate over the urls, applying the function each time
+authors_coursera <- map_dfr(weblinks_coursera, scraper, .id = "id")
+
+authors_coursera
+
+
+#Combine into single columns
+
+authors_coursera <- authors_coursera %>%
+ group_by(id) %>%
+ summarize(author = str_c(author, collapse = ", "))
+
+
+authors_coursera$id <- as.numeric(authors_coursera$id)
+
+authors_coursera[order(authors_coursera$id, decreasing = FALSE),] 
+
+
+authors <- as.vector(authors_coursera$author)
+
+
+```
+
+
+```{r}
+# Parse out the SDGs
+#REQUIRES DICTIONARY 
+
+
+
+
+
+```
+
+```{r}
+
+# Define the AUDIENCE worker function
+# DOESN'T EXIST - ASSUME EVERYONE
+
+
+```
+
+
+
+```{r}
+ 
+coursera_df <- as.data.frame(titles_coursera)
+weblinks_df <- as.data.frame(weblinks_coursera) 
+weblinks_df <- cbind(data.frame(id=rownames(weblinks_df)), weblinks_df)
+
+weblinks_coursera
+coursera_df <- merge(coursera_df, authors_coursera, by = "id", all = TRUE)
+coursera_df <- merge(coursera_df, keywords_coursera, by = "id", all = TRUE)
+coursera_df <- merge(coursera_df, weblinks_df, by = "id", all = TRUE)
+
+#remove redundant id
+coursera_df <- mutate(coursera_df, id=NULL)
+
+```
+
+
+
+```{r}
+
+#unsdglearn_subpage <- read_html("https://www.unsdglearn.org/courses/unido-industrial-analytics-platform-iap/")
+```
+
+
+
+
+```{r}
+
+
+write.csv(coursera_df,"C:/Users/caitl/Documents/GitHub/thesis/exports/coursera_c.csv", row.names = TRUE)
+
+
+```
+
+```{r}
+#not working?
+#system("sudo docker pull selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#system("sudo docker run -d -p 4445:4444 selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#remDr <- remoteDriver(port=4445L, browserName="chrome")
+#Sys.sleep(15)
+#remDr$open()
+

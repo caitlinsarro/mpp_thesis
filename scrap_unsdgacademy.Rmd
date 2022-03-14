@@ -1,0 +1,337 @@
+---
+title: "Web Scraping"
+subtitle: "UNSDGLEARN: Breaking the Si"
+author: "Caitlin Sarro"
+date: "2/9/2022"
+output: 
+  html_document:
+    toc: TRUE
+    df_print: paged
+    number_sections: FALSE
+    highlight: tango
+    theme: lumen
+    toc_depth: 3
+    toc_float: true
+    css: custom.css 
+    self_contained: false
+    includes:
+      after_body: footer.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+***
+CONTEXT TEXT
+
+In general, remember, the basic **workflow for scraping static webpages** is the following.
+
+**Step 1.** Load the packages
+
+```{r, message=F}
+#install.packages("")
+library(RSelenium)
+library(tidyverse)
+library(rvest)
+library(stringr)
+library(readr)
+
+library(reshape2)
+library(dplyr)
+
+library(purrr)
+library(tibble)
+```
+
+
+
+```{r}
+#SDG Academy https://sdgacademy.org/courses/
+```
+
+# Scraping multiple pages `r emo::ji("robot")`
+
+Whenever you want to really understand what's going on within the functions of a new R package, it is very likely that there is a relevant article published in the [Journal of Statistical Software](https://www.jstatsoft.org/index). Let's say you are interested in how the journal was doing over the past years.
+
+**Step 1.** Inspect the source. Basically, follow steps to extract the Xpath information.
+```{r, eval=F}
+#browseURL("https://sdgacademy.org/courses/")
+```
+
+**Step 2.** Parse the page source.
+
+```{r}
+#SDG Academy
+#start RSelenium
+
+system('docker kill $(docker ps -q)')
+Sys.sleep(2)
+system('docker run -d -p 4445:4444 selenium/standalone-chrome')
+Sys.sleep(2)
+system('docker container ls')
+
+#rstudioapi::terminalExecute('java -Dwebdriver.chrome.driver="C:/Users/caitl/Documents/R #Files/selenium/chromedriver.exe" -jar "C:/Users/caitl/Documents/R #Files/selenium/selenium-server-standalone-3.141.59.jar" -port 4567')
+#standalone-chrome-debug:latest
+
+
+remDr <- remoteDriver(
+        remoteServerAdd = "localhost",
+        port = 4445L,
+        browser = "chrome", chromever = "94.0.4606.61" 
+)
+
+remDr$open()
+
+#navigate to your page
+remDr$navigate("https://sdgacademy.org/courses/")
+
+#scroll down 5 times, waiting for the page to load at each time
+for(i in 1:5){      
+remDr$executeScript(paste("scroll(0,",i*10000,");"))
+Sys.sleep(3)    
+}
+
+#get the page html
+page_source <-remDr$getPageSource()
+
+#pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
+
+sdgacademy <- read_html(page_source[[1]])
+
+
+```
+
+
+**Step 3.** Extract information.
+```{r}
+#Parse out TITLES for the training courses
+parsed_nodes <- html_nodes(sdgacademy, 
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "desktop", " " ))]//a')
+titles_acad <- html_text(parsed_nodes)
+titles_acad
+
+#Parse out WEBLINKS to the courses
+weblink_acad <- sdgacademy  %>% html_nodes("div.course-item") %>% html_attr("data-link")
+weblink_acad
+
+```
+
+```{r}
+# Subpage scraping
+# Define the AUDIENCE worker function
+scraper <- function(weblink_acad) {
+  read_html(weblink_acad) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "course-detail", " " ))] | //strong') %>% 
+    html_text() %>% 
+    enframe("id", "audience")
+}
+
+# Iterate over the urls, applying the function each time
+audience_acad <- map_dfr(weblink_acad, scraper, .id = "id")
+
+
+#Combine into single columns
+
+audience_acad <- audience_acad %>%
+ group_by(id) %>%
+ summarize(audience = str_c(audience, collapse = ", "))
+
+#sort
+
+audience_acad$id <- as.numeric(audience_acad$id)
+
+audience_acad <- audience_acad[order(audience_acad$id, decreasing = FALSE),] 
+
+audience <- as.vector(audience_acad$audience)
+
+```
+
+
+
+```{r}
+weblink_acad
+# Define the AUTHOR worker function
+scraper <- function(weblink_acad) {
+  read_html(weblink_acad) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "fauclty-degree", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "author")
+}
+
+# Iterate over the urls, applying the function each time
+authors_acad <- map_dfr(weblink_acad, scraper, .id = "id")
+authors_acad
+
+
+#Combine into single columns
+
+authors_acad <- authors_acad %>%
+ group_by(id) %>%
+ summarize(author = str_c(author, collapse = ", "))
+
+
+authors_acad$id <- as.numeric(authors_acad$id)
+
+authors_acad[order(authors_acad$id, decreasing = FALSE),] 
+
+
+authors <- as.vector(authors_acad$author)
+
+
+```
+
+```{r}
+#adding in authors for #16
+
+id <- c(16)
+author <- c("Natural Resource Governance Institute (NRGI), the Columbia Center on Sustainable Investment (CCSI), the CONNEX Support Unit, GIZ, the European Union")
+
+authors_gooddeal <- data.frame(id, author)
+
+authors_gooddeal$id <- as.numeric(authors_gooddeal$id)
+
+#Add new row
+authors_acad[nrow(authors_acad) + 1,] <- authors_gooddeal
+
+
+#reorganize
+
+authors_acad <- authors_acad[order(authors_acad$id, decreasing = FALSE),] 
+
+author <- as.vector(authors_acad$author)
+```
+
+```{r}
+
+# Parse out the SDGs
+test <-"https://sdgacademy.org/course/governance-for-transboundary-freshwater-security/"
+weblink_test <- read_html(test)
+
+test_alt <- weblink_test %>% 
+  html_nodes("#goal-image .img src") %>%
+  html_attr("alt")
+test_alt
+
+
+test_alt <- html_nodes(weblink_test, 
+                           xpath = '//p[(((count(preceding-sibling::*) + 1) = 5) and parent::*)]') %>% 
+    html_text()
+test_alt
+
+
+```
+
+
+```{r}
+# DELETE THIS
+# Define the AUTHOR worker function
+scraper <- function(weblink_acad) {
+  read_html(weblink_acad) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 3) and parent::*)]') %>% 
+    html_text() %>% 
+    enframe("id", "author")
+}
+
+############################################
+list("Agenda 2030" = "Private: Just wheel",
+                "2" = "lemmon",
+                "3" = "orange",
+                "4" =c("apple", "lemon", "grape"),
+                "5"=c("cheery", "lemon", "grape"),
+                "6"=c("apple", "lemon", "apple"))
+
+```
+
+```{r}
+# Define the SDGs  worker function
+scraper <- function(weblink_acad) {
+  read_html(weblink_acad) %>% 
+html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "goals", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "goal-image", " " ))]//img') %>%
+  html_attr("alt") %>%
+    enframe("id", "SDGs")
+}
+
+# Iterate over the urls, applying the function each time
+SDGs_acad <- map_dfr(weblink_acad, scraper, .id = "id")
+
+# Cleanup, remove NA
+SDGs_acad <- na.omit(SDGs_acad) 
+
+# Cleanup, remove Duplicates
+SDGs_acad <- SDGs_acad[!duplicated(SDGs_acad),]
+
+
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Private: Just wheel"] <- "Agenda 2030"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "No Poverty"] <- "SDG1"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Zero Hunger"] <- "SDG2"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Good Health and Well-Being"] <- "SDG3"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Quality Education"] <- "SDG4"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Gender Equality"] <- "SDG5"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Clean Water and Sanitation"] <- "SDG6"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Affordable and Clean Energy"] <- "SDG7"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Decent Work and Economic Growth"] <- "SDG8"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Industry, Innovation and Infrastructure"] <- "SDG9"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Reduced Inequalities"] <- "SDG10"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Sustainable Cities and Communities"] <- "SDG11"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Responsible Consumption and Production"] <- "SDG12"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Climate Action"] <- "SDG13"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Life Below Water"] <- "SDG14"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Life on Land"] <- "SDG15"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Peace, Justice and Strong Institutions"] <- "SDG16"
+SDGs_acad$SDGs[SDGs_acad$SDGs == "Partnerships for the Goals"] <- "SDG17"
+SDGs_acad
+```
+
+
+
+```{r}
+#Combine into single columns
+
+sdgs_combined <- SDGs_acad %>%
+ group_by(id) %>%
+ summarize(SDGs = str_c(SDGs, collapse = ", "))
+
+
+sdgs_combined$id <- as.numeric(sdgs_combined$id)
+
+sdgs_combined <- sdgs_combined[order(sdgs_combined$id, decreasing = FALSE),] 
+
+
+SDGs <- as.vector(sdgs_combined$SDGs)
+
+```
+
+
+```{r}
+#merge into single dataframe
+
+sdgacad_df <- data.frame(titles_acad, authors_acad, weblink_acad, sdgs_combined, audience_acad )
+
+#remove redundant cols
+sdgacad_df <- mutate(sdgacad_df, id=NULL, id.1=NULL, id.2=NULL)
+
+
+```
+
+```{r}
+#export as CSV
+write.csv(sdgacad_df,"C:/Users/caitl/Documents/GitHub/thesis/exports/sdgacademy.csv", row.names = TRUE)
+
+```
+
+```{r}
+#missing keywords and tags
+
+```
+
+
+```{r}
+#not working?
+#system("sudo docker pull selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#system("sudo docker run -d -p 4445:4444 selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#remDr <- remoteDriver(port=4445L, browserName="chrome")
+#Sys.sleep(15)
+#remDr$open()
+
