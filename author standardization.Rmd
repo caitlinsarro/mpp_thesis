@@ -449,7 +449,18 @@ result <- authors_list_A$authors %>%
 
 authors_list_A$C <- ifelse(grepl(un_specialized_agencies, authors_list_A$authors), "yes", "no")
                         
-                        
+test<-authors_list_A$authors[str_detect(authors_list_A$authors, un_specialized_agencies),]
+test
+
+
+authors_list_A %>%
+    bind_cols(un_specialized_agencies %>% 
+                  set_names() %>% 
+                  map_dfc(~str_detect(authors_list_A$authors, .x)) %>% 
+                  mutate_all(as.numeric)) %>% 
+    as_tibble()
+
+
 ```
 
 
