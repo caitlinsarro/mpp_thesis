@@ -122,7 +122,7 @@ unique(weblink_au)
 url.exists("weblink_au")
 
 
-
+authors_list
 
 ```
 ```{r}
@@ -365,7 +365,151 @@ urls_with_cate <-merge(results_urls_t, au_category_clean, by.x = "id", by.y = "i
 
 urls_with_cate 
 
+#remove redundant id
+urls_with_cate <- mutate(urls_with_cate, exists=NULL)
+
 ```
+
+
+```{r}
+#merge with titles
+authors_list_A <- merge(authors_list, urls_with_cate, by.x = "weblink", by.y = "weblink_au", all.x = TRUE)
+
+authors_list_A <- unique(authors_list_A)
+
+authors_list_A 
+
+#remove redundant cols
+authors_list_A <- mutate(authors_list_A, weblink=NULL, piece=NULL, au_category=NULL, id=NULL)
+authors_list_A
+
+authors_list_A <- unique(authors_list_A)
+authors_list_A
+
+
+```
+
+```{r}
+#Universal fixes
+#trim leading and ending whitespaces
+authors_list_A$category <- trimws(authors_list_A$category)
+#lowercase
+authors_list_A$category <- tolower(authors_list_A$category)
+#remove punctuation
+authors_list_A$category <- removePunctuation(authors_list_A$category)
+```
+
+
+```{r}
+#author dictionaries
+
+un_specialized_agencies <-
+  c(
+    "FAO",
+    "Food and Agriculture Organization of the United Nations",
+    "ICAO",
+    "International Civil Aviation Organization",
+    "IFAD",
+    "International Fund for Agricultural Development",
+    "ILO",
+    "International Labour Organization",
+    "IMF",
+    "International Monetary Fund",
+    "IMO",
+    "International Maritime Organization",
+    "ITU",
+    "International Telecommunication Union",
+    "UNESCO",
+    "United Nations Educational Scientific and Cultural Organization",
+    "UNIDO",
+    "United Nations Industrial Development Organization",
+    "UNWTO",
+    "World Tourism Organization",
+    "UPU",
+    "Universal Postal Union",
+    "WHO",
+    "World Health Organization",
+   "WIPO",
+    "World Intellectual Property Organization",
+    "WMO",
+    "World Meteorological Organization",
+    "World Bank Group",
+    "World Bank"
+  )
+
+un_programs <-c("UN-Habitat", "UNDP", "UNEP", "UN Global Compact")
+
+str_detect(authors_list_A$authors, un_specialized_agencies)
+authors_list_A$category[authors_list_A$authors
+
+                        
+dictionary <- data.frame(search="un_specialized_agencies")
+result <- authors_list_A$authors %>%
+  filter(grepl(paste(dictionary$search, collapse="|"), text)) 
+
+authors_list_A$C <- ifelse(grepl(un_specialized_agencies, authors_list_A$authors), "yes", "no")
+                        
+                        
+```
+
+
+
+
+
+
+
+```{r}
+#manual fixing
+authors_list_A$category[authors_list_A$authors=="Academy of Korean Studies"] <- "research institution"
+
+authors_list_A$category[authors_list_A$authors=="African Center for Cities"] <- "research institution"
+
+
+authors_list_A$category[authors_list_A$authors=="African Center for Cities"] <- "research institution"
+
+authors_list_A$category[authors_list_A$authors=="African Local Government Academy"] <- "government network"
+
+authors_list_A$category[authors_list_A$authors=="Ain Shams University"] <- "public university"
+
+authors_list_A$category[authors_list_A$authors=="Alliance for Global Water Adaptation"] <- "international ngo"
+
+authors_list_A$category[authors_list_A$authors=="American Museum of Natural History"] <- "cultural institution"
+
+authors_list_A$category[authors_list_A$authors=="Athens University of Economics and Business"] <- "public university"
+
+
+authors_list_A$category[authors_list_A$authors=="Columbia University"] <- "private research university"
+
+authors_list_A$category[authors_list_A$category=="public"] <- "public university"
+
+authors_list_A$category[authors_list_A$category=="private"] <- "private university"
+
+authors_list_A$category[authors_list_A$authors=="Cornell University"] <- "private research university"
+
+
+authors_list_A$category[authors_list_A$authors=="Belize National Institute of Culture and History"] <- "cultural institution"
+
+authors_list_A$category[authors_list_A$authors=="Banco Interamericano de Desarrollo"] <- "bank"
+
+authors_list_A$category[authors_list_A$authors=="Federal Government"] <- "government"
+
+authors_list_A
+
+authors_list_A$category <- gsub(".*(501(c)(3)|501|nonprofit|non-profit|Non-governmental organization (NGO)).*", "ngo", authors_list_A$category)
+authors_list_A$category <- gsub(".*(nonprofit|non-profit).*", "ngo", authors_list_A$category)
+authors_list_A$category <- gsub(".*(Non-governmental organization).*", "ngo", authors_list_A$category)
+
+
+
+authors_list_A$category
+
+
+
+write.csv(authors_list_A,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/authors_list_A.csv", row.names = TRUE)
+
+
+```
+
 
 ```{r}
 
@@ -400,6 +544,8 @@ au_category_clean[order(au_category_clean$id, decreasing = FALSE),]
 
 authors_list
 authors_list$id <- as.numeric(authors_list$id)
+
+
 
 
 ```
@@ -531,7 +677,7 @@ write.csv(results_urls,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/resul
 write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_category_clean.csv", row.names = TRUE)
 
 
-write.csv(urls_with_cate,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/urls_with_cate.csv", row.names = TRUE)
+write.csv(authors_list_A,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/authors_list_A.csv", row.names = TRUE)
 
 ```
 
