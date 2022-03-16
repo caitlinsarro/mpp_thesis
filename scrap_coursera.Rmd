@@ -75,21 +75,6 @@ remDr <- remoteDriver(
 
 remDr$open()
 
-#navigate to your page
-#remDr$navigate("https://sdgacademy.org/courses/")
-
-#scroll down 5 times, waiting for the page to load at each time
-#for(i in 1:5){      
-#remDr$executeScript(paste("scroll(0,",i*10000,");"))
-#Sys.sleep(3)    
-#}
-
-#get the page html
-#page_source <-remDr$getPageSource()
-
-#pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
-
-#sdgacademy <- read_html(page_source[[1]])
 
 
 ```
@@ -218,11 +203,13 @@ weblinks_df <- cbind(data.frame(id=rownames(weblinks_df)), weblinks_df)
 
 weblinks_coursera
 coursera_df <- merge(coursera_df, authors_coursera, by = "id", all = TRUE)
-coursera_df <- merge(coursera_df, keywords_coursera, by = "id", all = TRUE)
 coursera_df <- merge(coursera_df, weblinks_df, by = "id", all = TRUE)
+coursera_df <- merge(coursera_df, keywords_coursera, by = "id", all = TRUE)
 
 #remove redundant id
 coursera_df <- mutate(coursera_df, id=NULL)
+
+#titles	authors	tags	SDGs	weblink	keywords	audience
 
 ```
 
@@ -240,6 +227,7 @@ coursera_df <- mutate(coursera_df, id=NULL)
 
 
 write.csv(coursera_df,"C:/Users/caitl/Documents/GitHub/thesis/exports/coursera_c.csv", row.names = TRUE)
+
 
 
 ```

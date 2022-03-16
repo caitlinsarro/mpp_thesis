@@ -243,6 +243,9 @@ knitr::kable(chart_df  %>% head(10))
 
 chart_df <- tibble::rowid_to_column(chart_df, "id")
 
+#titles	authors	tags	SDGs	weblink	keywords	audience
+
+
 ```
 
 ```{r}

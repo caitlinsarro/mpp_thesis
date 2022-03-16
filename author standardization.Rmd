@@ -37,8 +37,14 @@ library(readr)
 library(reshape2)
 library(dplyr)
 
+library(xml2)
 library(purrr)
 library(tibble)
+
+library(tm)
+
+library(RCurl)
+
 ```
 
 
@@ -48,96 +54,380 @@ library(tibble)
 #Breaking the Silos https://www.unsdglearn.org/courses/?_sfm_sdg=5
 
 
+
+coursera <- read_csv("exports/coursera_c.csv")
+unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
+unsdglearn <- read_csv("exports/unsdglearn.csv")
+sdgacademy <- read_csv("exports/sdgacademy.csv")
+
+
+authors_cour <- coursera %>% select(titles, author)
+authors_unsdglearn_silos <- unsdglearn_silos %>% select(titles, authors) #fix this s
+authors_unsdglearn <- unsdglearn %>% select(titles, authors) #fix this s
+authors_sdgacademy <- sdgacademy %>% select(titles_acad, author) #fix this standardize
+
+#fix nonstandard names to titles and authors
+authors_sdgacademy <- authors_sdgacademy %>%
+  rename(titles = titles_acad)
+
+authors_sdgacademy <- authors_sdgacademy %>%
+  rename(authors = author)
+
+authors_cour <- authors_cour %>%
+  rename(authors = author)
+
+
+#combine into one set
+combined <- rbind(authors_cour, authors_unsdglearn_silos, authors_unsdglearn, authors_sdgacademy)
+
 ```
 
 
 
 
-**Step 2.** Parse the page source.
 
 ```{r}
-#UN SDGLearn Parsing 
+#to long data
+combined <- combined %>% 
+  mutate(authors = strsplit(as.character(authors), ",")) %>%
+  unnest(authors)
+
+#trim leading and ending whitespaces
+combined$authors <- trimws(combined$authors)
+
+authors_list <- combined
+
+
+#make a dataframe
+#duplicate column
+authors_list$au_category <- authors_list$authors
+
+```
+
+
+```{r}
+#this category to transform
+authors_list$au_category
+
+#making the website link for a google search
+#replace whitespace with + 
+authors_list$piece <- gsub(" ", "_", authors_list$authors)
+
+authors_list$weblink <- paste0("https://wikipedia.org/wiki/", authors_list$piece)
+#authors_list$weblink <- paste0("https://www.google.com/search?q=", authors_list$piece)
+
+weblink_au <- authors_list$weblink
+
+unique(weblink_au)
+url.exists("weblink_au")
+
+
+
+
+```
+```{r}
+#
 #start RSelenium
+
+system('docker kill $(docker ps -q)')
+Sys.sleep(2)
+system('docker run -d -p 4445:4444 selenium/standalone-chrome-debug:latest')
+Sys.sleep(2)
+system('docker container ls')
+
+#rstudioapi::terminalExecute('java -Dwebdriver.chrome.driver="C:/Users/caitl/Documents/R #Files/selenium/chromedriver.exe" -jar "C:/Users/caitl/Documents/R #Files/selenium/selenium-server-standalone-3.141.59.jar" -port 4567')
+#standalone-chrome-debug:latest
+
+
 remDr <- remoteDriver(
         remoteServerAdd = "localhost",
         port = 4445L,
-        browser = "chrome"
+        browser = "chrome" 
 )
 
 remDr$open()
 
-#navigate to your page
-remDr$navigate("https://www.unsdglearn.org/courses/?_sfm_sdg=5")
 
-#scroll down 5 times, waiting for the page to load at each time
-for(i in 1:5){      
-remDr$executeScript(paste("scroll(0,",i*10000,");"))
-Sys.sleep(3)    
+
+```
+
+
+```{r}
+
+
+# Run a test
+weblink_test <-"https://en.wikipedia.org/wiki/Lund_University"
+
+test <- read_html(weblink_test) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text()
+
+test
+
+
+
+```
+
+
+
+
+```{r}
+# Finding and fixing NOT-REAL-LINKS
+url.exists("weblink_au")
+
+scraper <- function(weblink_au) { tryCatch(
+  read_html(weblink_au) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "category"),
+    error = function(err) return(NULL))
 }
 
-#get the page html
-page_source <-remDr$getPageSource()
-
-#pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
-
-unsdglearn <- read_html(page_source[[1]])
-
-
-#parse it
-#html(page_source[[1]]) %>% html_nodes(".product-itm-price-new") %>%
-#  html_text()
-
-
-
-#unsdglearn <- read_html("https://www.unsdglearn.org/courses/?sf_data=results&_sf_s=capacity%20building&sf_paged=2")
-
-#unsdglearn
 ```
 
-**Step 3.** Extract information.
 
 ```{r}
-parsed_nodes <- html_nodes(unsdglearn, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-title-course", " " ))]//a')
-titles <- html_text(parsed_nodes)
-titles
+
+url_exists <- function(x, non_2xx_return_value = FALSE, quiet = FALSE,...) {
+
+  suppressPackageStartupMessages({
+    require("httr", quietly = FALSE, warn.conflicts = FALSE)
+  })
+
+  # you don't need thse two functions if you're alread using `purrr`
+  # but `purrr` is a heavyweight compiled pacakge that introduces
+  # many other "tidyverse" dependencies and this doesnt.
+
+  capture_error <- function(code, otherwise = NULL, quiet = TRUE) {
+    tryCatch(
+      list(result = code, error = NULL),
+      error = function(e) {
+        if (!quiet)
+          message("Error: ", e$message)
+
+        list(result = otherwise, error = e)
+      },
+      interrupt = function(e) {
+        stop("Terminated by user", call. = FALSE)
+      }
+    )
+  }
+
+  safely <- function(.f, otherwise = NULL, quiet = TRUE) {
+    function(...) capture_error(.f(...), otherwise, quiet)
+  }
+
+  sHEAD <- safely(httr::HEAD)
+  sGET <- safely(httr::GET)
+
+  # Try HEAD first since it's lightweight
+  res <- sHEAD(x, ...)
+
+  if (is.null(res$result) || 
+      ((httr::status_code(res$result) %/% 200) != 1)) {
+
+    res <- sGET(x, ...)
+
+    if (is.null(res$result)) return(NA) # or whatever you want to return on "hard" errors
+
+    if (((httr::status_code(res$result) %/% 200) != 1)) {
+      if (!quiet) warning(sprintf("Requests for [%s] responded but without an HTTP status code in the 200-299 range", x))
+      return(non_2xx_return_value)
+    }
+
+    return(TRUE)
+
+  } else {
+    return(TRUE)
+  }
+
+}
+
+results_urls <- data.frame(
+  exists = sapply(weblink_au, url_exists, USE.NAMES = FALSE),
+  weblink_au,
+  stringsAsFactors = FALSE
+) 
+
+#%>% dplyr::tbl_df() %>% print()
+
+results_urls
+
+results_urls_fix <- results_urls[results_urls$exists == 'FALSE',]
+results_urls_t <- results_urls[results_urls$exists == 'TRUE',]
 
 
 
-parsed_nodes2 <- html_nodes(unsdglearn, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-institutions", " " ))]//span')
-authors <- html_text(parsed_nodes2)
-authors
 
-parsed_nodes2 <- html_nodes(unsdglearn, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " )) and (((count(preceding-sibling::*) + 1) = 1) and parent::*)]')
-SDGs <- html_text(parsed_nodes2)
-SDGs <-gsub('[\n\t\t\t\t\t\t\t\t\t\t\t\t\t]', ',', SDGs)
+```
 
-SDGs
+
+
+```{r}
+
+weblink_au_t <- results_urls_t$weblink_au
+
+
+# Define the AUTHORS CATEGORY worker function
+scraper <- function(weblink_au_t) {read_html(weblink_au_t) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "category")
+}
+
+
+# Iterate over the urls, applying the function each time
+au_category_t <- map_dfr(weblink_au_t, scraper, .id = "id")
+
+au_category_t
+
+#    html_text() %>% 
+#    enframe("id", "category"),
+#    error = function(err) {print(NA)}
+#  )}
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+# Define the AUTHORS CATEGORY worker function
+scraper <- function(weblink_au) { tryCatch(
+  read_html(weblink_au) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "category"),
+    error = function(err) return(NULL))
+}
+
+
+# Iterate over the urls, applying the function each time
+au_category <- map_dfr(weblink_au, scraper, .id = "id")
+
+au_category
+
+#    html_text() %>% 
+#    enframe("id", "category"),
+#    error = function(err) {print(NA)}
+#  )}
+```
+
+
+
+
+
+
+
+
+```{r}
+#group and summarize
+au_category_clean <- au_category_t %>%
+ group_by(id) %>%
+ summarize(category = str_c(category, collapse = ", "))
+au_category_clean 
+
+
+#separate type text from category
+#au_category_clean <- str_split_fixed(au_category_clean$category, "Type,", 2)
+
+au_category_clean <- separate(data = au_category_clean, col = category, into = c("category", "text"), sep = "Type,")
+
+au_category_clean <- separate(data = au_category_clean, col = text, into = c("text", "remainder"), sep = ",")
+
+au_category_clean
+
+#remove redundant cols
+au_category_clean <- mutate(au_category_clean, category=NULL, remainder=NULL)
+
+au_category_clean$category <- au_category_clean$text
+
+au_category_clean <- mutate(au_category_clean, text=NULL)
+
+au_category_clean
+
+#reorder
+au_category_clean$id <- as.numeric(au_category_clean$id)
+
+au_category_clean[order(au_category_clean$id, decreasing = FALSE),] 
+
+
+au_category_clean
+
+#Join two sets
+
+urls_with_cate <-merge(results_urls_t, au_category_clean, by.x = "id", by.y = "id", all.x = TRUE)
+
+urls_with_cate 
+
 ```
 
 ```{r}
-parsed_nodes2 <- html_nodes(unsdglearn, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " )) and (((count(preceding-sibling::*) + 1) = 2) and parent::*)]')
-tags <- html_text(parsed_nodes2)
-tags
 
-parsed_nodes2 <- html_nodes(unsdglearn, 
-                           xpath = '//*~[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " ))]')
-lang <- html_text(parsed_nodes2)
-lang
+au_category_clean <- au_category %>%
+ group_by(id) %>%
+ summarize(category = str_c(category, collapse = ", "))
+au_category_clean 
+
+
+#separate type text from category
+#au_category_clean <- str_split_fixed(au_category_clean$category, "Type,", 2)
+
+au_category_clean <- separate(data = au_category_clean, col = category, into = c("category", "text"), sep = "Type,")
+
+au_category_clean <- separate(data = au_category_clean, col = text, into = c("text", "remainder"), sep = ",")
+
+au_category_clean
+
+#remove redundant cols
+au_category_clean <- mutate(au_category_clean, category=NULL, remainder=NULL)
+
+au_category_clean$category <- au_category_clean$text
+
+au_category_clean <- mutate(au_category_clean, text=NULL)
+
+au_category_clean
+
+#reorder
+au_category_clean$id <- as.numeric(au_category_clean$id)
+
+au_category_clean[order(au_category_clean$id, decreasing = FALSE),] 
+
+authors_list
+authors_list$id <- as.numeric(authors_list$id)
+
 
 ```
+
+
+
 
 ```{r}
-#extract the links
+#probably need later?
+authors_corpus <- VCorpus(VectorSource(authors))
+# Extra whitespace is eliminated by:
+authors_corpus <- tm_map(authors_corpus, stripWhitespace)
+# Conversion to lower case by:
+authors_corpus <- tm_map(authors_corpus, content_transformer(tolower))
+#Removal of stopwords by:
+authors_corpus <- tm_map(authors_corpus, removeWords, stopwords("english"))
+#Stemming is done by:
+tm_map(authors_corpus, stemDocument)
 
-weblink <- unsdglearn  %>% html_nodes("div.card-content > h4 > a") %>% html_attr("href")
+ dtm <- DocumentTermMatrix(authors_corpus)
+ inspect(dtm)
 
 
 
 ```
+
+
+
 
 
 ```{r}
@@ -223,603 +513,26 @@ write.csv(combined,"C:/Users/caitl/Documents/GitHub/thesis/exports/unsdglearn.cs
 
 ```
 
-
-
-
-
-
-
-
-How can do I know THIS `xpath = '//p[(((count(preceding-sibling::*) + 1) = 157) and parent::*)]'` ?
-
-There are two options: 
-
-**Option 1.** On your page of interest, go to a table that you'd like to scrape. Our favorite bowser for webscraping is Google Chrome but others work as well. On Chrome, you go in View > Developer > inspect elements. If you hover over the html code on the right, you should see boxes of different colors framing different elements of the page. Once the part of the page you would like to scrape is selected, right click on the html code and Copy > Copy Xpath. That's it. 
-
-```{r, fig.align='center', echo=F, out.width = "90%"}
-#knitr::include_graphics("pics/inspect.png")
-```
-
-**Option 2.** You download the [Chrome Extension](https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb?hl=de) `SelectorGadget` and activate it while browsing the page you'd like to scrape from. You will see a selection box moving with your cursor. You select an element by clickin on it. It turns green - and so does all other content that would be selected with the current XPath.
-
-```{r, fig.align='center', echo=F, out.width = "90%"}
-#knitr::include_graphics("pics/selector.png")
-
-```
-
-You can now de-select everything that is irrelevant to you by clicking it again (it then turns red). Final step, then just click the XPath button at the bottom of the browser window. Make sure to use single quotation marks with this XPath!
-
-```{r, fig.align='center', echo=F, out.width = "90%"}
-
-#knitr::include_graphics("pics/selector2.png")
-```
-
-
-
-Let's repeat step 2 and 3 with a more data-sciency example. `r emo::ji("man_dancing")`
-
-**Step 2.** Parse the page source.
-```{r}
-hot100page <- "https://www.billboard.com/charts/hot-100"
-hot100 <- read_html(hot100page)
-```
-
-**Step 3.** Extract information. When going through different levels of html, you can also use tidyverse logic.
-```{r, eval=F}
-body_nodes <- hot100 %>% 
- html_node("body") %>% 
- html_children()
-
-body_nodes %>% 
- html_children()
-```
-play with that yourself if you like...
-
-Now let's get more specific - `xml_find_all()` takes xpath syntax!
-```{r}
-rank <- hot100 %>% 
-  rvest::html_nodes('body') %>% 
-  xml2::xml_find_all("//span[contains(@class, 'chart-element__rank__number')]") %>% 
-  rvest::html_text()
-
-artist <- hot100 %>% 
-  rvest::html_nodes('body') %>% 
-  xml2::xml_find_all("//span[contains(@class, 'chart-element__information__artist')]") %>% 
-  rvest::html_text()
-
-title <- hot100 %>% 
-  rvest::html_nodes('body') %>% 
-  xml2::xml_find_all("//span[contains(@class, 'chart-element__information__song')]") %>% 
-  rvest::html_text()
-
-```
-**Step 4.** Usually, step 4 is to clean extracted data. In this case, it actually is very clean already. However, if you need help with data cleaning using regular expressions (me, always.), visit the section of [R for Data Science](https://r4ds.had.co.nz/strings.html) or simply this [cheat sheet](https://evoldyn.gitlab.io/evomics-2018/ref-sheets/R_strings.pdf).
-
-**Step 5.** Put everything into a data frame. `r emo::ji("musical_note")`
-```{r}
-chart_df <- data.frame(title, authors, title)
-
-knitr::kable(chart_df  %>% head(10))
-```
-
-## Scraping HTML tables `r emo::ji("rocket")`
-
-We have just been scraping an html table... but there is even an easier way to do this in `rvest`!
-
-```{r}
-url_p <- read_html("https://en.wikipedia.org/wiki/List_of_human_spaceflights")
-tables <- html_table(url_p, header = TRUE, fill = TRUE)
-spaceflights <- tables[[1]]
-
-knitr::kable(spaceflights[,1:7]  %>% head(10))
-```
-Another R workaround for more complex tables is the package `htmltab` that offers some more flexibility.
-
-## It's your turn! `r emo::ji("hammer_and_wrench")`
-
-Think about web data hosted on a **static webpage** that you might be interested in scraping!
-Comparably easy to scrape webpages are Wikipedia pages or pages that contain data in table format (as we've seen already). 
-
-Before you start - it might be worth a thought to get Chrome + Selector Gadget. This will make your future as web scraper a bit easier. 
-
-**Option A**
-
-1. Inspect the page and try to find the elements you are interested in in the html code.
-
-2. Parse the url.
-
-3. Extract the XPath for the element you would like to scrape and parse the nodes.
-
-4. Inspect the html output you get. What would be the next steps now? Can you already put your output into a dataframe? 
-
-**Option B**
-
-1. Find an html table that you'd like to scrape.
-
-2. Scrape it.
-
-
-# Scraping multiple pages `r emo::ji("robot")`
-
-Whenever you want to really understand what's going on within the functions of a new R package, it is very likely that there is a relevant article published in the [Journal of Statistical Software](https://www.jstatsoft.org/index). Let's say you are interested in how the journal was doing over the past years.
-
-**Step 1.** Inspect the source. Basically, follow steps to extract the Xpath information.
-```{r, eval=F}
-browseURL("http://www.jstatsoft.org/issue/archive")
-```
-
-**Step 2** Develop a scraping strategy. We need a set of URLs leading to all sources. Inspect the URLs of different sources and find the pattern. Then, construct the list of URLs from scratch.
-```{r}
-baseurl <- "http://www.jstatsoft.org/article/view/v"
-volurl <- paste0("0", seq(1, 99, 1))
-volurl[1:9] <- paste0("00", seq(1, 9, 1))
-brurl <- paste0("0", seq(1, 9, 1))
-urls_list <- paste0(baseurl, volurl)
-urls_list <- paste0(rep(urls_list, each = 9), "i", brurl)
-urls_list[1:5]
-```
-
-**Step 3** Think about where you want your scraped material to be stored and create a directory.
-```{r, eval=F}
-tempwd <- ("data/jstatsoftStats")
-dir.create(tempwd)
-setwd(tempwd)
-```
-
-**Step 4** Download the pages. Note that we did not do this step last time, when we were only scraping one page.
-```{r, eval=F}
-folder <- "html_articles/"
-dir.create(folder)
-
-for (i in 1:length(urls_list)) {
-  # only update, don't replace
-    if (!file.exists(paste0(folder, names[i]))) {  
-  # skip article when we run into an error   
-      tryCatch( 
-        download.file(urls_list[i], destfile = paste0(folder, names[i])),
-        error = function(e) e
-      )
-  # don't kill their server --> be polite!  
-      Sys.sleep(runif(1, 0, 1)) 
-        
-} }
-```
-
-While R is downloading the pages for you, you can watch it directly in the directory you defined...
-
-```{r, fig.align='center', echo=F, out.width = "70%"}
-knitr::include_graphics("pics/html_files.png")
-```
-
-Check whether it worked.
-```{r, eval=F}
-list_files <- list.files(folder, pattern = "0.*")
-list_files_path <- list.files(folder, pattern = "0.*", full.names = TRUE)
-length(list_files)
-```
-Yay! Apparently, we scraped the html pages of 802 articles. 
-
-## (Git)ignoring files `r emo::ji("no_good_woman")`
-In case you scraping project is is linked to GitHub (as it will be in your assignment!), it can be useful to **.gitignore** the folder of downloaded files. This means that the folder can be stored in your local directory of the project but will not be synced with the remote (main) repository. Here is information on how to do this using [RStudio](https://carpentries-incubator.github.io/git-Rstudio-course/02-ignore/index.html). In Github Desktop it is very simple, you do your scraping work, the folder is created in your local repository and before your commit and push these changes, you go on `Repository` > `Repository Settings` > `Ignored Files` and edit the .gitignore file (add the name of the new folder / files you don't want to sync). More generally, it makes sense to exclude .Rproj files, .RData files (and other binary or large data files), draft folders and sensitive information from version control. Remember, git is built to track changes in code, not in large data files.
-
-
-**Step 5** Import files and parse out information. A loop is helpful here!
-```{r, eval=F}
-# define output first
-authors <- character()
-title <- character()
-datePublish <- character()
-
-# then run the loop
-for (i in 1:length(list_files_path)) {
-  html_out <- read_html(list_files_path[i])
-    
-  authors[i] <- html_text(html_nodes(html_out , xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "authors_long", " " ))]//strong'))
-    
-  title[i] <- html_text(html_nodes(html_out , xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "page-header", " " ))]'))
-    
-  datePublish[i] <- html_text(html_nodes(html_out , xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "article-meta", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "row", " " )) and (((count(preceding-sibling::*) + 1) = 2) and parent::*)]//*[contains(concat( " ", @class, " " ), concat( " ", "col-sm-8", " " ))]'))
-}
-
-# inspect data
-authors[1:3]
-title[1:2]
-datePublish[1:3]
-
-# create a data frame
-dat <- data.frame(authors = authors, title = title, datePublish = datePublish)
-dim(dat)
-```
-**Step 6** Clean data...
-
-You see, scraping data from multiple pages is no problem in R. Most of the brain work often goes into developing a scraping strategy and tidying the data, not into the actual downloading/scraping part.
-
-Scraping is also possible in much more complex scenarios! Watch out for workshop presentations on 
-
-* Dynamic webscraping with RSelenium
-* Web APIs
-* Regular expressions with stringr
-* Data cleaning with janitor
-
-and many more `r emo::ji("star_struck")`
-
-
-# Good scraping practice
-
-There is a set of general rules to the game: 
-
-1. You take all the responsibility for your web scraping work.
-2. Think about the nature of the data. Does it entail sensitive information? Do not collect personal data without explicit permission.
-3. Take all copyrights of a country’s jurisdiction into account. If you publish data, do not commit copyright fraud.
-4. If possible, stay identifiable. Stay polite. Stay friendly. Obey the scraping etiquette.
-5. If in doubt, ask the author/creator/provider of data for permission—if your interest is entirely scientific, chances aren’t bad that you get data.
-
-## How do I know the scraping etiquette of a site? `r emo::ji("handshake")`
-
-Robot exclusion standards (`robot.txt`) are informal protocols to prohibit web robots from crawling content. They list documents that are allowed to crawl and which not. It is not a technical barrier but an ask for compliance.
-They are located in the root directory of a website (e.g `https://de.wikipedia.org/robots.txt`). 
-
-For example, let's have a look at wikipedia's [robot.txt](https://de.wikipedia.org/robots.txt) file, which is very human readable.
-
-General rules are listed under `User-agent: *` which is most interesting for R-based crawlers. A universal ban for a directory looks like this `Disallows: /`, sometimes Crawl-delays are suggested (in seconds) `Crawl-delay: 2`.
-
-## What is "polite" scraping? `r emo::ji("snail")`
-
-First thing would be not to scrape at a speed that causes trouble for their server. Therefore, whenever you loop over a list of URLs, add a `Sys.sleep(runif(1, 1, 2))` at the end of the loop. 
-
-And generally, it is better practice to store data on your local drive first (`download.file()`), then parse (`read_html()`). 
-
-**A footnote on sustainability.** In the digital context, we often forget that or actions do have physical consequences. For example, training AI, using blockchain and just streaming videos do cause considerable amounts of CO2 emissions. So does bombarding a server with requests - certainly to a much lesser extent than the examples before - but please consider whether you have to re-run a large scraping project 100 times in order to debug things. 
-
-Furthermore, downloading massive amounts of data may arouse attention from server administrators.
-Assuming that you've got nothing to hide, you should stay identifiable beyond your IP address.
-
-## How can I stay identifyable? `r emo::ji("bust_in_silhouette")`
-
-Option 1: Get in touch with website administrators / data owners.
-
-Option 2: Use HTTP header fields From and User-Agent to provide information about yourself.
-
-```
-url <- "http://a-totally-random-website.com"
-
-rvest_session <- session(url, 
-  add_headers(From = "my@email.com", 
-              `UserAgent` = R.Version()$version.string))
-                
-scraped_text <- rvest_session %>% 
-            html_elements(xpath = "p//a") %>% 
-            html_text()
-
-```
-
-rvest's `session()` creates a session object that responds to HTTP and HTML methods.
-Here, we provide our email address and the current R version as User-Agent information.
-This will pop up in the server logs: The webpage administrator has the chance to easily get in touch with you.
-
-
-# Sources
-
-This tutorial drew heavily on Simon Munzert's book [Automated Data Collection with R](http://r-datacollection.com/) and related [course materials](https://github.com/simonmunzert/web-scraping-with-r-extended-edition). We also used an [example](https://towardsdatascience.com/tidy-web-scraping-in-r-tutorial-and-resources-ac9f72b4fe47) from Keith McNulty's blog post on tidy web scraping in R.
-
-```{r}
-#SDG Academy
-#start RSelenium
-remDr <- remoteDriver(
-        remoteServerAdd = "localhost",
-        port = 4445L,
-        browser = "chrome"
-)
-
-remDr$open()
-
-#navigate to your page
-remDr$navigate("https://sdgacademy.org/courses/")
-
-#scroll down 5 times, waiting for the page to load at each time
-for(i in 1:5){      
-remDr$executeScript(paste("scroll(0,",i*10000,");"))
-Sys.sleep(3)    
-}
-
-#get the page html
-page_source <-remDr$getPageSource()
-
-#pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
-
-sdgacademy <- read_html(page_source[[1]])
-
-
-sdgacad_web <-"https://sdgacademy.org/course/living-heritage-and-sustainable-development/"
-sdgacademy <- read_html(sdgacad_web)
-
-```
-**Step 3.** Extract information.
-
-```{r}
-#Parse out TITLES for the training courses
-parsed_nodes <- html_nodes(sdgacademy, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "desktop", " " ))]//a')
-titles_acad <- html_text(parsed_nodes)
-titles_acad
-
-#Parse out WEBLINKS to the courses
-weblink_acad <- sdgacademy  %>% html_nodes("div.course-item") %>% html_attr("data-link")
-weblink_acad
-
-```
-
-```{r}
-# Subpage scraping
-# Define the AUDIENCE worker function
-scraper <- function(weblink_acad) {
-  read_html(weblink_acad) %>% 
-    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "course-detail", " " ))] | //strong') %>% 
-    html_text() %>% 
-    enframe("id", "audience")
-}
-
-# Iterate over the urls, applying the function each time
-audience_acad <- map_dfr(weblink_acad, scraper, .id = "id")
-
-
-#Combine into single columns
-
-audience_acad <- audience_acad %>%
- group_by(id) %>%
- summarize(audience = str_c(audience, collapse = ", "))
-
-```
-
-
-//*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 3) and parent::*)]
-
-
-
-```{r}
-#test <-"https://sdgacademy.org/course/living-heritage-and-sustainable-development/"
-#weblink_test <- read_html(test)
-
-authors_nodes <- html_nodes(weblink_test, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "course-detail-main", " " ))] //p | //strong')
-authors <- html_text(authors_nodes)
-authors
-
-
-
-# Define the AUTHOR worker function
-scraper <- function(weblink_acad) {
-  read_html(weblink_acad) %>% 
-    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "course-detail-main", " " ))] //p | //strong') %>% 
-    html_text() %>% 
-    enframe("id", "author")
-}
-
-# Iterate over the urls, applying the function each time
-authors_acad <- map_dfr(weblink_acad, scraper, .id = "id")
-authors_acad
-
-
-#Combine into single columns
-
-authors_acad <- authors_acad %>%
- group_by(id) %>%
- summarize(author = str_c(author, collapse = ", "))
-
-```
-
 ```{r}
 
-# Parse out the SDGs
-test <-"https://sdgacademy.org/course/governance-for-transboundary-freshwater-security/"
-weblink_test <- read_html(test)
+authors_list <- as.data.frame(authors_list)
 
-test_alt <- weblink_test %>% 
-  html_nodes("#goal-image .img src") %>%
-  html_attr("alt")
-test_alt
+write.csv(authors_list,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/authors_list.csv", row.names = TRUE)
 
+au_category_clean
 
-test_alt <- html_nodes(weblink_test, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "goals", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "goal-image", " " ))]//img') %>%
-  html_attr("alt")
-test_alt
+au_category_list <- as.data.frame(au_category_clean)
+
+write.csv(au_category_list,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_category_list.csv", row.names = TRUE)
 
 
+write.csv(results_urls,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/results_urls.csv", row.names = TRUE)
 
-# Define the AUTHOR worker function
-scraper <- function(weblink_acad) {
-  read_html(weblink_acad) %>% 
-    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 3) and parent::*)]') %>% 
-    html_text() %>% 
-    enframe("id", "author")
-}
-
-############################################
-
-# Define the SDGs  worker function
-scraper <- function(weblink_acad) {
-  read_html(weblink_acad) %>% 
-html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "goals", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "goal-image", " " ))]//img') %>%
-  html_attr("alt") %>%
-    enframe("id", "SDGs")
-}
-
-# Iterate over the urls, applying the function each time
-SDGs_acad <- map_dfr(weblink_acad, scraper, .id = "id")
-
-# Cleanup, remove NA
-SDGs_acad <- na.omit(SDGs_acad) 
-
-# Cleanup, remove Duplicates
-SDGs_acad <- SDGs_acad[!duplicated(SDGs_acad),]
+write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_category_clean.csv", row.names = TRUE)
 
 
-list("Agenda 2030" = "Private: Just wheel",
-                "2" = "lemmon",
-                "3" = "orange",
-                "4" =c("apple", "lemon", "grape"),
-                "5"=c("cheery", "lemon", "grape"),
-                "6"=c("apple", "lemon", "apple"))
-
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Private: Just wheel"] <- "Agenda 2030"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "No Poverty"] <- "SDG1"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Zero Hunger"] <- "SDG2"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Good Health and Well-Being"] <- "SDG3"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Quality Education"] <- "SDG4"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Gender Equality"] <- "SDG5"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Clean Water and Sanitation"] <- "SDG6"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Affordable and Clean Energy"] <- "SDG7"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Decent Work and Economic Growth"] <- "SDG8"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Industry, Innovation and Infrastructure"] <- "SDG9"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Reduced Inequalities"] <- "SDG10"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Sustainable Cities and Communities"] <- "SDG11"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Responsible Consumption and Production"] <- "SDG12"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Climate Action"] <- "SDG13"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Life Below Water"] <- "SDG14"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Life on Land"] <- "SDG15"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Peace, Justice and Strong Institutions"] <- "SDG16"
-SDGs_acad$SDGs[SDGs_acad$SDGs == "Partnerships for the Goals"] <- "SDG17"
-SDGs_acad
-```
-
-```{r}
-#Combine into single columns
-
-sdgs_combined <- SDGs_acad %>%
- group_by(id) %>%
- summarize(SDGs = str_c(SDGs, collapse = ", "))
-```
-
-
-```{r}
-#merge into single dataframe
-
-sdgacad_df <- data.frame(titles_acad, authors_acad, weblink_acad, sdgs_combined, audience_acad)
-
-sdgacad_combined <- merge(titles_acad, weblink_acad)
-
-
-
-sdgacad_df <- merge(sdgacad_df, sdgs_combined, by = "id")
-
-sdgacad_df <- merge(sdgacad_df, audience_acad, by = "id")
-
+write.csv(urls_with_cate,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/urls_with_cate.csv", row.names = TRUE)
 
 ```
-
-```{r}
-#export as CSV
-write.csv(sdgacad_df,"C:/Users/caitl/Documents/GitHub/thesis/exports/sdgacademy.csv", row.names = TRUE)
-
-```
-
-```{r}
-#https://unfccc.int/topics/capacity-building/workstreams/capacity-building-portal/capacity-building-e-learning#eq-1
-
-unfcccpage <- "https://unfccc.int/topics/capacity-building/workstreams/capacity-building-portal/capacity-building-e-learning#eq-1"
-unfccc <- read_html(unfcccpage)
-
-```
-
-Extract easy information.
-
-```{r}
-unfccc
-#Parse out TITLES for the training courses
-
-parsed_nodes <- html_nodes(unfccc, '.region-breadcrumbs')
-
-node_data <- html_text(parsed_nodes)
-
-parsed_nodes <- html_nodes(unfccc, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "info", " " ))] | //strong')
-titles_unfccc <- html_text(parsed_nodes)
-titles_unfccc
-
-titles_unfccc <- unfccc %>% html_nodes("div.accordion-body-container") %>% html_text()
-
-titles_unfccc
-
-
-authors_nodes <- html_nodes(weblink_test, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "course-detail-main", " " ))] //p | //strong')
-authors <- html_text(authors_nodes)
-authors
-
-
-
-
-#titles_unfccc <- html_text(parsed_nodes)
-#titles_unfccc
-
-#Parse out WEBLINKS to the courses
-#weblink_unfccc <- unfccc  %>% html_nodes("div.course-item") %>% html_attr("data-link")
-#weblink_unfccc
-
-#test_alt <- weblink_test %>% 
-#  html_nodes("#goal-image .img src") %>%
-#  html_attr("alt")
-#test_alt
-
-
-title <- unfccc %>% 
-  rvest::html_nodes('body') %>% 
-  xml2::xml_find_all('h4') %>% 
-  rvest::html_text()
-
-
-
-```
-
-```{r}
-#start RSelenium
-remDr <- remoteDriver(
-        remoteServerAdd = "localhost",
-        port = 4445L,
-        browser = "chrome"
-)
-
-remDr$open()
-
-#navigate to your page
-remDr$navigate("https://sdgacademy.org/courses/")
-
-#scroll down 5 times, waiting for the page to load at each time
-for(i in 1:5){      
-remDr$executeScript(paste("scroll(0,",i*10000,");"))
-Sys.sleep(3)    
-}
-
-#get the page html
-page_source <-remDr$getPageSource()
-
-#pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
-
-sdgacademy <- read_html(page_source[[1]])
-
-######
-  replicate(100,
-          {
-            # scroll down
-            webElem <- remDr$findElement("css", "body")
-            webElem$sendKeysToElement(list(key = "end"))
-            # find button
-            morereviews <- remDr$findElement(using = 'css selector', "#BVRRContainer div.bv-content-pagination-container button")
-            # click button
-            morereviews$clickElement()
-            # wait
-            Sys.sleep(4)
-          })
-
-# Scrap the reviews
-reviews <- xml2::read_html(remDr$getPageSource()[[1]])%>%
-  rvest::html_nodes("#BVRRContainer div.bv-content-summary-body-text") %>%
-  rvest::html_text() %>%
-  dplyr::data_frame(reviews = .)
-reviews
-
-
-
 
 ```
