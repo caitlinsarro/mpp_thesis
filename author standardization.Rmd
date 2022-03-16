@@ -452,6 +452,31 @@ authors_list_A$C <- ifelse(grepl(un_specialized_agencies, authors_list_A$authors
 test<-authors_list_A$authors[str_detect(authors_list_A$authors, un_specialized_agencies),]
 test
 
+df <- data.frame(text =  c('UN-Habitat', 'UNDP', 'UNEP', 'UN Global Compact'), 
+                 un_programs = 0)
+
+
+
+#------------------------
+
+#df <- data.frame(text =  c('flight cancelled','dog cat','coach travel','car bus','cow sheep',' #high bar'), 
+#                 transport = 0)
+#words <- 'flight|flights|plane|seats|seat|travel|time|coach'
+
+
+#df[grep(words, df$text, value = F), "transport"] <- 1
+
+#------------------------
+
+un_programs <- 'UN-Habitat|UNDP|UNEP|UN Global Compact'
+
+df <- data.frame(authors_list_A$authors, un_programs = 0)
+df[grep(un_programs, df$authors, value = F), "un_programs"] <- 1
+
+df
+
+#------------------
+
 
 authors_list_A %>%
     bind_cols(un_specialized_agencies %>% 
@@ -460,6 +485,7 @@ authors_list_A %>%
                   mutate_all(as.numeric)) %>% 
     as_tibble()
 
+data2 <- iris[iris$Species %like% "virg", ]    
 
 ```
 
