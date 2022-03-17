@@ -457,6 +457,19 @@ df <- data.frame(text =  c('UN-Habitat', 'UNDP', 'UNEP', 'UN Global Compact'),
 
 
 
+authors_list_A %>%
+    bind_cols(un_specialized_agencies %>% 
+                  set_names() %>% 
+                  map_dfc(~str_detect(authors_list_A$authors, .x)) %>% 
+                  mutate_all(as.numeric)) %>% 
+    as_tibble()
+
+data2 <- iris[iris$Species %like% "virg", ]
+
+```
+
+```{r}
+#author dictionaries
 #------------------------
 
 #df <- data.frame(text =  c('flight cancelled','dog cat','coach travel','car bus','cow sheep',' #high bar'), 
@@ -466,7 +479,7 @@ df <- data.frame(text =  c('UN-Habitat', 'UNDP', 'UNEP', 'UN Global Compact'),
 
 #df[grep(words, df$text, value = F), "transport"] <- 1
 
-#------------------------
+#------------------------UN PROGRAMS
 
 un_programs <- 'UN-Habitat|UNDP|UNEP|UN Global Compact'
 
@@ -475,18 +488,28 @@ df[grep(un_programs, df$authors, value = F), "un_programs"] <- 1
 
 df
 
+
+
+#------------------------UN SPECIALIZED AGENCIES
+un_specialized_agencies <-
+  c('FAO|Food and Agriculture Organization of the United Nations|ICAO|International Civil Aviation Organization|IFAD|International Fund for Agricultural Development|ILO|International Labour Organization|IMF|International Monetary Fund|IMO|International Maritime Organization|ITU|International Telecommunication Union|UNESCO|United Nations Educational Scientific and Cultural Organization|UNIDO|United Nations Industrial Development Organization|UNWTO|World Tourism Organization|UPU|Universal Postal Union|WHO|World Health Organization|WIPO|World Intellectual Property Organization|WMO|World Meteorological Organization|World Bank Group|World Bank')
+df_agent <- data.frame(authors_list_A$authors, un_specialized_agencies = 0)
+df_agent[grep(un_specialized_agencies, df_agent$authors, value = F), "un_specialized_agencies"] <- 1
+
+df_agent
+
 #------------------
 
+#df3 <- merge(audience, keywords_combined, by = "id")
 
-authors_list_A %>%
-    bind_cols(un_specialized_agencies %>% 
-                  set_names() %>% 
-                  map_dfc(~str_detect(authors_list_A$authors, .x)) %>% 
-                  mutate_all(as.numeric)) %>% 
-    as_tibble()
+authors_list_A_comb <- merge(authors_list_A, df, by.x = "authors", all = TRUE)
+authors_list_A_comb <- merge(authors_list_A, df_agent, by.x = "authors", by.y = "authors_list_A.authors", all = TRUE)
 
-data2 <- iris[iris$Species %like% "virg", ]    
+authors_list_A_comb$category[authors_list_A$un_programs=="1"] <- "un program"
+authors_list_A_comb$category[authors_list_A$un_specialized_agencies=="1"] <- "un specialized agency"
 
+
+authors_list_A_comb
 ```
 
 
