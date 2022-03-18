@@ -279,9 +279,34 @@ scraper <- function(weblink_au_t) {read_html(weblink_au_t) %>%
 
 
 # Iterate over the urls, applying the function each time
-au_category_t <- map_dfr(weblink_au_t, scraper, .id = "id")
+au_category_t <- map_dfr(weblink_au_t, scraper, .id = "id") 
 
 au_category_t
+
+#    html_text() %>% 
+#    enframe("id", "category"),
+#    error = function(err) {print(NA)}
+#  )}
+```
+
+```{r}
+
+weblink_au_t <- results_urls_t$weblink_au
+
+
+# Define the AUTHORS CATEGORY worker function
+scraper <- function(weblink_au_t) {read_html(weblink_au_t) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "category")  %>%
+    mutate(weblink_au_t = weblink_au_t) 
+}
+
+
+# Iterate over the urls, applying the function each time
+au_category_t2 <- map_dfr(weblink_au_t, scraper, .id ="id") 
+
+au_category_t2
 
 #    html_text() %>% 
 #    enframe("id", "category"),
@@ -298,7 +323,7 @@ au_category_t
 
 
 ```{r}
-
+#Not currently using - old code
 # Define the AUTHORS CATEGORY worker function
 scraper <- function(weblink_au) { tryCatch(
   read_html(weblink_au) %>% 
@@ -335,7 +360,7 @@ au_category_clean <- au_category_t %>%
 au_category_clean 
 
 #reorder by index
- au_category_clean[order(as.numeric(rownames(au_category_clean$index))),]
+au_category_clean[order(as.numeric(rownames(au_category_clean$index))),]
 
 au_category_clean  <- read.table(text=readClipboard(), header=TRUE)    
 au_category_clean$index <- as.numeric(row.names(au_category_clean ))
@@ -367,7 +392,13 @@ au_category_clean[order(au_category_clean$id, decreasing = FALSE),]
 
 #merge using the index
 
-urls_with_cate <-merge(results_urls_t, au_category_clean, by.x = 1, by.y = "id", all.x = TRUE)
+colnames(results_urls_t)[1] <- "id"
+
+as.character(results_urls_t2$id)
+
+urls_with_cate <-merge(results_urls_t, au_category_clean, by.x = results_urls_t$index, by.y = "id", all.y = TRUE)
+
+left_join(results_urls_t,au_category_clean, by = "id")
 
 #remove redundant id
 urls_with_cate <- mutate(urls_with_cate, exists=NULL)
