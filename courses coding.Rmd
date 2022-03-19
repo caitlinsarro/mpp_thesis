@@ -49,6 +49,15 @@ library(RCurl)
 
 library(quanteda)
 
+#for categorization
+library(quanteda)
+library(tidytext)
+#library(quanteda.textmodels)
+#library(caret)
+library(SnowballC)
+
+library(topicmodels)
+
 ```
 
 
@@ -99,6 +108,185 @@ descrp_list$key_category <- descrp_list$description
 
 ```
 
+```{r}
+#test using a prefab dictionary
+
+dict <- dictionary(file = "data/dictionary/policy_agendas_english.lcd")
+
+
+dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
+d_descrip <- dfm_lookup(dfmat_descrip, dict)
+d_descrip <- as.data.frame(as.matrix(d_descrip))
+d_descrip$id <- seq.int(nrow(d_descrip))
+
+d_descrip
+
+
+mydfm.un <- dfm(mydfm.trim, groups = "country", dictionary = dict)
+
+un.topics.pa <- convert(mydfm.un, "data.frame") %>%
+  dplyr::rename(country = doc_id) %>%
+  select(country, immigration, intl_affairs, defence) %>%
+  tidyr::gather(immigration:defence, key = "Topic", value = "Share") %>%
+  group_by(country) %>%
+  mutate(Share = Share / sum(Share)) %>%
+  mutate(Topic = haven::as_factor(Topic))
+
+```
+
+```{r}
+#import text from  Glass, L., & Newig, J. (2019). Governance for achieving the sustainable development goals: How important are participation, policy coherence, reflexivity, adaptation and democratic institutions? Earth System Governance, 2, 100031. doi:10.1016/j.esg.2019.100031
+
+#-------PARTICIPATION
+participation <- read_csv("data/dictionary/glass newig/participation.csv")
+
+tidy_participation<- participation %>%
+    unnest_tokens("word", Terms)
+
+#remove stopwords
+data("stop_words")
+    tidy_participation<-tidy_participation %>%
+      anti_join(stop_words)
+    
+#remove punctuation
+#tidy_participation<-tidy_participation[-grep("\\b\\d+\\b", tidy_participation$word),]
+tidy_participation$word<- gsub("[[:punct:]]|[[:digit:]]|^http:\\/\\/.*|^https:\\/\\/.*","",tidy_participation$word)
+
+#to lowercase
+tidy_participation$word<- tolower(tidy_participation$word)
+
+#remove whitespace
+tidy_participation$word <- gsub("\\s+","",tidy_participation$word)
+
+#stemming the keywords
+tidy_participation<-tidy_participation %>%
+      mutate_at("word", funs(wordStem((.), language="en")))
+
+
+#see most frequent   
+#tidy_participation %>%
+#  count(word) %>%
+#    arrange(desc(n))
+
+#keep unique values
+tidy_participation <- unique(tidy_participation)
+
+policy_coherence <- read_csv("data/dictionary/glass newig/policy coherence.csv")
+democratic_institutions_ <- read_csv("data/dictionary/glass newig/democratic institutions .csv")
+reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity and adaptation.csv")
+
+```
+
+```{r}
+#import text from  Glass, L., & Newig, J. (2019). Governance for achieving the sustainable development goals: How important are participation, policy coherence, reflexivity, adaptation and democratic institutions? Earth System Governance, 2, 100031. doi:10.1016/j.esg.2019.100031
+
+#-------POLICY COHERENCE
+policy_coherence <- read_csv("data/dictionary/glass newig/policy coherence.csv")
+
+tidy_policy_c<- policy_coherence %>%
+    unnest_tokens("word", Terms)
+
+#remove stopwords
+data("stop_words")
+    tidy_policy_c<-tidy_policy_c %>%
+      anti_join(stop_words)
+    
+#remove punctuation
+#tidy_participation<-tidy_participation[-grep("\\b\\d+\\b", tidy_participation$word),]
+tidy_policy_c$word<- gsub("[[:punct:]]|[[:digit:]]|^http:\\/\\/.*|^https:\\/\\/.*","",tidy_policy_c$word)
+
+#to lowercase
+tidy_policy_c$word<- tolower(tidy_policy_c$word)
+
+#remove whitespace
+tidy_policy_c$word <- gsub("\\s+","",tidy_policy_c$word)
+
+#stemming the keywords
+tidy_policy_c<-tidy_policy_c %>%
+      mutate_at("word", funs(wordStem((.), language="en")))
+
+
+#see most frequent   
+#tidy_participation %>%
+#  count(word) %>%
+#    arrange(desc(n))
+
+#keep unique values
+tidy_policy_c <- unique(tidy_policy_c)
+tidy_policy_c
+
+
+
+
+
+
+#---------------demo
+
+democratic_institutions_ <- read_csv("data/dictionary/glass newig/democratic institutions .csv")
+reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity and adaptation.csv")
+
+```
+
+```{r}
+#terms into a character list
+policy_coh_keystems <- tidy_policy_c$word
+
+#POLICY COHERENCE dictionary
+dict_pol <- dictionary(list(tidy_policy_c$word))
+
+
+dfmat_ex <- dfm(tokens(authors_list_A$authors, remove_punct = TRUE))
+d_au <- dfm_lookup(dfmat_ex, dict_au)
+df_au <- as.data.frame(as.matrix(d_au))
+df_au$id <- seq.int(nrow(df_au))
+
+
+
+```
+
+```{r}
+#don't push - lots of tried attempts
+dfmat_ex <- dfm(tokens(participation$Terms, remove_punct = TRUE))
+dfmat_ex
+
+
+stopWords <- stopwords("en")
+
+participation$dict<- as.character(participation$Terms)
+ '%nin%' <- Negate('%in%')
+ participation$Terms<-lapply(participation$Terms, function(x) {
+  chk <- unlist(strsplit(x," "))
+  p <- chk[chk %nin% stopWords]
+  paste(p,collapse = " ")
+})
+
+
+dfmat_ex <- dfm(tokens(participation$Terms, remove_punct = TRUE))
+
+participation$dict<- gsub("[[:punct:]]|[[:digit:]]|^http:\\/\\/.*|^https:\\/\\/.*","",participation$dict)
+participation$dict<- gsub("\u0092","",participation$dict)
+
+participation$dict
+
+
+
+
+
+participation_corpus <- Corpus(VectorSource(as.vector(participation$dict))) 
+participation_corpus
+
+participation_corpus <- tm_map(participation_corpus, removeWords, stopwords("english"))
+trump_corpus <- tm_map(trump_corpus, content_transformer(removePunctuation))
+
+
+tidy_trump_tweets<- participation %>%
+    unnest_tokens("word", text)
+ 
+participation_source <- VectorSource(participation)
+df_source <- DataframeSource(participation_source)
+
+
+```
 
 
 ```{r}
