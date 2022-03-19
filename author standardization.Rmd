@@ -47,6 +47,8 @@ library(tm)
 
 library(RCurl)
 
+library(quanteda)
+
 ```
 
 
@@ -432,6 +434,7 @@ authors_list_A$category <- trimws(authors_list_A$category)
 authors_list_A$category <- tolower(authors_list_A$category)
 #remove punctuation
 authors_list_A$category <- removePunctuation(authors_list_A$category)
+
 ```
 
 
@@ -513,73 +516,66 @@ data2 <- iris[iris$Species %like% "virg", ]
 
 
 #df[grep(words, df$text, value = F), "transport"] <- 1
+#taxglob = "tax*",
+#taxregex = "tax.+$",
 
-#------------------------UN PROGRAMS
-
-un_programs <- 'UN-Habitat|UNDP|UNEP|UN Global Compact'
-
-df <- data.frame(unique(authors_list_A$authors), un_programs = 0)
-df[grep(un_programs, df$authors, value = F), "un_programs"] <- 1
-colnames(df)[1] <- "authors"
-df <- df[order(df$un_programs, decreasing = TRUE),] %>% unique()
-
-df
-
-#------------------------UN SPECIALIZED AGENCIES
-un_specialized_agencies <-
-  c('FAO|Food and Agriculture Organization of the United Nations|ICAO|International Civil Aviation Organization|IFAD|International Fund for Agricultural Development|ILO|International Labour Organization|IMF|International Monetary Fund|IMO|International Maritime Organization|ITU|International Telecommunication Union|UNESCO|United Nations Educational Scientific and Cultural Organization|UNIDO|United Nations Industrial Development Organization|UNWTO|World Tourism Organization|UPU|Universal Postal Union|WHO|World Health Organization|WIPO|World Intellectual Property Organization|WMO|World Meteorological Organization|World Bank Group|World Bank')
-df_agent <- data.frame(authors_list_A$authors, un_specialized_agencies = 0)
-df_agent[grep(un_specialized_agencies, df_agent$authors, value = F), "un_specialized_agencies"] <- 1
-colnames(df_agent)[1] <- "authors"
-df_agent <- df_agent[order(df_agent$un_specialized_agencies, decreasing = TRUE),] %>% unique()
-
-df_agent
-
-#------------------------UN
-un <-
-  c('UN DESA|UN Statistics Division|United Nations Statistics Division|United Nations Global Compact Academy|UNDCO|UNGCA|UNITAR')
-df_un <- data.frame(authors_list_A$authors, un = 0)
-df_un[grep(un, df_un$authors, value = F), "un"] <- 1
-colnames(df_un)[1] <- "authors"
-df_un <- df_un[order(df_un$un, decreasing = TRUE),] %>% unique()
-df_un
+#AUTHOR dictionary
+dict_au <- dictionary(list(un_programs = c("UN-Habitat", "UNDP", "UNEP", "UN Global Compact"),
+                        un_specialized_agencies = c("FAO", "Food and Agriculture Organization of the United Nations", "ICAO", "International Civil Aviation Organization", "IFAD", "International Fund for Agricultural Development","International Labour Organization","IMF","International Monetary Fund","IMO","International Maritime Organization","ITU","International Telecommunication Union","UNESCO","United Nations Educational Scientific and Cultural Organization","UNIDO","United Nations Industrial Development Organization","UNWTO","World Tourism Organization","UPU","Universal Postal Union","WHO","World Health Organization","WIPO","World Intellectual Property Organization","WMO","World Meteorological Organization","World Bank Group","World Bank"),
+                        un = c("UN DESA", "UN Statistics Division", "United Nations Statistics Division", "United Nations Global Compact Academy", "United Nations Global Compact Academy","UNDCO","UNGCA","UNITAR")))
 
 
-#------------------------NONProfit
-#space clear rm(unsdglearn,unsdglearn_silos,coursera)
-ngo <-
-  c('501|nonprofit|non-profit|non-governmental|nongovernmental|Non-governmental organization|Non-governmental|NGO|ngo')
-df_ngo <- data.frame(authors_list_A$authors, ngo = 0)
-df_ngo[grep(ngo, df_ngo$authors, value = F), "ngo"] <- 1
-colnames(df_ngo)[1] <- "authors"
-df_ngo <- df_ngo[order(df_ngo$ngo, decreasing = TRUE),] %>% unique()
-df_ngo
-
-#------------------
+dfmat_ex <- dfm(tokens(authors_list_A$authors, remove_punct = TRUE))
+d_au <- dfm_lookup(dfmat_ex, dict_au)
+df_au <- as.data.frame(as.matrix(d_au))
+df_au$id <- seq.int(nrow(df_au))
 
 
 
-#------------------ If Coded, Change Category
-#df
-#df_agent 262
-#authors_list_A
-#add on new columns
-#522
-#authors_list_A
-#df
+#------------------------------
+
+#CATEGORY dictionary
+dict_cat <- dictionary(list(
+                        ngo = c("501", "nonprofit", "non-profit", "non-governmental", "nongovernmental","Non-governmental organization","Non-governmental","NGO","ingo","ngo","nongovernmental","philanthropic initiative","Foundation","501c3")))
+
+
+
+
+
+dfmat_ex <- dfm(tokens(authors_list_A$category, remove_punct = TRUE))
+d_cat <- dfm_lookup(dfmat_ex, dict_cat)
+df_cat <- as.data.frame(as.matrix(d_cat))
+df_cat$id <- seq.int(nrow(df_cat))
+
+
+#------------------------------------
+
 
 ```
 
+
+
+
+
 ```{r}
-#start to combine
+#transform into a leaner dataframe
 #authors_list_A_comb <- mutate(authors_list_A, titles=NULL, piece=NULL, weblink=NULL, au_category=NULL)
 
-authors_list_A_comb <- left_join(authors_list_A_comb,df, by = "authors") 
-authors_list_A_comb
-authors_list_A_comb <- left_join(authors_list_A_comb,df_agent, by = "authors")
-authors_list_A_comb <- left_join(authors_list_A_comb,df_ngo, by = "authors")
-authors_list_A_comb <- left_join(authors_list_A_comb,df_un, by = "authors")
+#adding index as a col for matching
+authors_list_A$id <- seq.int(nrow(authors_list_A))
 
+#start to combine
+ 
+authors_list_A_comb <- left_join(authors_list_A,df_au, by = "id") 
+authors_list_A_comb <- left_join(authors_list_A_comb,df_cat, by = "id") 
+
+
+#authors_list_A_comb <- left_join(authors_list_A,df, by = "authors") 
+#authors_list_A_comb <- merge(authors_list_A,df, by = "authors")
+#authors_list_A_comb <- left_join(authors_list_A_comb,df_agent, by = "authors")
+#authors_list_A_comb <- left_join(authors_list_A_comb,df_ngo, by = "category")
+#authors_list_A_comb <- left_join(authors_list_A_comb,df_un, by = "authors")
+#authors_list_A_comb
 
 authors_list_A_comb$category[authors_list_A_comb$un_programs=="1"] <- "un program"
 authors_list_A_comb$category[authors_list_A_comb$un_specialized_agencies=="1"] <- "un specialized agency"
@@ -666,9 +662,12 @@ authors_list_A_comb$category[authors_list_A_comb$category=="public"] <- "public 
 
 authors_list_A_comb$category[authors_list_A_comb$category=="private"] <- "private university"
 
-authors_list_A_comb$category[authors_list_A_comb$category=="philanthropic initiative"] <- "ngo"
+authors_list_A_comb$category[authors_list_A_comb$category=="501c3"] <- "ngo"
+
+authors_list_A_comb$category[authors_list_A_comb$category=="501c3 nonprofit organization1"] <- "ngo"
 
 authors_list_A_comb$category[authors_list_A_comb$category=="private  not for profit"] <- "ngo"
+
 
 authors_list_A_comb$category[authors_list_A_comb$category=="nongovernmental organization ngo"] <- "ngo"
 
@@ -702,6 +701,8 @@ ancient university"] <- "public research university"
 
 authors_list_A_comb$category[authors_list_A_comb$category=="public landgrant research university"] <- "public research university"
 
+authors_list_A_comb$category[authors_list_A_comb$category=="private landgrant research university"] <- "private research university"
+
 authors_list_A_comb$category[authors_list_A_comb$category=="public staterelated landgrant flagship research university"] <- "public research university"
 
 authors_list_A_comb$category[authors_list_A_comb$category=="publicdistance educationmega university"] <- "public research university"
@@ -713,8 +714,6 @@ authors_list_A_comb$category[authors_list_A_comb$category=="international financ
 authors_list_A_comb$category[authors_list_A_comb$category=="public limited company"] <- "business"
 
 authors_list_A_comb$category[authors_list_A_comb$category=="Department of Nuclear Science and Technology"] <- "research institute"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="Foundation"] <- "ngo"
 
 authors_list_A_comb$category[authors_list_A_comb$category=="governmentrun"] <- "government"
 
@@ -728,7 +727,9 @@ authors_list_A_comb$category[authors_list_A_comb$category=="primary organ – re
 
 authors_list_A_comb
 
+```
 
+```{r}
 write.csv(authors_list_A_comb,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/authors_list_A_comb.csv", row.names = TRUE)
 
 
@@ -902,6 +903,72 @@ write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/
 
 
 write.csv(authors_list_A,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/authors_list_A.csv", row.names = TRUE)
+
+```
+
+```{r}
+#long way
+#------------------------UN PROGRAMS
+
+un_programs <- c('UN-Habitat|UNDP|UNEP|UN Global Compact')
+
+df <- data.frame(unique(authors_list_A$authors), un_programs = 0)
+colnames(df)[1] <- "authors"
+df[grep(un_programs, df$authors, value = F), "un_programs"] <- 1
+df <- df[order(df$un_programs, decreasing = TRUE),] %>% unique()
+
+df
+
+#------------------------UN SPECIALIZED AGENCIES
+un_specialized_agencies <-
+  c('FAO|Food and Agriculture Organization of the United Nations|ICAO|International Civil Aviation Organization|IFAD|International Fund for Agricultural Development|ILO|International Labour Organization|IMF|International Monetary Fund|IMO|International Maritime Organization|ITU|International Telecommunication Union|UNESCO|United Nations Educational Scientific and Cultural Organization|UNIDO|United Nations Industrial Development Organization|UNWTO|World Tourism Organization|UPU|Universal Postal Union|WHO|World Health Organization|WIPO|World Intellectual Property Organization|WMO|World Meteorological Organization|World Bank Group|World Bank')
+df_agent <- data.frame(authors_list_A$authors, un_specialized_agencies = 0)
+colnames(df_agent)[1] <- "authors"
+df_agent[grep(pattern = un_specialized_agencies, df_agent$authors, value = F), "un_specialized_agencies"] <- 1
+df_agent <- df_agent[order(df_agent$un_specialized_agencies, decreasing = TRUE),] %>% unique()
+
+df_agent
+
+#------------------------UN
+un <-
+  c('UN DESA|UN Statistics Division|United Nations Statistics Division|United Nations Global Compact Academy|UNDCO|UNGCA|UNITAR')
+df_un <- data.frame(authors_list_A$authors, un = 0)
+colnames(df_un)[1] <- "authors"
+df_un[grep(un, df_un$authors, value = F), "un"] <- 1
+df_un <- df_un[order(df_un$un, decreasing = TRUE),] %>% unique()
+df_un
+
+#sapply(un, function(x) df_un$authors[grepl(x, df_un$authors)])
+
+#sapply(un, function(x) df_un[grepl(x, un)])
+
+
+
+#------------------------NONProfit
+#space clear rm(unsdglearn,unsdglearn_silos,coursera)
+ngo <-
+  c('501','nonprofit','non-profit','non-governmental','nongovernmental','Non-governmental organization','Non-governmental','NGO','ngo','ingo','nongovernmental','philanthropic initiative')
+df_ngo <- data.frame(authors_list_A$category, ngo = 0)
+colnames(df_ngo)[1] <- "category"
+df_ngo[grep(pattern = ngo, df_ngo$category, value = F), "ngo"] <- 1
+df_ngo <- df_ngo[order(df_ngo$ngo, decreasing = TRUE),] %>% unique()
+df_ngo
+
+#sapply(ngo, function(x) df_ngo$authors[grepl(x, df_ngo$authors)])
+
+
+#------------------
+
+
+
+#------------------ If Coded, Change Category
+#df
+#df_agent 262
+#authors_list_A
+#add on new columns
+#522
+#authors_list_A
+#df
 
 ```
 
