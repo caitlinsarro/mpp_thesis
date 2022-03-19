@@ -149,6 +149,83 @@ audience <- as.vector(audience_acad$audience)
 
 
 ```{r}
+test_alt <- read_html("https://sdgacademy.org/course/governance-for-transboundary-freshwater-security/")%>% html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 2) and parent::*)] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 3) and parent::*)] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 4) and parent::*)] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 1) and parent::*)]') %>% 
+    html_text()
+test_alt
+```
+
+
+```{r}
+
+# Define the KEYWORDS worker function
+scraper <- function(weblink_acad) {
+  read_html(weblink_acad) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "chapter-title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "no", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label | //*[contains(concat( " ", @class, " " ), concat( " ", "yes", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "keywords")
+}
+
+# Iterate over the urls, applying the function each time
+keywords_acad <- map_dfr(weblink_acad, scraper, .id = "id")
+
+
+
+#Combine into single columns
+
+keywords_acad <- keywords_acad %>%
+ group_by(id) %>%
+ summarize(keywords = str_c(keywords, collapse = ", "))
+
+
+keywords_acad$id <- as.numeric(keywords_acad$id)
+
+keywords_acad[order(keywords_acad$id, decreasing = FALSE),] 
+
+
+keywords <- as.vector(keywords_acad$keywords)
+
+
+```
+
+```{r}
+
+# Define the DESCRIPTION worker function
+scraper <- function(weblink_acad) {
+  read_html(weblink_acad) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "chapter-title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "no", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label | //*[contains(concat( " ", @class, " " ), concat( " ", "yes", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "description")
+}
+
+# Iterate over the urls, applying the function each time
+descrp_acad <- map_dfr(weblink_acad, scraper, .id = "id")
+
+
+
+#Combine into single columns
+
+descrp_acad <- descrp_acad %>%
+ group_by(id) %>%
+ summarize(description = str_c(description, collapse = ", "))
+
+
+descrp_acad$id <- as.numeric(descrp_acad$id)
+
+descrp_acad[order(descrp_acad$id, decreasing = FALSE),] 
+
+
+descrp <- as.vector(descrp_acad$description)
+
+descrp
+```
+
+
+
+
+
+
+
+```{r}
 
 # Define the AUTHOR worker function
 scraper <- function(weblink_acad) {
@@ -266,9 +343,7 @@ SDGs <- as.vector(sdgs_combined$SDGs)
 ```{r}
 #merge into single dataframe
 
-
-
-sdgacad_df <- data.frame(titles_acad, authors_acad, weblink_acad, sdgs_combined, audience_acad )
+sdgacad_df <- data.frame(titles_acad, authors_acad, weblink_acad, sdgs_combined, keywords_acad, audience_acad )
 
 #remove redundant cols
 sdgacad_df <- mutate(sdgacad_df, id=NULL, id.1=NULL, id.2=NULL)

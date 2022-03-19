@@ -65,24 +65,14 @@ unsdglearn <- read_csv("exports/unsdglearn.csv")
 sdgacademy <- read_csv("exports/sdgacademy.csv")
 
 
-authors_cour <- coursera %>% select(titles, author)
-authors_unsdglearn_silos <- unsdglearn_silos %>% select(titles, authors) #fix this s
-authors_unsdglearn <- unsdglearn %>% select(titles, authors) #fix this s
-authors_sdgacademy <- sdgacademy %>% select(titles_acad, author) #fix this standardize
-
-#fix nonstandard names to titles and authors
-authors_sdgacademy <- authors_sdgacademy %>%
-  rename(titles = titles_acad)
-
-authors_sdgacademy <- authors_sdgacademy %>%
-  rename(authors = author)
-
-authors_cour <- authors_cour %>%
-  rename(authors = author)
+keywords_cour <- coursera %>% select(titles, keywords)
+keywords_unsdglearn_silos <- unsdglearn_silos %>% select(titles, keywords) #fix this s
+keywords_unsdglearn <- unsdglearn %>% select(titles, keywords) #fix this s
+keywords_sdgacademy <- sdgacademy %>% select(titles_acad, keywords) #fix this standardize
 
 
 #combine into one set
-combined <- rbind(authors_cour, authors_unsdglearn_silos, authors_unsdglearn, authors_sdgacademy)
+combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn, keywords_sdgacademy)
 
 ```
 
@@ -439,74 +429,6 @@ authors_list_A$category <- removePunctuation(authors_list_A$category)
 
 
 ```{r}
-#Don't run, old code
-
-un_specialized_agencies <-
-  c(
-    "FAO",
-    "Food and Agriculture Organization of the United Nations",
-    "ICAO",
-    "International Civil Aviation Organization",
-    "IFAD",
-    "International Fund for Agricultural Development",
-    "ILO",
-    "International Labour Organization",
-    "IMF",
-    "International Monetary Fund",
-    "IMO",
-    "International Maritime Organization",
-    "ITU",
-    "International Telecommunication Union",
-    "UNESCO",
-    "United Nations Educational Scientific and Cultural Organization",
-    "UNIDO",
-    "United Nations Industrial Development Organization",
-    "UNWTO",
-    "World Tourism Organization",
-    "UPU",
-    "Universal Postal Union",
-    "WHO",
-    "World Health Organization",
-   "WIPO",
-    "World Intellectual Property Organization",
-    "WMO",
-    "World Meteorological Organization",
-    "World Bank Group",
-    "World Bank"
-  )
-
-un_programs <-c("UN-Habitat", "UNDP", "UNEP", "UN Global Compact")
-
-str_detect(authors_list_A$authors, un_specialized_agencies)
-authors_list_A$category[authors_list_A$authors
-
-                        
-dictionary <- data.frame(search="un_specialized_agencies")
-result <- authors_list_A$authors %>%
-  filter(grepl(paste(dictionary$search, collapse="|"), text)) 
-
-authors_list_A$C <- ifelse(grepl(un_specialized_agencies, authors_list_A$authors), "yes", "no")
-                        
-test<-authors_list_A$authors[str_detect(authors_list_A$authors, un_specialized_agencies),]
-test
-
-df <- data.frame(text =  c('UN-Habitat', 'UNDP', 'UNEP', 'UN Global Compact'), 
-                 un_programs = 0)
-
-
-
-authors_list_A %>%
-    bind_cols(un_specialized_agencies %>% 
-                  set_names() %>% 
-                  map_dfc(~str_detect(authors_list_A$authors, .x)) %>% 
-                  mutate_all(as.numeric)) %>% 
-    as_tibble()
-
-data2 <- iris[iris$Species %like% "virg", ]
-
-```
-
-```{r}
 #author dictionaries
 #------------------------
 
@@ -604,69 +526,6 @@ authors_list_A_comb
 #manual fixing based on authors
 authors_list_A_comb$category[authors_list_A_comb$authors=="Academy of Korean Studies"] <- "research institute" 
 
-authors_list_A_comb$category[authors_list_A_comb$authors=="African Center for Cities"] <- "research institute" 
-
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="African Center for Cities"] <- "research institute" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="African Local Government Academy"] <- "government network" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Ain Shams University"] <- "public university" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Alliance for Global Water Adaptation"] <- "ngo" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="American Museum of Natural History"] <- "cultural institution" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Athens University of Economics and Business"] <- "public university" 
-
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Columbia University"] <- "private research university" 
-
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Cornell University"] <- "private research university" 
-
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Belize National Institute of Culture and History"] <- "cultural institution" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Banco Interamericano de Desarrollo"] <- "finance" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Federal Government"] <- "government" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="UNSSC"] <- "un internal agency" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Global Environment Facility"] <- "government network" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Seoul National University"] <- "public research university" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Sustainable Development Solutions Network|SDSN"] <- "un ngo" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="SDG Academy"] <- "un ngo" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Cities Alliance"] <- "intergovernmental organization" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="OECD_PCSD"] <- "intergovernmental organization" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Public Health Foundation of India"] <- "ngo" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Brookings"] <- "research institute" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Supranational"] <- "government" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Chatham House"] <- "public policy think tank" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Howard Hughes Medical Institute"] <- "ngo" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Natural Resource Governance Institute"] <- "ngo" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="Roman Catholic Church"] <- "cultural institution" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="University of Colorado System"] <- "public university" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="University of Manchester"] <- "public research university" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="UNOG"] <- "un" 
-
-authors_list_A_comb$category[authors_list_A_comb$authors=="World Business Council for Sustainable Development"] <- "business"
 
 
 ```
@@ -675,68 +534,6 @@ authors_list_A_comb$category[authors_list_A_comb$authors=="World Business Counci
 #------------- category cleanups
 authors_list_A_comb$category[authors_list_A_comb$category=="public"] <- "public university"
 
-authors_list_A_comb$category[authors_list_A_comb$category=="private"] <- "private university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="501c3"] <- "ngo"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="501c3 nonprofit organization1"] <- "ngo"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="private  not for profit"] <- "ngo"
-
-
-authors_list_A_comb$category[authors_list_A_comb$category=="nongovernmental organization ngo"] <- "ngo"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="united nations specialised agency"] <- "un specialized agency"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="united nations specialized agency"] <- "un specialized agency"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="intergovernmental organisation"] <- "intergovernmental organization"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="intergovernmental organisation"] <- "intergovernmental organization"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="Federal Government"] <- "government"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="research institution"] <- "research institute"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="research and training institute"] <- "research institute"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="programme"] <- "un program"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="public research university"] <- "public research university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="public university system"] <- "public university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="public research university
-ancient university"] <- "public research university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="public research university1"] <- "public research university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="public research university
-ancient university"] <- "public research university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="public landgrant research university"] <- "public research university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="private landgrant research university"] <- "private research university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="public staterelated landgrant flagship research university"] <- "public research university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="publicdistance educationmega university"] <- "public research university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="public medical university"] <- "public university"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="international financial institution"] <- "finance"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="public limited company"] <- "business"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="Department of Nuclear Science and Technology"] <- "research institute"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="governmentrun"] <- "government"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="catholic"] <- "cultural institution"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="primary organ  regional branch"] <- "un primary organ"
-
-authors_list_A_comb$category[authors_list_A_comb$category=="primary organ – regional branch"] <- "un primary organ"
 
 
 
