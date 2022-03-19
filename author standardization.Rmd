@@ -266,7 +266,7 @@ results_urls_t <- results_urls[results_urls$exists == 'TRUE',]
 
 
 ```{r}
-
+# OLD CODE DON'T RUN
 weblink_au_t <- results_urls_t$weblink_au
 
 
@@ -354,17 +354,17 @@ au_category
 
 ```{r}
 #group and summarize
-au_category_clean <- au_category_t %>%
- group_by(id) %>%
+au_category_clean <- au_category_t2 %>%
+ group_by(weblink_au_t) %>%
  summarize(category = str_c(category, collapse = ", "))
 au_category_clean 
 
 #reorder by index
-au_category_clean[order(as.numeric(rownames(au_category_clean$index))),]
+#au_category_clean[order(as.numeric(rownames(au_category_clean$index))),]
 
-au_category_clean  <- read.table(text=readClipboard(), header=TRUE)    
-au_category_clean$index <- as.numeric(row.names(au_category_clean ))
-au_category_clean [order(au_category_clean$id), ]
+#au_category_clean  <- read.table(text=readClipboard(), header=TRUE)    
+#au_category_clean$index <- as.numeric(row.names(au_category_clean ))
+#au_category_clean [order(au_category_clean$id), ]
 
 #separate type text from category
 #au_category_clean <- str_split_fixed(au_category_clean$category, "Type,", 2)
@@ -382,43 +382,43 @@ au_category_clean$category <- au_category_clean$text
 
 au_category_clean <- mutate(au_category_clean, text=NULL)
 
-au_category_clean
+urls_with_cate <- au_category_clean
 
 #reorder
-au_category_clean$id <- as.numeric(au_category_clean$id)
+#au_category_clean$id <- as.numeric(au_category_clean$id)
 
-au_category_clean[order(au_category_clean$id, decreasing = FALSE),] 
+#au_category_clean[order(au_category_clean$id, decreasing = FALSE),] 
 
 
 #merge using the index
 
-colnames(results_urls_t)[1] <- "id"
+#colnames(results_urls_t)[1] <- "id"
 
-as.character(results_urls_t2$id)
+#as.character(results_urls_t2$id)
 
-urls_with_cate <-merge(results_urls_t, au_category_clean, by.x = results_urls_t$index, by.y = "id", all.y = TRUE)
+#urls_with_cate <-merge(results_urls_t, au_category_clean, by.x = results_urls_t$index, by.y = "id", all.y = TRUE)
 
-left_join(results_urls_t,au_category_clean, by = "id")
+#left_join(results_urls_t,au_category_clean, by = "id")
 
 #remove redundant id
-urls_with_cate <- mutate(urls_with_cate, exists=NULL)
+#urls_with_cate <- mutate(urls_with_cate, exists=NULL)
 
 ```
 
 
 ```{r}
 #merge with titles
-authors_list_A <- merge(authors_list, urls_with_cate, by.x = "weblink", by.y = "weblink_au", all.x = TRUE)
+authors_list_A <- merge(authors_list, urls_with_cate, by.x = "weblink", by.y = "weblink_au_t", all.y = TRUE)
+#authors_list_A
+#authors_list_A <- unique(authors_list_A)
 
-authors_list_A <- unique(authors_list_A)
-
-authors_list_A 
+#authors_list_A 
 
 #remove redundant cols
-authors_list_A <- mutate(authors_list_A, weblink=NULL, piece=NULL, au_category=NULL, id=NULL)
-authors_list_A
+#authors_list_A <- mutate(authors_list_A, weblink=NULL, piece=NULL, au_category=NULL, id=NULL)
+#authors_list_A
 
-authors_list_A <- unique(authors_list_A)
+#authors_list_A <- unique(authors_list_A)
 authors_list_A
 
 
@@ -518,18 +518,20 @@ data2 <- iris[iris$Species %like% "virg", ]
 
 un_programs <- 'UN-Habitat|UNDP|UNEP|UN Global Compact'
 
-df <- data.frame(authors_list_A$authors, un_programs = 0)
+df <- data.frame(unique(authors_list_A$authors), un_programs = 0)
 df[grep(un_programs, df$authors, value = F), "un_programs"] <- 1
+colnames(df)[1] <- "authors"
+df <- df[order(df$un_programs, decreasing = TRUE),] %>% unique()
 
 df
-
-
 
 #------------------------UN SPECIALIZED AGENCIES
 un_specialized_agencies <-
   c('FAO|Food and Agriculture Organization of the United Nations|ICAO|International Civil Aviation Organization|IFAD|International Fund for Agricultural Development|ILO|International Labour Organization|IMF|International Monetary Fund|IMO|International Maritime Organization|ITU|International Telecommunication Union|UNESCO|United Nations Educational Scientific and Cultural Organization|UNIDO|United Nations Industrial Development Organization|UNWTO|World Tourism Organization|UPU|Universal Postal Union|WHO|World Health Organization|WIPO|World Intellectual Property Organization|WMO|World Meteorological Organization|World Bank Group|World Bank')
 df_agent <- data.frame(authors_list_A$authors, un_specialized_agencies = 0)
 df_agent[grep(un_specialized_agencies, df_agent$authors, value = F), "un_specialized_agencies"] <- 1
+colnames(df_agent)[1] <- "authors"
+df_agent <- df_agent[order(df_agent$un_specialized_agencies, decreasing = TRUE),] %>% unique()
 
 df_agent
 
@@ -538,17 +540,19 @@ un <-
   c('UN DESA|UN Statistics Division|United Nations Statistics Division|United Nations Global Compact Academy|UNDCO|UNGCA|UNITAR')
 df_un <- data.frame(authors_list_A$authors, un = 0)
 df_un[grep(un, df_un$authors, value = F), "un"] <- 1
-
+colnames(df_un)[1] <- "authors"
+df_un <- df_un[order(df_un$un, decreasing = TRUE),] %>% unique()
 df_un
 
 
 #------------------------NONProfit
 #space clear rm(unsdglearn,unsdglearn_silos,coursera)
-
-ngo <-c('(c)(3)|501|nonprofit|non-profit|non-governmental|nongovernmental|Non-governmental|NGO|ngo')
+ngo <-
+  c('501|nonprofit|non-profit|non-governmental|nongovernmental|Non-governmental organization|Non-governmental|NGO|ngo')
 df_ngo <- data.frame(authors_list_A$authors, ngo = 0)
 df_ngo[grep(ngo, df_ngo$authors, value = F), "ngo"] <- 1
-
+colnames(df_ngo)[1] <- "authors"
+df_ngo <- df_ngo[order(df_ngo$ngo, decreasing = TRUE),] %>% unique()
 df_ngo
 
 #------------------
@@ -556,35 +560,45 @@ df_ngo
 
 
 #------------------ If Coded, Change Category
-df
-df_agent 262
-authors_list_A
+#df
+#df_agent 262
+#authors_list_A
 #add on new columns
-522
-authors_list_A
-df
+#522
+#authors_list_A
+#df
 
-authors_list_A$un_programs <- merge(authors_list_A, df, by.x = "authors_list_A$authors", by.y = "df$authors_list_A.authors", all.x = TRUE)
+```
 
-authors_list_A_comb$un_specialized_agencies <- merge(authors_list_A_comb, df_agent, by = "authors_list_A.authors", all = TRUE)
+```{r}
+#start to combine
+#authors_list_A_comb <- mutate(authors_list_A, titles=NULL, piece=NULL, weblink=NULL, au_category=NULL)
 
-authors_list_A_comb$ngo <- merge(authors_list_A_comb, df_ngo, by.x = "authors_list_A.authors", all = TRUE)
+authors_list_A_comb <- left_join(authors_list_A_comb,df, by = "authors") 
+authors_list_A_comb
+authors_list_A_comb <- left_join(authors_list_A_comb,df_agent, by = "authors")
+authors_list_A_comb <- left_join(authors_list_A_comb,df_ngo, by = "authors")
+authors_list_A_comb <- left_join(authors_list_A_comb,df_un, by = "authors")
 
-authors_list_A_comb$un <- merge(authors_list_A_comb, df_un, by.x = "authors_list_A.authors", all = TRUE)
-
-#change cateogries
 
 authors_list_A_comb$category[authors_list_A_comb$un_programs=="1"] <- "un program"
 authors_list_A_comb$category[authors_list_A_comb$un_specialized_agencies=="1"] <- "un specialized agency"
-
-authors_list_A_comb$category[authors_list_A_comb$ngo=="1"] <- "ngo"
 authors_list_A_comb$category[authors_list_A_comb$ngo=="1"] <- "ngo"
 authors_list_A_comb$category[authors_list_A_comb$un=="1"] <- "un"
+
 
 authors_list_A_comb
 ```
 
+```{r}
+#cut unnessesary columns before fixing
 
+#authors_list_A_comb <- mutate(authors_list_A_comb, un_programs=NULL, un_specialized_agencies=NULL, ngo=NULL, un=NULL)
+
+#authors_list_A_comb <- unique(authors_list_A_comb)
+#authors_list_A_comb
+
+```
 
 
 
@@ -712,7 +726,7 @@ authors_list_A_comb$category[authors_list_A_comb$category=="primary organ – re
 
 
 
-authors_list_A_comb$category
+authors_list_A_comb
 
 
 write.csv(authors_list_A_comb,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/authors_list_A_comb.csv", row.names = TRUE)
