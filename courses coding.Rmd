@@ -113,8 +113,12 @@ descrp_list$key_category <- descrp_list$description
 
 dict <- dictionary(file = "data/dictionary/policy_agendas_english.lcd")
 
+dfm(dfmat1, remove = stopwords("english"), stem = TRUE, verbose = TRUE)
 
-dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
+dfmat_descrip <- tokens(descrp_list$key_category)
+dfm_wordstem(dfmat_descrip)
+dfmat_descrip <-dfm(dfmat_descrip, remove_punct = TRUE, tolower = TRUE, stem = TRUE, verbose = TRUE)
+
 d_descrip <- dfm_lookup(dfmat_descrip, dict)
 d_descrip <- as.data.frame(as.matrix(d_descrip))
 d_descrip$id <- seq.int(nrow(d_descrip))
@@ -178,6 +182,50 @@ reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity 
 ```
 
 ```{r}
+#terms into a character list
+participation_keystems <- tidy_participation$word
+policy_coh_keystems <- as.list(tidy_participation$word)
+
+
+policy_coh_keystems <- as.list(tidy_participation)
+names(participation_keystems)
+participation_keystems
+
+
+#PARTICIPATION dictionary
+dict_part <- dictionary(list(participation_keystems = c("particip", "capabl", "econom", "propos", "assess", "relev", "polici", "measur", "implement", "associ", "compet", "busi", "societ", "develop", "social", "actor", "represent", "stakehold", "involv", "collabor", "govern", "approach", "institution", "interact", "build", "trust", "share", "understand", "increas", "commit", "consensus", "decis", "accept", "facilit", "specif", "knowledg", "valu", "resourc", "conceptu", "clarif", "note", "articl", "refer", "polit", "citizen", "elect", "aspect", "form", "concept", "democrat", "institut", "discuss", "adopt", "activ", "matter", "indirect", "government", "affair", "vote", "extend", "engag", "participation", "stakeholders", "multi-stakeholders")))
+
+
+
+dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
+d_descrip <- dfm_lookup(dfmat_descrip, dict_part)
+d_descrip <- as.data.frame(as.matrix(d_descrip))
+d_descrip$id <- seq.int(nrow(d_descrip))
+
+d_descrip
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
 #import text from  Glass, L., & Newig, J. (2019). Governance for achieving the sustainable development goals: How important are participation, policy coherence, reflexivity, adaptation and democratic institutions? Earth System Governance, 2, 100031. doi:10.1016/j.esg.2019.100031
 
 #-------POLICY COHERENCE
@@ -229,20 +277,36 @@ reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity 
 
 ```{r}
 #terms into a character list
-policy_coh_keystems <- tidy_policy_c$word
+policy_coh_keystems <- tidy_policy_c$word #pick one
+policy_coh_keystems <- as.list(tidy_policy_c)
+names(policy_coh_keystems)
+policy_coh_keystems
+
+
 
 #POLICY COHERENCE dictionary
-dict_pol <- dictionary(list(tidy_policy_c$word))
+#dict_pol <- dictionary(policy_coh_keystems)
+
+dict_policy_coh <- dictionary(list(policy_coh_keystems = c("polici", "coher", "extent", "institut", "structur", "foster", "coordin", "implement", "interministeri","communic", "normat", "govern", "agenda", "effect", "framework", "sustain", "develop", "adapt", "arrang", "process", "increas", "design", "aid", "systemat", "promot", "mutual", "reinforc", "action", "depart", "agenc", "creat", "synergi", "achiev", "defin", "object", "integr", "approach", "complex", "issu", "network", "theori", "common", "goal", "overcom", "silo", "mental", "sector", "level", "polit", "commit", "strong", "leadership", "contribut", "reduct", "trade", "off", "enhanc", "align", "econom", "social", "environment", "reduc", "unintend", "consequ", "inform", "decis", "diverg", "target", "stronger", "focus", "interrel", "time", "consum", "effort", "interact", "product", "feedback", "policy coherence","coherence")))
 
 
-dfmat_ex <- dfm(tokens(authors_list_A$authors, remove_punct = TRUE))
-d_au <- dfm_lookup(dfmat_ex, dict_au)
-df_au <- as.data.frame(as.matrix(d_au))
-df_au$id <- seq.int(nrow(df_au))
+dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
+d_descrip <- dfm_lookup(dfmat_descrip, dict_policy_coh)
+d_descrip <- as.data.frame(as.matrix(d_descrip))
+d_descrip$id <- seq.int(nrow(d_descrip))
+
+d_descrip
+
 
 
 
 ```
+
+
+
+
+
+
 
 ```{r}
 #don't push - lots of tried attempts
