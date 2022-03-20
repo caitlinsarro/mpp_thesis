@@ -176,7 +176,6 @@ tidy_participation<-tidy_participation %>%
 tidy_participation <- unique(tidy_participation)
 
 policy_coherence <- read_csv("data/dictionary/glass newig/policy coherence.csv")
-democratic_institutions_ <- read_csv("data/dictionary/glass newig/democratic institutions .csv")
 reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity and adaptation.csv")
 
 ```
@@ -184,10 +183,10 @@ reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity 
 ```{r}
 #terms into a character list
 participation_keystems <- tidy_participation$word
-policy_coh_keystems <- as.list(tidy_participation$word)
+participation_keystems <- as.list(tidy_participation$word)
 
 
-policy_coh_keystems <- as.list(tidy_participation)
+participation_keystems <- as.list(tidy_participation)
 names(participation_keystems)
 participation_keystems
 
@@ -208,8 +207,6 @@ d_descrip
 
 
 ```
-
-
 
 
 
@@ -266,13 +263,6 @@ tidy_policy_c
 
 
 
-
-
-#---------------demo
-
-democratic_institutions_ <- read_csv("data/dictionary/glass newig/democratic institutions .csv")
-reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity and adaptation.csv")
-
 ```
 
 ```{r}
@@ -282,6 +272,9 @@ policy_coh_keystems <- as.list(tidy_policy_c)
 names(policy_coh_keystems)
 policy_coh_keystems
 
+policy_coh_keystems <- as.list(tidy_policy_c)
+names(policy_coh_keystems)
+policy_coh_keystems
 
 
 #POLICY COHERENCE dictionary
@@ -301,6 +294,169 @@ d_descrip
 
 
 ```
+```{r}
+#import text from  Glass, L., & Newig, J. (2019). Governance for achieving the sustainable development goals: How important are participation, policy coherence, reflexivity, adaptation and democratic institutions? Earth System Governance, 2, 100031. doi:10.1016/j.esg.2019.100031
+
+#-------DEMOCRATIC INSTITUTIONS
+democratic_institutions <- read_csv("data/dictionary/glass newig/democratic institutions .csv")
+
+tidy_democratic <- democratic_institutions %>%
+    unnest_tokens("word", Terms)
+
+#remove stopwords
+data("stop_words")
+    tidy_democratic <- tidy_democratic %>%
+      anti_join(stop_words)
+    
+#remove punctuation
+#tidy_participation<-tidy_participation[-grep("\\b\\d+\\b", tidy_participation$word),]
+tidy_democratic$word <- gsub("[[:punct:]]|[[:digit:]]|^http:\\/\\/.*|^https:\\/\\/.*","", tidy_democratic$word)
+
+#to lowercase
+tidy_democratic$word<- tolower(tidy_democratic$word)
+
+#remove whitespace
+tidy_democratic$word <- gsub("\\s+","",tidy_democratic$word)
+
+#stemming the keywords
+tidy_democratic <- tidy_democratic %>%
+      mutate_at("word", funs(wordStem((.), language="en")))
+
+
+#see most frequent   
+#tidy_participation %>%
+#  count(word) %>%
+#    arrange(desc(n))
+
+#keep unique values
+tidy_democratic <- unique(tidy_democratic)
+
+policy_coherence <- read_csv("data/dictionary/glass newig/policy coherence.csv")
+reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity and adaptation.csv")
+
+```
+
+```{r}
+
+
+#terms into a character list
+democratic_keystems <- tidy_democratic$word
+democratic_keystems <- as.list(tidy_democratic$word)
+
+
+democratic_keystems <- as.list(tidy_democratic)
+names(democratic_keystems)
+democratic_keystems
+
+
+#DEMOCRATIC INSTITUTIONS dictionary
+dict_demo <- dictionary(list(democratic_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent")))
+
+
+
+dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
+d_descrip <- dfm_lookup(dfmat_descrip, dict_demo)
+d_descrip <- as.data.frame(as.matrix(d_descrip))
+d_descrip$id <- seq.int(nrow(d_descrip))
+
+d_descrip
+
+
+
+
+```
+
+
+
+```{r}
+#import text from  Glass, L., & Newig, J. (2019). Governance for achieving the sustainable development goals: How important are participation, policy coherence, reflexivity, adaptation and democratic institutions? Earth System Governance, 2, 100031. doi:10.1016/j.esg.2019.100031
+
+#-------REFLEXIVITY AND ADAPTATION INSTITUTIONS
+reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity and adaptation.csv")
+
+tidy_reflex_adapt <- reflexivity_and_adaptation %>%
+    unnest_tokens("word", Terms)
+
+#remove stopwords
+data("stop_words")
+    tidy_reflex_adapt <- tidy_reflex_adapt %>%
+      anti_join(stop_words)
+    
+#remove punctuation
+#tidy_participation<-tidy_participation[-grep("\\b\\d+\\b", tidy_participation$word),]
+tidy_reflex_adapt$word <- gsub("[[:punct:]]|[[:digit:]]|^http:\\/\\/.*|^https:\\/\\/.*","", tidy_reflex_adapt$word)
+
+#to lowercase
+tidy_reflex_adapt$word<- tolower(tidy_reflex_adapt$word)
+
+#remove whitespace
+tidy_reflex_adapt$word <- gsub("\\s+","",tidy_reflex_adapt$word)
+
+#stemming the keywords
+tidy_reflex_adapt <- tidy_reflex_adapt %>%
+      mutate_at("word", funs(wordStem((.), language="en")))
+
+
+#see most frequent   
+#tidy_participation %>%
+#  count(word) %>%
+#    arrange(desc(n))
+
+#keep unique values
+tidy_reflex_adapt <- unique(tidy_reflex_adapt)
+
+
+```
+
+```{r}
+
+
+#terms into a character list
+reflex_adpt_keystems <- tidy_reflex_adapt$word
+reflex_adpt_keystems <- as.list(tidy_reflex_adapt$word)
+
+
+reflex_adpt_keystems <- as.list(tidy_reflex_adapt)
+names(reflex_adpt_keystems)
+reflex_adpt_keystems
+
+
+#REFLEXIVITY AND ADAPTATION dictionary
+dict_ref_ad <- dictionary(list(reflex_adpt_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent")))
+
+
+
+dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
+d_descrip <- dfm_lookup(dfmat_descrip, dict_ref_ad)
+d_descrip <- as.data.frame(as.matrix(d_descrip))
+d_descrip$id <- seq.int(nrow(d_descrip))
+
+d_descrip
+
+
+
+
+```
+```{r}
+#check overlaps
+#reflex_adpt_keystems
+#democratic_keystems
+#policy_coh_keystems
+#participation_keystems
+
+#intersect(,)
+
+```
+
+```{r}
+
+
+
+
+```
+
+
+
 
 
 
@@ -353,52 +509,9 @@ df_source <- DataframeSource(participation_source)
 ```
 
 
-```{r}
-#author dictionaries
-#------------------------
-
-#df <- data.frame(text =  c('flight cancelled','dog cat','coach travel','car bus','cow sheep',' #high bar'), 
-#                 transport = 0)
-#words <- 'flight|flights|plane|seats|seat|travel|time|coach'
-
-
-#df[grep(words, df$text, value = F), "transport"] <- 1
-#taxglob = "tax*",
-#taxregex = "tax.+$",
-
-#AUTHOR dictionary
-dict_au <- dictionary(list(un_programs = c("UN-Habitat", "UNDP", "UNEP", "UN Global Compact"),
-                        un_specialized_agencies = c("FAO", "Food and Agriculture Organization of the United Nations", "ICAO", "International Civil Aviation Organization", "IFAD", "International Fund for Agricultural Development","International Labour Organization","IMF","International Monetary Fund","IMO","International Maritime Organization","ITU","International Telecommunication Union","UNESCO","United Nations Educational Scientific and Cultural Organization","UNIDO","United Nations Industrial Development Organization","UNWTO","World Tourism Organization","UPU","Universal Postal Union","WHO","World Health Organization","WIPO","World Intellectual Property Organization","WMO","World Meteorological Organization","World Bank Group","World Bank"),
-                        un = c("UN DESA", "UN Statistics Division", "United Nations Statistics Division", "United Nations Global Compact Academy", "United Nations Global Compact Academy","UNDCO","UNGCA","UNITAR")))
-
-
-dfmat_ex <- dfm(tokens(authors_list_A$authors, remove_punct = TRUE))
-d_au <- dfm_lookup(dfmat_ex, dict_au)
-df_au <- as.data.frame(as.matrix(d_au))
-df_au$id <- seq.int(nrow(df_au))
 
 
 
-#------------------------------
-
-#CATEGORY dictionary
-dict_cat <- dictionary(list(
-                        ngo = c("501", "nonprofit", "non-profit", "non-governmental", "nongovernmental","Non-governmental organization","Non-governmental","NGO","ingo","ngo","nongovernmental","philanthropic initiative","Foundation","501c3")))
-
-
-
-
-
-dfmat_ex <- dfm(tokens(authors_list_A$category, remove_punct = TRUE))
-d_cat <- dfm_lookup(dfmat_ex, dict_cat)
-df_cat <- as.data.frame(as.matrix(d_cat))
-df_cat$id <- seq.int(nrow(df_cat))
-
-
-#------------------------------------
-
-
-```
 
 
 
