@@ -79,7 +79,8 @@ keywords_unsdglearn_silos <- unsdglearn_silos %>% select(titles, keywords) #fix 
 keywords_unsdglearn <- unsdglearn %>% select(titles, keywords) #fix this s
 keywords_sdgacademy <- sdgacademy %>% select(titles_acad, keywords) #fix this standardize
 
-descrp_sdgacademy <- descrp_acad
+# descrp_acad
+
 
 #combine into one set
 combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn, keywords_sdgacademy)
@@ -92,20 +93,26 @@ combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn,
 
 ```{r}
 #to long data
-combined <- combined %>% 
-  mutate(authors = strsplit(as.character(authors), ",")) %>%
-  unnest(authors)
+# combined <- sdgacad_df_mini
+
+#combined <- combined %>% 
+#  mutate(keywords = strsplit(as.character(keywords), ",")) %>%
+#  unnest(keywords)
 
 #trim leading and ending whitespaces
-combined$authors <- trimws(combined$authors)
+#combined$keywords <- trimws(combined$keywords)
 
-descrp_list <- combined
-
+descrp_list <- sdgacad_df_mini
+#combined
 
 #make a dataframe
 #duplicate column (safety redudancy)
 descrp_list$key_category <- descrp_list$description
 
+
+dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
+
+descrp_list$key_category
 ```
 
 ```{r}
@@ -113,11 +120,11 @@ descrp_list$key_category <- descrp_list$description
 
 dict <- dictionary(file = "data/dictionary/policy_agendas_english.lcd")
 
-dfm(dfmat1, remove = stopwords("english"), stem = TRUE, verbose = TRUE)
+#dfm(dfmat1, remove = stopwords("english"), stem = TRUE, verbose = TRUE)
 
-dfmat_descrip <- tokens(descrp_list$key_category)
+dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE, tolower = TRUE, stem = TRUE, verbose = TRUE))
 dfm_wordstem(dfmat_descrip)
-dfmat_descrip <-dfm(dfmat_descrip, remove_punct = TRUE, tolower = TRUE, stem = TRUE, verbose = TRUE)
+#dfmat_descrip <-dfm(dfmat_descrip, remove_punct = TRUE, tolower = TRUE, stem = TRUE, verbose = TRUE)
 
 d_descrip <- dfm_lookup(dfmat_descrip, dict)
 d_descrip <- as.data.frame(as.matrix(d_descrip))
@@ -125,16 +132,6 @@ d_descrip$id <- seq.int(nrow(d_descrip))
 
 d_descrip
 
-
-mydfm.un <- dfm(mydfm.trim, groups = "country", dictionary = dict)
-
-un.topics.pa <- convert(mydfm.un, "data.frame") %>%
-  dplyr::rename(country = doc_id) %>%
-  select(country, immigration, intl_affairs, defence) %>%
-  tidyr::gather(immigration:defence, key = "Topic", value = "Share") %>%
-  group_by(country) %>%
-  mutate(Share = Share / sum(Share)) %>%
-  mutate(Topic = haven::as_factor(Topic))
 
 ```
 
@@ -178,9 +175,6 @@ tidy_participation <- unique(tidy_participation)
 policy_coherence <- read_csv("data/dictionary/glass newig/policy coherence.csv")
 reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity and adaptation.csv")
 
-```
-
-```{r}
 #terms into a character list
 participation_keystems <- tidy_participation$word
 participation_keystems <- as.list(tidy_participation$word)
@@ -190,30 +184,7 @@ participation_keystems <- as.list(tidy_participation)
 names(participation_keystems)
 participation_keystems
 
-
-#PARTICIPATION dictionary
-dict_part <- dictionary(list(participation_keystems = c("particip", "capabl", "econom", "propos", "assess", "relev", "polici", "measur", "implement", "associ", "compet", "busi", "societ", "develop", "social", "actor", "represent", "stakehold", "involv", "collabor", "govern", "approach", "institution", "interact", "build", "trust", "share", "understand", "increas", "commit", "consensus", "decis", "accept", "facilit", "specif", "knowledg", "valu", "resourc", "conceptu", "clarif", "note", "articl", "refer", "polit", "citizen", "elect", "aspect", "form", "concept", "democrat", "institut", "discuss", "adopt", "activ", "matter", "indirect", "government", "affair", "vote", "extend", "engag", "participation", "stakeholders", "multi-stakeholders")))
-
-
-
-dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
-d_descrip <- dfm_lookup(dfmat_descrip, dict_part)
-d_descrip <- as.data.frame(as.matrix(d_descrip))
-d_descrip$id <- seq.int(nrow(d_descrip))
-
-d_descrip
-
-
-
-
 ```
-
-
-
-
-
-
-
 
 
 
@@ -261,11 +232,6 @@ tidy_policy_c <- unique(tidy_policy_c)
 tidy_policy_c
 
 
-
-
-```
-
-```{r}
 #terms into a character list
 policy_coh_keystems <- tidy_policy_c$word #pick one
 policy_coh_keystems <- as.list(tidy_policy_c)
@@ -277,23 +243,9 @@ names(policy_coh_keystems)
 policy_coh_keystems
 
 
-#POLICY COHERENCE dictionary
-#dict_pol <- dictionary(policy_coh_keystems)
-
-dict_policy_coh <- dictionary(list(policy_coh_keystems = c("polici", "coher", "extent", "institut", "structur", "foster", "coordin", "implement", "interministeri","communic", "normat", "govern", "agenda", "effect", "framework", "sustain", "develop", "adapt", "arrang", "process", "increas", "design", "aid", "systemat", "promot", "mutual", "reinforc", "action", "depart", "agenc", "creat", "synergi", "achiev", "defin", "object", "integr", "approach", "complex", "issu", "network", "theori", "common", "goal", "overcom", "silo", "mental", "sector", "level", "polit", "commit", "strong", "leadership", "contribut", "reduct", "trade", "off", "enhanc", "align", "econom", "social", "environment", "reduc", "unintend", "consequ", "inform", "decis", "diverg", "target", "stronger", "focus", "interrel", "time", "consum", "effort", "interact", "product", "feedback", "policy coherence","coherence")))
-
-
-dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
-d_descrip <- dfm_lookup(dfmat_descrip, dict_policy_coh)
-d_descrip <- as.data.frame(as.matrix(d_descrip))
-d_descrip$id <- seq.int(nrow(d_descrip))
-
-d_descrip
-
-
-
-
 ```
+
+
 ```{r}
 #import text from  Glass, L., & Newig, J. (2019). Governance for achieving the sustainable development goals: How important are participation, policy coherence, reflexivity, adaptation and democratic institutions? Earth System Governance, 2, 100031. doi:10.1016/j.esg.2019.100031
 
@@ -334,9 +286,7 @@ tidy_democratic <- unique(tidy_democratic)
 policy_coherence <- read_csv("data/dictionary/glass newig/policy coherence.csv")
 reflexivity_and_adaptation <- read_csv("data/dictionary/glass newig/reflexivity and adaptation.csv")
 
-```
 
-```{r}
 
 
 #terms into a character list
@@ -347,24 +297,9 @@ democratic_keystems <- as.list(tidy_democratic$word)
 democratic_keystems <- as.list(tidy_democratic)
 names(democratic_keystems)
 democratic_keystems
-
-
-#DEMOCRATIC INSTITUTIONS dictionary
-dict_demo <- dictionary(list(democratic_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent")))
-
-
-
-dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
-d_descrip <- dfm_lookup(dfmat_descrip, dict_demo)
-d_descrip <- as.data.frame(as.matrix(d_descrip))
-d_descrip$id <- seq.int(nrow(d_descrip))
-
-d_descrip
-
-
-
-
 ```
+
+
 
 
 
@@ -406,10 +341,6 @@ tidy_reflex_adapt <- tidy_reflex_adapt %>%
 tidy_reflex_adapt <- unique(tidy_reflex_adapt)
 
 
-```
-
-```{r}
-
 
 #terms into a character list
 reflex_adpt_keystems <- tidy_reflex_adapt$word
@@ -421,22 +352,31 @@ names(reflex_adpt_keystems)
 reflex_adpt_keystems
 
 
-#REFLEXIVITY AND ADAPTATION dictionary
-dict_ref_ad <- dictionary(list(reflex_adpt_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent")))
+```
+
+```{r}
+
+#PARTICIPATION dictionary
+dict_descrip <- dictionary(list(participation_keystems = c("particip", "capabl", "econom", "propos", "assess", "relev", "polici", "measur", "implement", "associ", "compet", "busi", "societ", "develop", "social", "actor", "represent", "stakehold", "involv", "collabor", "govern", "approach", "institution", "interact", "build", "trust", "share", "understand", "increas", "commit", "consensus", "decis", "accept", "facilit", "specif", "knowledg", "valu", "resourc", "conceptu", "clarif", "note", "articl", "refer", "polit", "citizen", "elect", "aspect", "form", "concept", "democrat", "institut", "discuss", "adopt", "activ", "matter", "indirect", "government", "affair", "vote", "extend", "engag", "participation", "stakeholders", "multi-stakeholders","cooperation"),
+                             policy_coh_keystems = c("polici", "coher", "extent", "institut", "structur", "foster", "coordin", "implement", "interministeri","communic", "normat", "govern", "agenda", "effect", "framework", "sustain", "develop", "adapt", "arrang", "process", "increas", "design", "aid", "systemat", "promot", "mutual", "reinforc", "action", "depart", "agenc", "creat", "synergi", "achiev", "defin", "object", "integr", "approach", "complex", "issu", "network", "theori", "common", "goal", "overcom", "silo", "mental", "sector", "level", "polit", "commit", "strong", "leadership", "contribut", "reduct", "trade", "off", "enhanc", "align", "econom", "social", "environment", "reduc", "unintend", "consequ", "inform", "decis", "diverg", "target", "stronger", "focus", "interrel", "time", "consum", "effort", "interact", "product", "feedback", "policy coherence","coherence"),
+                               democratic_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent", "peace"),
+                               reflex_adpt_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent")))
 
 
 
 dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
-d_descrip <- dfm_lookup(dfmat_descrip, dict_ref_ad)
-d_descrip <- as.data.frame(as.matrix(d_descrip))
-d_descrip$id <- seq.int(nrow(d_descrip))
+d_descrip_ref <- dfm_lookup(dfmat_descrip, dict_descrip)
+d_descrip_ref <- as.data.frame(as.matrix(d_descrip_ref))
+d_descrip_ref$id <- seq.int(nrow(d_descrip_ref))
 
-d_descrip
-
+d_descrip_ref
 
 
 
 ```
+
+
+
 ```{r}
 #check overlaps
 #reflex_adpt_keystems
@@ -450,7 +390,32 @@ d_descrip
 
 ```{r}
 
+#d_descrip_demo
+#d_descrip_part
+#d_descrip_pol
+#d_descrip_ref
 
+
+#descrip_comb <- left_join(d_descrip_demo,d_descrip_part, by = "id") 
+#descrip_comb <- left_join(descrip_comb,d_descrip_pol, by = "id") 
+#descrip_comb <- left_join(descrip_comb,d_descrip_ref, by = "id")
+
+#descrip_comb
+
+
+#descrp_list <- sdgacad_df_mini
+descrip_comb <- left_join(descrp_list,d_descrip_ref, by = "id") 
+
+
+descrip_comb
+
+
+```
+
+```{r}
+
+
+write.csv(descrip_comb,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/descrip_comb.csv", row.names = TRUE)
 
 
 ```
@@ -593,6 +558,9 @@ authors_list_A_comb$au_category <-authors_list_A_comb$category
 #subet clean
 au_category_clean <- authors_list_A_comb[c("titles","authors","au_category")]
 au_category_clean
+
+
+
 ```
 
 

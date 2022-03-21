@@ -107,14 +107,52 @@ sdgacademy <- read_html(page_source[[1]])
 #Parse out TITLES for the training courses
 parsed_nodes <- html_nodes(sdgacademy, 
                            xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "desktop", " " ))]//a')
-titles_acad <- html_text(parsed_nodes)
+titles_acad <- html_text(parsed_nodes) 
 titles_acad
+
+#make a dataframe
+titles_df <- as.data.frame(titles_acad)
+#adding index as a col for matching
+titles_df$id <- seq.int(nrow(titles_df))
+
+
 
 #Parse out WEBLINKS to the courses
 weblink_acad <- sdgacademy  %>% html_nodes("div.course-item") %>% html_attr("data-link")
 weblink_acad
 
+#make a dataframe
+weblink_df <- as.data.frame(weblink_acad)
+#adding index as a col for matching
+weblink_df$id <- seq.int(nrow(weblink_df))
+left_join(titles_df,weblink_df, by="id")
+
+sdg_acad_list <- left_join(titles_df,weblink_df, by = "id")
+
+
+``
+
+```{r}
+
+# Define the TITLES worker function
+scraper <- function(weblink_acad) {
+  read_html(weblink_acad) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "desktop", " " ))]//a') %>% 
+    html_text() %>% 
+    enframe("id", "titles")  %>%
+    mutate(weblink_acad = weblink_acad) 
+}
+weblink_acad
+
+# Iterate over the urls, applying the function each time
+titles_acad <- map_dfr(weblink_acad, scraper, .id = "id")
+
+
+
+
 ```
+
+
 
 ```{r}
 # Subpage scraping
@@ -188,14 +226,15 @@ keywords <- as.vector(keywords_acad$keywords)
 ```
 
 ```{r}
-
 # Define the DESCRIPTION worker function
 scraper <- function(weblink_acad) {
   read_html(weblink_acad) %>% 
     html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "chapter-title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "no", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label | //*[contains(concat( " ", @class, " " ), concat( " ", "yes", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))]') %>% 
     html_text() %>% 
-    enframe("id", "description")
+    enframe("id", "description")  %>%
+    mutate(weblink_acad = weblink_acad) 
 }
+
 
 # Iterate over the urls, applying the function each time
 descrp_acad <- map_dfr(weblink_acad, scraper, .id = "id")
@@ -343,12 +382,16 @@ SDGs <- as.vector(sdgs_combined$SDGs)
 ```{r}
 #merge into single dataframe
 
-sdgacad_df <- data.frame(titles_acad, authors_acad, weblink_acad, sdgs_combined, keywords_acad, audience_acad )
+sdgacad_df <- data.frame(titles_acad, authors_acad, weblink_acad, sdgs_combined, keywords_acad, descrp_acad, audience_acad )
 
 #remove redundant cols
 sdgacad_df <- mutate(sdgacad_df, id=NULL, id.1=NULL, id.2=NULL)
 
-
+#sdg_acad_list has weblinks and titles correctly matched
+descrp_acad$id <- as.integer(descrp_acad$id)
+#mini
+sdgacad_df_mini <- left_join(sdg_acad_list, descrp_acad, by = "id")
+sdgacad_df_mini
 ```
 
 ```{r}

@@ -169,6 +169,12 @@ test <- read_html(weblink_test) %>%
 test
 
 
+read_html(weblink_test) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "category")  %>%
+    mutate(weblink_test = weblink_test) 
+
 
 ```
 
@@ -292,7 +298,7 @@ au_category_t
 ```
 
 ```{r}
-
+#THIS IS THE RIGHT ONE
 weblink_au_t <- results_urls_t$weblink_au
 
 
