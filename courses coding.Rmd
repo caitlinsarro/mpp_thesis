@@ -412,6 +412,48 @@ descrip_comb
 
 ```
 
+
+```{r}
+#I AM HERE
+descrip_comb
+authors_list
+
+authors_list <- read_csv("exports/authors_list_A_comb.csv")
+authors_list_lean <- authors_list %>% select(titles, authors, category) 
+
+authors_list_lean
+
+#combine all authors into the courses
+authors_list_lean <- authors_list_lean %>%
+ group_by(titles) %>%
+ summarize(category = str_c(category, collapse = ", "))
+authors_list_lean
+
+
+#
+descrip_comb$titles <- descrip_comb$titles_acad
+descrip_comb$titles <- descrip_comb$titles_acad
+
+#trim whitespace from each side
+descrip_comb$titles <- trimws(descrip_comb$titles)
+
+authors_list_lean$titles <- trimws(authors_list_lean$titles)
+
+
+#join the datasets
+descrip_comb_test <- left_join(descrip_comb, authors_list_lean,  by = "titles", all=TRUE) 
+
+descrip_comb_test
+
+```
+
+
+
+
+
+
+
+
 ```{r}
 
 
