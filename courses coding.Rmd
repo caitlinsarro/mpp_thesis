@@ -57,6 +57,7 @@ library(tidytext)
 library(SnowballC)
 
 library(topicmodels)
+library(qdap)
 
 ```
 
@@ -407,14 +408,30 @@ d_descrip_ref
 descrip_comb <- left_join(descrp_list,d_descrip_ref, by = "id") 
 
 
-descrip_comb
 
+descrip_comb_test <- descrip_comb %>% select( -id)
+
+colnames(descrip_comb_test)[apply(descrip_comb_test,1,which.max)]
+
+descrip_comb %>% 
+  mutate(max.col = colnames(pmax(participation_keystems, policy_coh_keystems, democratic_keystems, reflex_adpt_keystems )))
+
+colnames(descrip_comb)[apply(descrip_comb,1,which.max)]
+
+
+
+
+#colnames(descrip_comb)[max.col(descrip_comb, ties.method = "first")]
+descrip_comb %>% 
+  pivot_longer(cols = setdiff(names(.), "Year"), names_to = "column") %>% 
+  filter(max(value) == value) %>% 
+  pull(column)
 
 ```
 
 
 ```{r}
-#I AM HERE
+#I AM HEREE
 descrip_comb
 authors_list
 
@@ -422,6 +439,7 @@ authors_list <- read_csv("exports/authors_list_A_comb.csv")
 authors_list_lean <- authors_list %>% select(titles, authors, category) 
 
 authors_list_lean
+#authors_list_lean <- unique(authors_list_lean)
 
 #combine all authors into the courses
 authors_list_lean <- authors_list_lean %>%
@@ -437,13 +455,52 @@ descrip_comb$titles <- descrip_comb$titles_acad
 #trim whitespace from each side
 descrip_comb$titles <- trimws(descrip_comb$titles)
 
+
+
 authors_list_lean$titles <- trimws(authors_list_lean$titles)
 
 
 #join the datasets
 descrip_comb_test <- left_join(descrip_comb, authors_list_lean,  by = "titles", all=TRUE) 
 
+
+
+descrip_comb_test <- descrip_comb_test %>% select(titles, participation_keystems, policy_coh_keystems, democratic_keystems, reflex_adpt_keystems, category)
+
+
+
+#to long data
+descrip_comb_test <- descrip_comb_test %>% 
+  mutate(category = strsplit(as.character(category), ",")) %>%
+  unnest(category)
+
+#remove duplicates
+descrip_comb_test <- unique(descrip_comb_test)
 descrip_comb_test
+
+
+#combine all categories into the courses
+descrip_comb_test <- descrip_comb_test %>%
+ group_by(titles) %>%
+ summarize(category = str_c(category, collapse = ", "), participation_keystems = participation_keystems, policy_coh_keystems = policy_coh_keystems, democratic_keystems = democratic_keystems, reflex_adpt_keystems = reflex_adpt_keystems)
+
+#capacity typology based on coding
+
+
+descrip_comb_test$capacity[descrip_comb_test$participation_keystems>"0"] <- "participation"
+descrip_comb_test$capacity[descrip_comb_test$policy_coh_keystems>"0"] <- "policy cohesion"
+descrip_comb_test$capacity[descrip_comb_test$democratic_keystems>"0"] <- "democratic"
+descrip_comb_test$capacity[descrip_comb_test$reflex_adpt_keystems>"0"] <- "reflexive adaptive"
+
+#view
+#descrip_comb_test <- unique(descrip_comb_test)
+
+descrip_comb_test <- descrip_comb_test %>% 
+  mutate(category = strsplit(as.character(category), ",")) %>%
+  unnest(category)
+
+descrip_comb_test
+
 
 ```
 
@@ -619,7 +676,25 @@ write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/
 
 
 
+```{r}
+#remove duplicates from a cell
 
+#rem_dup_word <- function(x){
+#x <- tolower(x)
+#paste(unique(trimws(unlist(strsplit(x,split=" ",fixed=F,perl=T)))),collapse = 
+#" ")
+#}
+
+#duptest <- "Samsung WA80E5LEC samsung Top Loading with Diamond Drum, 6 kg 
+#(Silver)"
+
+#capacities<- descrip_comb_test$capacity
+#capacities <- as.data.frame(capacities)
+
+#test <- map_dfr(capacities, rem_dup_word, .id = "id")
+#test
+
+```
 
 
 
