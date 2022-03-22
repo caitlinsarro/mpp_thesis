@@ -109,13 +109,27 @@ descrp_list <- sdgacad_df_mini
 #make a dataframe
 #duplicate column (safety redudancy)
 descrp_list$key_category <- descrp_list$description
-descrp_list$key_category <- tolower(descrp_list$key_category)
-descrp_list$key_category <- gsub('[[:punct:] ]+',' ',descrp_list$key_category)
 
+#text cleaning lowercase
+descrp_list$key_category <- tolower(descrp_list$key_category)
+#text cleaning punctuation / symbols
+descrp_list$key_category <- gsub('[[:punct:] ]+',' ',descrp_list$key_category)
+descrp_list$key_category <- gsub('“',' ',descrp_list$key_category)
+descrp_list$key_category <- gsub('”',' ',descrp_list$key_category)
+descrp_list$key_category <- gsub('‘',' ',descrp_list$key_category)
+descrp_list$key_category <- gsub('’',' ',descrp_list$key_category)
+descrp_list$key_category <- gsub('–',' ',descrp_list$key_category)
+#remove stopwords
+descrp_list$key_category = removeWords(descrp_list$key_category, stopwords("english"))
+#remove whitespace
+descrp_list$key_category = stripWhitespace(descrp_list$key_category)
+descrp_list$key_category <- trimws(descrp_list$key_category)
+descrp_list$key_category <- gsub('  ',' ',descrp_list$key_category)
 
 dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
 
 head(descrp_list$key_category)
+descrp_list$key_category
 ```
 
 ```{r}
@@ -360,17 +374,23 @@ reflex_adpt_keystems
 ```{r}
 
 #All in one dictionary
-dict_descrip <- dictionary(list(participation_keystems = c("particip", "capabl", "econom", "propos", "assess", "relev", "polici", "measur", "implement", "associ", "compet", "busi", "societ", "develop", "social", "actor", "represent", "stakehold", "involv", "collabor","approach", "institution", "interact", "build", "trust", "share", "understand", "increas", "commit", "consensus", "decis", "accept", "facilit", "specif", "knowledg", "valu", "resourc", "conceptu", "clarif", "note", "articl", "refer", "citizen", "elect", "aspect", "form", "concept", "democrat", "institut", "discuss", "adopt", "activ", "matter", "indirect", "affair", "vote", "extend", "engag", "participation", "stakeholders", "multi-stakeholders","cooperation", "diversity and inclusion", "vulnerable populations", "cultural heritage", "youth and indigenous people", "reduce inequalities", "stakeholders prioritize", "social inclusion", "cultural diversity"),
-                             policy_coh_keystems = c("polici", "coher", "extent", "institut", "structur", "foster", "coordin", "implement", "interministeri","communic", "normat", "agenda", "effect", "framework", "sustain", "develop", "adapt", "arrang", "process", "increas", "design", "aid", "systemat", "promot", "mutual", "reinforc", "action", "depart", "agenc", "creat", "synergi", "achiev", "defin", "object", "integr", "approach", "complex", "issu", "network", "theori", "common", "goal", "overcom", "silo", "mental", "sector", "level", "commit", "strong", "leadership", "contribut", "reduct", "trade", "off", "enhanc", "align", "econom", "social", "environment", "reduc", "unintend", "consequ", "inform", "decis", "diverg", "target", "stronger", "focus", "interrel", "time", "consum", "effort", "interact", "product", "feedback", "policy coherence","coherence", "align policy decisions", "policy sequence", "policy sequencing", "policy alignment", "interconnected"),
+dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos", "assess", "relev", "associ", "compet", "represent", "stakehold", "collabor", "consensus", "decis", "facilit", "aspect", "form", "concept", "activ", "matter", "indirect", "affair", "vote", "extend", "engag", "participation", "stakeholders", "multi-stakeholders","cooperation", "collaboration", "diversity and inclusion", "vulnerable populations", "cultural heritage", "youth and indigenous people", "reduce inequalities", "build trust", "stakeholders prioritize", "social inclusion", "cultural diversity", "discussion forum", "conversations", "interactive platform", "living heritage"),
+                             policy_coh_keystems = c("coher", "extent", "structur", "foster", "coordin", "implement", "interministeri", "systemat", "mutual", "reinforc", "synergi", "integr", "coordination", "overcom", "silo", "unintended consequences", "diverg", "interrel", "trade off", "feedback loop", "policy coherence","coherence", "align policy decisions", "policy sequence", "policy sequencing", "policy alignment", "interconnected", "increase coherence", "across government departments", "institutional structures", "common goals", "complex issues", "government departments"),
                              
-                               democratic_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent", "peace", "democratic institutions", "negotiation skills", "ethical leadership", "contract negotiations", "government negotiators"),
+                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl", "express", "fair", "legislatur", "check", "balanc", "altern", "respect", "independ", "judiciari", "legitim", "liber", "democraci", "voter", "franchis", "pluralist", "competit", "equal", "autocraci", "regim", "represent", "peace", "civil liberties", "democratic institutions", "negotiation skills", "ethical leadership", "contract negotiations", "government negotiators", "transaction cost", "human rights", "transaction cost", "free elections", "political philosopher", "political polarization", "populism"),
                              
-                               reflex_adpt_keystems = c("qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent", "data", "measurement")))
+                               reflex_adpt_keystems = c("reflex", "monitor", "reform", "regulatori", "instrument", "trajectori", "perform", "transdisciplinari", "process improvement", "reflexivity", "self-monitoring", "strategic planning", "regulatory", "impact assessments", "impact assessment", "organizational reform", "adaptability", "evidence-based", "self-awareness", "performance", "development strategies", "development strategy", "long term", "assessment", "data", "measurement", "accountability", "systemic changes", "structural changes", "structural shifts", "policy instrument", "policy instruments"))
 
+descrp_list
 
+```
+
+```{r}
+
+#run dictionary against descriptions
 
 dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
-d_descrip_ref <- dfm_lookup(dfmat_descrip, dict_descrip)
+d_descrip_ref <- dfm_lookup(dfmat_descrip, dict_descrip,  valuetype = c("glob"))
 d_descrip_ref <- as.data.frame(as.matrix(d_descrip_ref))
 d_descrip_ref$id <- seq.int(nrow(d_descrip_ref))
 
@@ -416,11 +436,11 @@ descrip_comb <- left_join(descrp_list,d_descrip_ref, by = "id")
 ```{r}
 #assigning a category label per course
 
-
-#this is it
-
 descrip_comb$max.col <- descrip_comb %>% select(participation_keystems:reflex_adpt_keystems) %>% {names(.)[max.col(.)]}
 descrip_comb
+
+#how many of each
+table(descrip_comb$max.col)
 
 ```
 
