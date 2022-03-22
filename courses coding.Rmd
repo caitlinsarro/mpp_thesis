@@ -423,9 +423,17 @@ colnames(descrip_comb)[apply(descrip_comb,1,which.max)]
 
 #colnames(descrip_comb)[max.col(descrip_comb, ties.method = "first")]
 descrip_comb %>% 
-  pivot_longer(cols = setdiff(names(.), "Year"), names_to = "column") %>% 
+  pivot_longer(cols = setdiff(names(.), "Category"), names_to = "column") %>% 
   filter(max(value) == value) %>% 
   pull(column)
+
+descrip_comb_mini <- descrip_comb %>% select(-titles_acad,-id,-weblink_acad, -description, -key_category, -weblink, -titles)
+
+#this is it
+descrip_comb %>% mutate(max.col = colnames(descrip_comb_mini)[max.col(descrip_comb_mini)])
+
+descrip_comb_mini 
+
 
 ```
 
