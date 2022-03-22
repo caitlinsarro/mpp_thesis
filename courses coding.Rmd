@@ -57,7 +57,7 @@ library(tidytext)
 library(SnowballC)
 
 library(topicmodels)
-library(qdap)
+
 
 ```
 
@@ -109,11 +109,13 @@ descrp_list <- sdgacad_df_mini
 #make a dataframe
 #duplicate column (safety redudancy)
 descrp_list$key_category <- descrp_list$description
+descrp_list$key_category <- tolower(descrp_list$key_category)
+descrp_list$key_category <- gsub('[[:punct:] ]+',' ',descrp_list$key_category)
 
 
 dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
 
-descrp_list$key_category
+head(descrp_list$key_category)
 ```
 
 ```{r}
@@ -357,11 +359,13 @@ reflex_adpt_keystems
 
 ```{r}
 
-#PARTICIPATION dictionary
-dict_descrip <- dictionary(list(participation_keystems = c("particip", "capabl", "econom", "propos", "assess", "relev", "polici", "measur", "implement", "associ", "compet", "busi", "societ", "develop", "social", "actor", "represent", "stakehold", "involv", "collabor", "govern", "approach", "institution", "interact", "build", "trust", "share", "understand", "increas", "commit", "consensus", "decis", "accept", "facilit", "specif", "knowledg", "valu", "resourc", "conceptu", "clarif", "note", "articl", "refer", "polit", "citizen", "elect", "aspect", "form", "concept", "democrat", "institut", "discuss", "adopt", "activ", "matter", "indirect", "government", "affair", "vote", "extend", "engag", "participation", "stakeholders", "multi-stakeholders","cooperation"),
-                             policy_coh_keystems = c("polici", "coher", "extent", "institut", "structur", "foster", "coordin", "implement", "interministeri","communic", "normat", "govern", "agenda", "effect", "framework", "sustain", "develop", "adapt", "arrang", "process", "increas", "design", "aid", "systemat", "promot", "mutual", "reinforc", "action", "depart", "agenc", "creat", "synergi", "achiev", "defin", "object", "integr", "approach", "complex", "issu", "network", "theori", "common", "goal", "overcom", "silo", "mental", "sector", "level", "polit", "commit", "strong", "leadership", "contribut", "reduct", "trade", "off", "enhanc", "align", "econom", "social", "environment", "reduc", "unintend", "consequ", "inform", "decis", "diverg", "target", "stronger", "focus", "interrel", "time", "consum", "effort", "interact", "product", "feedback", "policy coherence","coherence"),
-                               democratic_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent", "peace"),
-                               reflex_adpt_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent")))
+#All in one dictionary
+dict_descrip <- dictionary(list(participation_keystems = c("particip", "capabl", "econom", "propos", "assess", "relev", "polici", "measur", "implement", "associ", "compet", "busi", "societ", "develop", "social", "actor", "represent", "stakehold", "involv", "collabor","approach", "institution", "interact", "build", "trust", "share", "understand", "increas", "commit", "consensus", "decis", "accept", "facilit", "specif", "knowledg", "valu", "resourc", "conceptu", "clarif", "note", "articl", "refer", "citizen", "elect", "aspect", "form", "concept", "democrat", "institut", "discuss", "adopt", "activ", "matter", "indirect", "affair", "vote", "extend", "engag", "participation", "stakeholders", "multi-stakeholders","cooperation", "diversity and inclusion", "vulnerable populations", "cultural heritage", "youth and indigenous people", "reduce inequalities", "stakeholders prioritize", "social inclusion", "cultural diversity"),
+                             policy_coh_keystems = c("polici", "coher", "extent", "institut", "structur", "foster", "coordin", "implement", "interministeri","communic", "normat", "agenda", "effect", "framework", "sustain", "develop", "adapt", "arrang", "process", "increas", "design", "aid", "systemat", "promot", "mutual", "reinforc", "action", "depart", "agenc", "creat", "synergi", "achiev", "defin", "object", "integr", "approach", "complex", "issu", "network", "theori", "common", "goal", "overcom", "silo", "mental", "sector", "level", "commit", "strong", "leadership", "contribut", "reduct", "trade", "off", "enhanc", "align", "econom", "social", "environment", "reduc", "unintend", "consequ", "inform", "decis", "diverg", "target", "stronger", "focus", "interrel", "time", "consum", "effort", "interact", "product", "feedback", "policy coherence","coherence", "align policy decisions", "policy sequence", "policy sequencing", "policy alignment", "interconnected"),
+                             
+                               democratic_keystems = c("democrat", "institut", "qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "polit", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent", "peace", "democratic institutions", "negotiation skills", "ethical leadership", "contract negotiations", "government negotiators"),
+                             
+                               reflex_adpt_keystems = c("qualiti", "includ", "elector", "process", "media", "freedom", "access", "inform", "civil", "right", "liberti", "rule", "law", "govern", "account", "transpar", "effici", "effect", "countri", "develop", "facilit", "collect", "action", "reduct", "transact", "cost", "public", "percept", "credibl", "express", "free", "elect", "fair", "inclus", "legislatur", "check", "balanc", "altern", "respect", "human", "independ", "judiciari", "theori", "legitim", "peopl", "liber", "democraci", "voter", "univers", "franchis", "pluralist", "citizen", "hold", "competit", "system", "equal", "autocraci", "regim", "represent", "data", "measurement")))
 
 
 
@@ -407,17 +411,39 @@ d_descrip_ref
 #descrp_list <- sdgacad_df_mini
 descrip_comb <- left_join(descrp_list,d_descrip_ref, by = "id") 
 
+```
+
+```{r}
+#assigning a category label per course
 
 
-descrip_comb_test <- descrip_comb %>% select( -id)
+#this is it
 
-colnames(descrip_comb_test)[apply(descrip_comb_test,1,which.max)]
+descrip_comb$max.col <- descrip_comb %>% select(participation_keystems:reflex_adpt_keystems) %>% {names(.)[max.col(.)]}
+descrip_comb
+
+```
+
+
+```{r}
+#old code
+
+
+
+descrip_comb$result = descrip_comb %>% select(participation_keystems, policy_coh_keystems, democratic_keystems, reflex_adpt_keystems) %>% names(descrip_comb)[apply(descrip_comb, 1, which.max)]
+
+descrip_comb$result <- colnames(descrip_comb)[apply(max.col = colnames(pmax(participation_keystems, policy_coh_keystems, democratic_keystems, reflex_adpt_keystems), MARGIN = 4))]
+
+
+descrip_comb_test <- descrip_comb %>% select( -id) %>% colnames(descrip_comb)[apply(descrip_comb,1,which.max)]
+
+colnames(descrip_comb_mini)[apply(descrip_comb_mini,1,which.max)]
 
 descrip_comb %>% 
   mutate(max.col = colnames(pmax(participation_keystems, policy_coh_keystems, democratic_keystems, reflex_adpt_keystems )))
 
 colnames(descrip_comb)[apply(descrip_comb,1,which.max)]
-
+descrip_comb_mini$result = descrip_comb_mini %>% names(descrip_comb_mini)[apply(descrip_comb_mini, 1, which.max)]
 
 
 
@@ -429,11 +455,21 @@ descrip_comb %>%
 
 descrip_comb_mini <- descrip_comb %>% select(-titles_acad,-id,-weblink_acad, -description, -key_category, -weblink, -titles)
 
-#this is it
-descrip_comb %>% mutate(max.col = colnames(descrip_comb_mini)[max.col(descrip_comb_mini)])
+
+
+summarize(descrip_comb_mini$result)
+
+#other attempts
+#descrip_comb_mini$max.col <- descrip_comb_mini[mutate(max.col = #colnames(descrip_comb_mini)[max.col(descrip_comb_mini, ties.method = c("first"))]) ]
+
+#%>% mutate(max.col_2 = colnames(descrip_comb_mini)[max.col(descrip_comb_mini, ties.method = c("last"))])
 
 descrip_comb_mini 
+descrip_comb
 
+descrip_comb_mini %>%
+ summarize(result)
+au_category_clean 
 
 ```
 

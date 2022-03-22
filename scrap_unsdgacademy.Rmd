@@ -229,7 +229,7 @@ keywords <- as.vector(keywords_acad$keywords)
 # Define the DESCRIPTION worker function
 scraper <- function(weblink_acad) {
   read_html(weblink_acad) %>% 
-    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "chapter-title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "no", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label | //*[contains(concat( " ", @class, " " ), concat( " ", "yes", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))]') %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "title-number", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))]') %>% 
     html_text() %>% 
     enframe("id", "description")  %>%
     mutate(weblink_acad = weblink_acad) 
@@ -256,6 +256,10 @@ descrp_acad[order(descrp_acad$id, decreasing = FALSE),]
 descrp <- as.vector(descrp_acad$description)
 
 descrp
+
+
+#old path
+#//*[contains(concat( " ", @class, " " ), concat( " ", "chapter-title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "no", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label | //*[contains(concat( " ", @class, " " ), concat( " ", "yes", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))]
 ```
 
 
@@ -391,6 +395,7 @@ sdgacad_df <- mutate(sdgacad_df, id=NULL, id.1=NULL, id.2=NULL)
 descrp_acad$id <- as.integer(descrp_acad$id)
 #mini
 sdgacad_df_mini <- left_join(sdg_acad_list, descrp_acad, by = "id")
+sdgacad_df_mini$titles <- sdgacad_df_mini$weblink_acad
 sdgacad_df_mini
 ```
 
