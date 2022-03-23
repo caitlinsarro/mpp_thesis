@@ -130,7 +130,7 @@ left_join(titles_df,weblink_df, by="id")
 sdg_acad_list <- left_join(titles_df,weblink_df, by = "id")
 
 
-``
+```
 
 ```{r}
 
@@ -401,7 +401,7 @@ sdgacad_df_mini
 
 ```{r}
 #export as CSV
-write.csv(sdgacad_df,"C:/Users/caitl/Documents/GitHub/thesis/exports/sdgacademy.csv", row.names = TRUE)
+write.csv(sdgacad_df,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/sdgacademy.csv", row.names = TRUE)
 
 ```
 

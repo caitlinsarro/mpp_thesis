@@ -67,6 +67,13 @@ Whenever you want to really understand what's going on within the functions of a
 ```{r}
 #UN SDGLearn Parsing 
 #start RSelenium
+
+system('docker kill $(docker ps -q)')
+Sys.sleep(2)
+system('docker run -d -p 4445:4444 selenium/standalone-chrome-debug:latest')
+Sys.sleep(2)
+system('docker container ls')
+
 remDr <- remoteDriver(
         remoteServerAdd = "localhost",
         port = 4445L,
@@ -144,7 +151,6 @@ lang
 #extract the links
 
 weblink <- unsdglearn  %>% html_nodes("div.card-content > h4 > a") %>% html_attr("href")
-
 
 
 ```
@@ -262,6 +268,39 @@ keywords <- map_dfr(weblink, scraper, .id = "id")
 
 
 ```{r}
+# Define the DESCRIPTION worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "resource-contentblock", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "wrapper", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "resource-contentblock", " " ))]//p') %>% 
+    html_text() %>% 
+    enframe("id", "description")  %>%
+    mutate(weblink = weblink) 
+}
+
+
+# Iterate over the urls, applying the function each time
+descrp <- map_dfr(weblink, scraper, .id = "id")
+
+
+
+#Combine into single columns
+
+descrp <- descrp %>%
+ group_by(id) %>%
+ summarize(description = str_c(description, collapse = ", "))
+
+
+descrp$id <- as.numeric(descrp$id)
+
+descrp[order(descrp$id, decreasing = FALSE),] 
+
+descrp$description <- gsub("\n\t\t\t\t\tAbout this course\n\t\t\t\t\t", "", descrp$description)
+
+
+
+```
+
+```{r}
 
 # Define the AUDIENCE worker function
 scraper <- function(weblink) {
@@ -290,20 +329,20 @@ keywords_combined <- keywords %>%
 #df3 <- merge(audience, keywords_combined, by = "id")
 
 chart_df <- merge(chart_df, keywords_combined, by = "id")
+chart_df <- merge(chart_df, descrp, by = "id")
 combined <- merge(chart_df, audience, by = "id", all = TRUE)
 
-write.csv(combined,"C:/Users/caitl/Documents/GitHub/thesis/exports/unsdglearn.csv", row.names = TRUE)
-
+write.csv(combined,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/unsdglearn.csv", row.names = TRUE)
 
 ```
 
 ```{r}
 #not working?
-#system("sudo docker pull selenium/standalone-chrome",wait=T)
-#Sys.sleep(5)
-#system("sudo docker run -d -p 4445:4444 selenium/standalone-chrome",wait=T)
-#Sys.sleep(5)
-#remDr <- remoteDriver(port=4445L, browserName="chrome")
-#Sys.sleep(15)
-#remDr$open()
+system("sudo docker pull selenium/standalone-chrome",wait=T)
+Sys.sleep(5)
+system("sudo docker run -d -p 4445:4444 selenium/standalone-chrome",wait=T)
+Sys.sleep(5)
+remDr <- remoteDriver(port=4445L, browserName="chrome")
+Sys.sleep(15)
+remDr$open()
 

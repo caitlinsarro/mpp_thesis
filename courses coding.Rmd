@@ -74,11 +74,15 @@ unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
 unsdglearn <- read_csv("exports/unsdglearn.csv")
 sdgacademy <- read_csv("exports/sdgacademy.csv")
 
+#quick fixes
+coursera$description <- coursera$keywords
+sdgacademy$titles <- sdgacademy$titles_acad
 
-keywords_cour <- coursera %>% select(titles, keywords)
-keywords_unsdglearn_silos <- unsdglearn_silos %>% select(titles, keywords) #fix this s
-keywords_unsdglearn <- unsdglearn %>% select(titles, keywords) #fix this s
-keywords_sdgacademy <- sdgacademy %>% select(titles_acad, keywords) #fix this standardize
+
+keywords_cour <- coursera %>% select(titles, description)
+keywords_unsdglearn_silos <- unsdglearn_silos %>% select(titles, description) 
+keywords_unsdglearn <- unsdglearn %>% select(titles, description) 
+keywords_sdgacademy <- sdgacademy %>% select(titles, description)
 
 # descrp_acad
 
@@ -103,17 +107,20 @@ combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn,
 #trim leading and ending whitespaces
 #combined$keywords <- trimws(combined$keywords)
 
-descrp_list <- sdgacad_df_mini
+descrp_list <- combined
 #combined
 
 #make a dataframe
 #duplicate column (safety redudancy)
 descrp_list$key_category <- descrp_list$description
 
+
+#text cleaning punctuation
+descrp_list$key_category <- gsub('[[:punct:] ]+',' ',descrp_list$key_category)
 #text cleaning lowercase
 descrp_list$key_category <- tolower(descrp_list$key_category)
-#text cleaning punctuation / symbols
-descrp_list$key_category <- gsub('[[:punct:] ]+',' ',descrp_list$key_category)
+
+#text cleaning symbols
 descrp_list$key_category <- gsub('“',' ',descrp_list$key_category)
 descrp_list$key_category <- gsub('”',' ',descrp_list$key_category)
 descrp_list$key_category <- gsub('‘',' ',descrp_list$key_category)
@@ -372,24 +379,30 @@ reflex_adpt_keystems
 ```
 
 ```{r}
-
 #All in one dictionary
-dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos", "assess", "relev", "associ", "compet", "represent", "stakehold", "collabor", "consensus", "decis", "facilit", "aspect", "form", "concept", "activ", "matter", "indirect", "affair", "vote", "extend", "engag", "participation", "stakeholders", "multi-stakeholders","cooperation", "collaboration", "diversity and inclusion", "vulnerable populations", "cultural heritage", "youth and indigenous people", "reduce inequalities", "build trust", "stakeholders prioritize", "social inclusion", "cultural diversity", "discussion forum", "conversations", "interactive platform", "living heritage"),
-                             policy_coh_keystems = c("coher", "extent", "structur", "foster", "coordin", "implement", "interministeri", "systemat", "mutual", "reinforc", "synergi", "integr", "coordination", "overcom", "silo", "unintended consequences", "diverg", "interrel", "trade off", "feedback loop", "policy coherence","coherence", "align policy decisions", "policy sequence", "policy sequencing", "policy alignment", "interconnected", "increase coherence", "across government departments", "institutional structures", "common goals", "complex issues", "government departments"),
+dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos", "assess", "relev", "associ", "compet", "represent", "stakehold", "collabor", "consensus", "decis", "facilit", "aspect", "form", "concept", "activ", "matter", "indirect", "affair", "vote", "extend", "engag", "particip", "stakehold", "multi-stakehold", "cooper", "collabor", "divers inclus", "vulner popul", "cultur heritag", "youth indigen peopl", "reduc inequ", "build trust", "stakehold priorit", "social inclus", "cultur divers", "discuss forum", "convers", "interact platform", "live heritag", "interdisciplinari issu", "interdisciplinari", "social inclus"),
+                             policy_coh_keystems = c("coher", "extent", "structur", "foster", "coordin", "implement", "interministeri", "systemat", "mutual", "reinforc", "synergi", "integr", "coordin", "overcom", "silo", "unintend consequ", "diverg", "interrel", "trade off", "feedback loop", "polici coher", "coher", "align polici decis", "polici sequenc", "polici sequenc", "polici align", "interconnect", "increas coher", "across govern depart", "institut structur", "common goal", "complex issu", "govern depart"),
                              
-                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl", "express", "fair", "legislatur", "check", "balanc", "altern", "respect", "independ", "judiciari", "legitim", "liber", "democraci", "voter", "franchis", "pluralist", "competit", "equal", "autocraci", "regim", "represent", "peace", "civil liberties", "democratic institutions", "negotiation skills", "ethical leadership", "contract negotiations", "government negotiators", "transaction cost", "human rights", "transaction cost", "free elections", "political philosopher", "political polarization", "populism"),
+                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl", "express", "fair", "legislatur", "check", "balanc", "altern", "respect", "independ", "judiciari", "legitim", "liber", "democraci", "voter", "franchis", "pluralist", "competit", "equal", "autocraci", "regim", "repres", "peac", "civil liberti", "democrat institut", "negoti skill", "ethic leadership", "contract negoti", "govern negoti", "transact cost", "human right", "transact cost", "free elect", "polit philosoph", "polit polar", "popul"),
                              
-                               reflex_adpt_keystems = c("reflex", "monitor", "reform", "regulatori", "instrument", "trajectori", "perform", "transdisciplinari", "process improvement", "reflexivity", "self-monitoring", "strategic planning", "regulatory", "impact assessments", "impact assessment", "organizational reform", "adaptability", "evidence-based", "self-awareness", "performance", "development strategies", "development strategy", "long term", "assessment", "data", "measurement", "accountability", "systemic changes", "structural changes", "structural shifts", "policy instrument", "policy instruments"))
+                               reflex_adpt_keystems = c("reflex", "monitor", "reform", "regulatori", "instrument", "trajectori", "perform", "transdisciplinari", "process improv", "reflex", "self-monitor", "strateg plan", "regulatori", "impact assess", "impact assess", "organiz reform", "adapt", "evidence-bas", "self-awar", "perform", "develop strategi", "develop strategi", "long term", "assess", "data", "measur", "account", "system chang", "structur chang", "structur shift", "polici instrument", "inform manag", "system think", "python program", "help compani", "scienc base", "program polici")))
 
-descrp_list
+
+
 
 ```
 
 ```{r}
 
 #run dictionary against descriptions
+#stemDocument(last_stem)
 
-dfmat_descrip <- dfm(tokens(descrp_list$key_category, remove_punct = TRUE))
+
+descrp_list <- descrp_list %>%
+  mutate(stem = stemDocument(descrp_list$key_category))
+
+
+dfmat_descrip <- dfm(tokens(descrp_list$stem, remove_punct = TRUE))
 d_descrip_ref <- dfm_lookup(dfmat_descrip, dict_descrip,  valuetype = c("glob"))
 d_descrip_ref <- as.data.frame(as.matrix(d_descrip_ref))
 d_descrip_ref$id <- seq.int(nrow(d_descrip_ref))
@@ -427,6 +440,8 @@ d_descrip_ref
 
 #descrip_comb
 
+#adding index as a col for matching
+descrp_list$id <- seq.int(nrow(descrp_list))
 
 #descrp_list <- sdgacad_df_mini
 descrip_comb <- left_join(descrp_list,d_descrip_ref, by = "id") 
@@ -442,6 +457,11 @@ descrip_comb
 #how many of each
 table(descrip_comb$max.col)
 
+```
+```{r}
+#wider export (useful for checking)
+write.csv(descrip_comb,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/descrip_comb.csv", row.names = TRUE)
+descrip_comb
 ```
 
 

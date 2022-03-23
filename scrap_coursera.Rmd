@@ -228,8 +228,9 @@ coursera_df <- mutate(coursera_df, id=NULL)
 
 write.csv(coursera_df,"C:/Users/caitl/Documents/GitHub/thesis/exports/coursera_c.csv", row.names = TRUE)
 
+coursera <- read_csv("exports/coursera_c.csv")
 
-
+coursera
 ```
 
 ```{r}

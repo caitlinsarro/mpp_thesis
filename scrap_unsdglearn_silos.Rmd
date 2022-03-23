@@ -205,7 +205,40 @@ keywords <- map_dfr(weblink, scraper, .id = "id")
 
 
 ```{r}
+# Define the DESCRIPTION worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "resource-contentblock", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "wrapper", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "resource-contentblock", " " ))]//p') %>% 
+    html_text() %>% 
+    enframe("id", "description")  %>%
+    mutate(weblink = weblink) 
+}
 
+
+# Iterate over the urls, applying the function each time
+descrp_silos <- map_dfr(weblink, scraper, .id = "id")
+
+
+
+#Combine into single columns
+
+descrp_silos <- descrp_silos %>%
+ group_by(id) %>%
+ summarize(description = str_c(description, collapse = ", "))
+
+
+descrp_silos$id <- as.numeric(descrp_silos$id)
+
+descrp_silos[order(descrp_silos$id, decreasing = FALSE),] 
+
+descrp_silos$description <- gsub("\n\t\t\t\t\tAbout this course\n\t\t\t\t\t", "", descrp_silos$description)
+
+
+
+```
+
+```{r}
+weblink <- unsdglearn_silos$weblink
 # Define the AUDIENCE worker function
 scraper <- function(weblink) {
   read_html(weblink) %>% 
@@ -233,9 +266,11 @@ keywords_combined <- keywords %>%
 #df3 <- merge(audience, keywords_combined, by = "id")
 
 chart_df <- merge(chart_df, keywords_combined, by = "id")
+chart_df <- merge(chart_df, descrp_silos, by = "id")
 combined <- merge(chart_df, audience, by = "id", all = TRUE)
 
-write.csv(combined,"C:/Users/caitl/Documents/GitHub/thesis/exports/unsdglearn_silos.csv", row.names = TRUE)
+write.csv(combined,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/unsdglearn_silos.csv", row.names = TRUE)
+unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
 
 
 ```
