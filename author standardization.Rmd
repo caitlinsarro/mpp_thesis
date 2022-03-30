@@ -267,11 +267,20 @@ results_urls_fix <- results_urls[results_urls$exists == 'FALSE',]
 results_urls_t <- results_urls[results_urls$exists == 'TRUE',]
 
 
+#export so don't have to do again
+write.csv(results_urls_t,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/results_urls_t.csv", row.names = TRUE)
 
 
 ```
 
+```{r}
+#assign author categories for remaining 85
+results_urls_fix
+#export so don't have to do again
+write.csv(results_urls_fix,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/results_urls_fix.csv", row.names = TRUE)
 
+
+```
 
 ```{r}
 # OLD CODE DON'T RUN
@@ -298,7 +307,7 @@ au_category_t
 ```
 
 ```{r}
-#THIS IS THE RIGHT ONE
+#THIS IS THE RIGHT ONE - already exported, try to load it first
 weblink_au_t <- results_urls_t$weblink_au
 
 
@@ -320,6 +329,13 @@ au_category_t2
 #    enframe("id", "category"),
 #    error = function(err) {print(NA)}
 #  )}
+
+
+#export so don't have to do again
+write.csv(au_category_t2,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_category_t2.csv", row.names = TRUE)
+
+
+
 ```
 
 
@@ -415,6 +431,7 @@ urls_with_cate <- au_category_clean
 
 
 ```{r}
+
 #merge with titles
 authors_list_A <- merge(authors_list, urls_with_cate, by.x = "weblink", by.y = "weblink_au_t", all.y = TRUE)
 #authors_list_A
@@ -432,6 +449,34 @@ authors_list_A
 
 ```
 
+
+```{r}
+#combine with nonquick links
+results_urls_fix_complete <- read_csv("exports/results_urls_fix_complete.csv")
+results_urls_fix_complete
+#merge with titles
+authors_list_B <- merge(authors_list, results_urls_fix_complete, by.x = "weblink", by.y = "weblink_au", all.y = TRUE)
+#authors_list_A
+#authors_list_A <- unique(authors_list_A)
+
+#authors_list_A 
+
+#remove redundant cols
+#authors_list_A <- mutate(authors_list_A, weblink=NULL, piece=NULL, au_category=NULL, id=NULL)
+#authors_list_A
+
+#authors_list_A <- unique(authors_list_A)
+authors_list_B
+
+#combine lists A and B
+authors_list_X <- rbind(authors_list_A, authors_list_B)
+#move back into the A list name
+authors_list_A <- authors_list_X
+authors_list_A
+```
+
+
+
 ```{r}
 #Universal fixes
 #trim leading and ending whitespaces
@@ -444,73 +489,7 @@ authors_list_A$category <- removePunctuation(authors_list_A$category)
 ```
 
 
-```{r}
-#Don't run, old code
 
-un_specialized_agencies <-
-  c(
-    "FAO",
-    "Food and Agriculture Organization of the United Nations",
-    "ICAO",
-    "International Civil Aviation Organization",
-    "IFAD",
-    "International Fund for Agricultural Development",
-    "ILO",
-    "International Labour Organization",
-    "IMF",
-    "International Monetary Fund",
-    "IMO",
-    "International Maritime Organization",
-    "ITU",
-    "International Telecommunication Union",
-    "UNESCO",
-    "United Nations Educational Scientific and Cultural Organization",
-    "UNIDO",
-    "United Nations Industrial Development Organization",
-    "UNWTO",
-    "World Tourism Organization",
-    "UPU",
-    "Universal Postal Union",
-    "WHO",
-    "World Health Organization",
-   "WIPO",
-    "World Intellectual Property Organization",
-    "WMO",
-    "World Meteorological Organization",
-    "World Bank Group",
-    "World Bank"
-  )
-
-un_programs <-c("UN-Habitat", "UNDP", "UNEP", "UN Global Compact")
-
-str_detect(authors_list_A$authors, un_specialized_agencies)
-authors_list_A$category[authors_list_A$authors
-
-                        
-dictionary <- data.frame(search="un_specialized_agencies")
-result <- authors_list_A$authors %>%
-  filter(grepl(paste(dictionary$search, collapse="|"), text)) 
-
-authors_list_A$C <- ifelse(grepl(un_specialized_agencies, authors_list_A$authors), "yes", "no")
-                        
-test<-authors_list_A$authors[str_detect(authors_list_A$authors, un_specialized_agencies),]
-test
-
-df <- data.frame(text =  c('UN-Habitat', 'UNDP', 'UNEP', 'UN Global Compact'), 
-                 un_programs = 0)
-
-
-
-authors_list_A %>%
-    bind_cols(un_specialized_agencies %>% 
-                  set_names() %>% 
-                  map_dfc(~str_detect(authors_list_A$authors, .x)) %>% 
-                  mutate_all(as.numeric)) %>% 
-    as_tibble()
-
-data2 <- iris[iris$Species %like% "virg", ]
-
-```
 
 ```{r}
 #author dictionaries
@@ -767,10 +746,12 @@ au_category_clean
 ```
 
 
+
+
 ```{r}
 #export
 write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_category_clean.csv", row.names = TRUE)
-
+au_category_clean
 ```
 
 
@@ -817,9 +798,9 @@ au_category_clean$id <- as.numeric(au_category_clean$id)
 
 au_category_clean[order(au_category_clean$id, decreasing = FALSE),] 
 
-authors_list
-authors_list$id <- as.numeric(authors_list$id)
 
+authors_list$id <- as.numeric(authors_list$id)
+authors_list
 
 
 
@@ -1021,5 +1002,71 @@ df_ngo
 #df
 
 ```
+```{r}
+#Don't run, old code
 
+un_specialized_agencies <-
+  c(
+    "FAO",
+    "Food and Agriculture Organization of the United Nations",
+    "ICAO",
+    "International Civil Aviation Organization",
+    "IFAD",
+    "International Fund for Agricultural Development",
+    "ILO",
+    "International Labour Organization",
+    "IMF",
+    "International Monetary Fund",
+    "IMO",
+    "International Maritime Organization",
+    "ITU",
+    "International Telecommunication Union",
+    "UNESCO",
+    "United Nations Educational Scientific and Cultural Organization",
+    "UNIDO",
+    "United Nations Industrial Development Organization",
+    "UNWTO",
+    "World Tourism Organization",
+    "UPU",
+    "Universal Postal Union",
+    "WHO",
+    "World Health Organization",
+   "WIPO",
+    "World Intellectual Property Organization",
+    "WMO",
+    "World Meteorological Organization",
+    "World Bank Group",
+    "World Bank"
+  )
+
+un_programs <-c("UN-Habitat", "UNDP", "UNEP", "UN Global Compact")
+
+str_detect(authors_list_A$authors, un_specialized_agencies)
+authors_list_A$category[authors_list_A$authors
+
+                        
+dictionary <- data.frame(search="un_specialized_agencies")
+result <- authors_list_A$authors %>%
+  filter(grepl(paste(dictionary$search, collapse="|"), text)) 
+
+authors_list_A$C <- ifelse(grepl(un_specialized_agencies, authors_list_A$authors), "yes", "no")
+                        
+test<-authors_list_A$authors[str_detect(authors_list_A$authors, un_specialized_agencies),]
+test
+
+df <- data.frame(text =  c('UN-Habitat', 'UNDP', 'UNEP', 'UN Global Compact'), 
+                 un_programs = 0)
+
+
+
+authors_list_A %>%
+    bind_cols(un_specialized_agencies %>% 
+                  set_names() %>% 
+                  map_dfc(~str_detect(authors_list_A$authors, .x)) %>% 
+                  mutate_all(as.numeric)) %>% 
+    as_tibble()
+
+data2 <- iris[iris$Species %like% "virg", ]
+
+```
 ```

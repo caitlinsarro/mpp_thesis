@@ -1,0 +1,54 @@
+"","au_category","max.col","n"
+"1","business","participation_keystems",1
+"2","business","reflex_adpt_keystems",3
+"3","cultural institution","democratic_keystems",1
+"4","cultural institution","participation_keystems",3
+"5","department","policy_coh_keystems",4
+"6","finance","participation_keystems",2
+"7","government","reflex_adpt_keystems",2
+"8","government network","participation_keystems",1
+"9","intergovernmental organization","democratic_keystems",1
+"10","intergovernmental organization","participation_keystems",3
+"11","ngo","democratic_keystems",7
+"12","ngo","participation_keystems",5
+"13","ngo","reflex_adpt_keystems",9
+"14","philanthropic initiative","participation_keystems",1
+"15","policy institute","democratic_keystems",3
+"16","policy institute","participation_keystems",2
+"17","private research university","democratic_keystems",21
+"18","private research university","participation_keystems",14
+"19","private research university","policy_coh_keystems",6
+"20","private research university","reflex_adpt_keystems",8
+"21","private university","participation_keystems",2
+"22","private university","policy_coh_keystems",5
+"23","private university","reflex_adpt_keystems",1
+"24","public policy think tank","participation_keystems",9
+"25","public policy think tank","reflex_adpt_keystems",1
+"26","public research university","democratic_keystems",8
+"27","public research university","participation_keystems",11
+"28","public research university","policy_coh_keystems",4
+"29","public research university","reflex_adpt_keystems",5
+"30","public university","democratic_keystems",20
+"31","public university","participation_keystems",15
+"32","public university","policy_coh_keystems",3
+"33","public university","reflex_adpt_keystems",5
+"34","research institute","democratic_keystems",4
+"35","research institute","participation_keystems",18
+"36","research institute","policy_coh_keystems",8
+"37","research institute","reflex_adpt_keystems",1
+"38","supranational union","democratic_keystems",1
+"39","un","participation_keystems",8
+"40","un","policy_coh_keystems",8
+"41","un internal agency","participation_keystems",4
+"42","un internal agency","policy_coh_keystems",4
+"43","un primary organ","democratic_keystems",1
+"44","un primary organ","participation_keystems",5
+"45","un primary organ","policy_coh_keystems",8
+"46","un program","democratic_keystems",3
+"47","un program","participation_keystems",5
+"48","un specialized agency","policy_coh_keystems",1
+"49","un specialized agency","reflex_adpt_keystems",4
+"50",NA,"democratic_keystems",2
+"51",NA,"participation_keystems",2
+"52",NA,"policy_coh_keystems",6
+"53",NA,"reflex_adpt_keystems",11

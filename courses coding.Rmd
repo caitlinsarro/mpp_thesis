@@ -464,6 +464,26 @@ write.csv(descrip_comb,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/descr
 descrip_comb
 ```
 
+```{r}
+#try to combine with authors
+descrip_comb
+au_category_clean
+
+try <- left_join(descrip_comb, au_category_clean, by= "titles")
+
+
+try
+
+
+
+
+
+
+
+
+
+
+```
 
 ```{r}
 #old code
