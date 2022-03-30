@@ -34,15 +34,19 @@ library(rvest)
 library(stringr)
 library(readr)
 
-library(reshape2)
-library(dplyr)
 
-library(xml2)
 library(purrr)
 library(tibble)
 
 library(data.table)
 
+library(tidyverse)
+#install.packages("broom", type="binary") 
+library(tidymodels)
+library(tidytext)
+
+
+###do I need these?
 library(tm)
 
 library(RCurl)
@@ -145,5 +149,12 @@ soft_coded$description = stripWhitespace(soft_coded$description)
 soft_coded$description <- trimws(soft_coded$description)
 soft_coded$description <- gsub('  ',' ',soft_coded$description)
 
-soft_coded$description
+head(soft_coded$description)
+```
+```{r}
+#move to long format
+soft_coded_long <- soft_coded %>% 
+  mutate(category = strsplit(as.character(category), ",")) %>%
+  unnest(category)
+soft_coded_long
 ```

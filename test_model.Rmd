@@ -1,0 +1,186 @@
+---
+title: "test"
+author: "Caitlin Sarro"
+date: "3/30/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+install.packages("naivebayes")
+library(tidyverse)
+library(tidymodels)
+library(tidytext)
+library(textrecipes)
+library(discrim)
+library(naivebayes)
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+#TEST of this https://cfss.uchicago.edu/notes/supervised-text-classification/
+
+set.seed(1234)
+theme_set(theme_minimal())
+
+# topic labels
+major_topics <- tibble(
+  major = c(1:10, 12:21, 99),
+  label = c(
+    "Macroeconomics", "Civil rights, minority issues, civil liberties",
+    "Health", "Agriculture", "Labor and employment", "Education", "Environment",
+    "Energy", "Immigration", "Transportation", "Law, crime, family issues",
+    "Social welfare", "Community development and housing issues",
+    "Banking, finance, and domestic commerce", "Defense",
+    "Space, technology, and communications", "Foreign trade",
+    "International affairs and foreign aid", "Government operations",
+    "Public lands and water management", "Other, miscellaneous"
+  )
+)
+
+(congress <- as_tibble(USCongress) %>%
+    mutate(text = as.character(text)) %>%
+    left_join(major_topics))
+
+```
+```{r}
+set.seed(123)
+
+congress <- congress %>%
+  mutate(major = factor(x = major, levels = major, labels = label))
+
+congress_split <- initial_split(data = congress, strata = major, prop = .8)
+congress_split
+
+
+congress_train <- training(congress_split)
+congress_test <- testing(congress_split)
+```
+
+```{r}
+#preprocessing the data frame
+congress_rec <- recipe(major ~ text, data = congress_train)
+```
+
+```{r}
+
+#process the text of the legislation summaries
+
+congress_rec <- congress_rec %>%
+  step_tokenize(text) %>%
+  step_stopwords(text) %>%
+  step_tokenfilter(text, max_tokens = 500) %>%
+  step_tfidf(text)
+
+```
+
+```{r}
+#train a model
+nb_spec <- naive_Bayes() %>%
+  set_mode("classification") %>%
+  set_engine("naivebayes")
+
+nb_spec
+```
+
+```{r}
+## Naive Bayes Model Specification (classification)
+## 
+## Computational engine: naivebayes
+nb_wf <- workflow() %>%
+  add_recipe(congress_rec) %>%
+  add_model(nb_spec)
+nb_wf
+
+```
+
+
+```{r}
+#train
+nb_wf %>%
+  fit(data = congress_train)
+
+```
+
+
+```{r}
+#evaluate
+set.seed(123)
+
+congress_folds <- vfold_cv(data = congress_train, strata = major)
+congress_folds
+
+```
+
+```{r}
+nb_cv <- nb_wf %>%
+  fit_resamples(
+    congress_folds,
+    control = control_resamples(save_pred = TRUE)
+  )
+
+```
+
+```{r}
+#We can extract relevant information using collect_metrics() and collect_predictions().
+
+nb_cv_metrics <- collect_metrics(nb_cv)
+nb_cv_predictions <- collect_predictions(nb_cv)
+
+nb_cv_metrics
+
+```
+
+```{r}
+#receiver operator curve plot that shows the sensitivity at different thresholds. It demonstrates how well a classification model can distinguish between classes.
+
+nb_cv_predictions %>%
+  group_by(id) %>%
+  roc_curve(truth = major, c(starts_with(".pred"), -.pred_class)) %>%
+  autoplot() +
+  labs(
+    color = NULL,
+    title = "Receiver operator curve for Congressional bills",
+    subtitle = "Each resample fold is shown in a different color")
+
+```
+
+
+```{r}
+#Compare to the null model
+null_classification <- null_model() %>%
+  set_engine("parsnip") %>%
+  set_mode("classification")
+
+null_cv <- workflow() %>%
+  add_recipe(congress_rec) %>%
+  add_model(null_classification) %>%
+  fit_resamples(
+    congress_folds
+  )
+
+null_cv %>%
+  collect_metrics()
+
+#Notice the accuracy is the same as for the naive Bayes model. This is because naive Bayes still leads to every observation predicted as “Health”, which is the exact same result as the null model. Clearly we need a better modeling strategy.
+
+```
+
+
+```{r}
+ggplot(data = congress, mapping = aes(x = fct_infreq(major) %>% fct_rev())) +
+  geom_bar() +
+  coord_flip() +
+  labs(
+    title = "Distribution of legislation",
+    subtitle = "By major policy topic",
+    x = NULL,
+    y = "Number of bills"
+  )
+
+```
