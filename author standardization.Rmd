@@ -724,9 +724,6 @@ authors_list_A_comb$category[authors_list_A_comb$category=="primary organ  regio
 authors_list_A_comb$category[authors_list_A_comb$category=="primary organ – regional branch"] <- "un primary organ"
 
 
-
-authors_list_A_comb
-
 ```
 
 ```{r}
@@ -742,16 +739,58 @@ authors_list_A_comb$au_category <-authors_list_A_comb$category
 
 #subet clean
 au_category_clean <- authors_list_A_comb[c("titles","authors","au_category")]
-au_category_clean
+
 ```
 
 
 
 
 ```{r}
+#remove duplicates
+au_category_clean <- unique(au_category_clean)
 #export
 write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_category_clean.csv", row.names = TRUE)
-au_category_clean
+
+```
+```{r}
+#simplified categories
+
+#government
+au_category_clean$au_category[au_category_clean$au_category=="government network"] <- "government" 
+au_category_clean$au_category[au_category_clean$au_category=="intergovernmental organization"] <- "government"
+au_category_clean$au_category[au_category_clean$au_category=="supranational union"] <- "government"
+#ngo
+au_category_clean$au_category[au_category_clean$au_category=="philanthropic initiative"] <- "ngo"
+
+#research & policy institute
+au_category_clean$au_category[au_category_clean$au_category=="policy institute"] <- "research  policy institutes"
+au_category_clean$au_category[au_category_clean$au_category=="public policy think tank"] <- "research  policy institutes"
+au_category_clean$au_category[au_category_clean$au_category=="research institute"] <- "research  policy institutes"
+
+#private university
+au_category_clean$au_category[au_category_clean$au_category=="private research university"] <- "private university"
+
+#public university
+au_category_clean$au_category[au_category_clean$au_category=="public research university"] <- "public university"
+au_category_clean$au_category[au_category_clean$au_category=="public research university"] <- "public university"
+
+#un
+au_category_clean$au_category[au_category_clean$au_category=="department"] <- "un" 
+au_category_clean$au_category[au_category_clean$au_category=="un primary organ"] <- "un" 
+au_category_clean$au_category[au_category_clean$au_category=="un specialized agency"] <- "un" 
+au_category_clean$au_category[au_category_clean$au_category=="un program"] <- "un" 
+au_category_clean$au_category[au_category_clean$au_category=="un internal agency"] <- "un" 
+
+
+
+```
+
+
+```{r}
+#group by author category
+
+table(au_category_clean$au_category) 
+
 ```
 
 
@@ -759,15 +798,8 @@ au_category_clean
 
 
 
-
-
-
-
-
-
-
-
 ```{r}
+#repeat code?
 
 au_category_clean <- au_category %>%
  group_by(id) %>%
@@ -805,8 +837,6 @@ authors_list
 
 
 ```
-
-
 
 
 ```{r}

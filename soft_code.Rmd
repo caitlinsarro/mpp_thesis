@@ -1,0 +1,149 @@
+---
+title: "Web Scraping"
+subtitle: "Author Standardization"
+author: "Caitlin Sarro"
+date: "2/9/2022"
+output: 
+  html_document:
+    toc: TRUE
+    df_print: paged
+    number_sections: FALSE
+    highlight: tango
+    theme: lumen
+    toc_depth: 3
+    toc_float: true
+    css: custom.css 
+    self_contained: false
+    includes:
+      after_body: footer.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+***
+
+
+**Step 1.** Load the packages `rvest` and `stringr`.
+
+```{r, message=F}
+#install.packages("")
+library(RSelenium)
+library(tidyverse)
+library(rvest)
+library(stringr)
+library(readr)
+
+library(reshape2)
+library(dplyr)
+
+library(xml2)
+library(purrr)
+library(tibble)
+
+library(data.table)
+
+library(tm)
+
+library(RCurl)
+
+library(quanteda)
+
+#for categorization
+library(quanteda)
+library(tidytext)
+#library(quanteda.textmodels)
+#library(caret)
+library(SnowballC)
+
+library(topicmodels)
+
+
+```
+
+
+```{r}
+#Capacity Building https://www.unsdglearn.org/courses/?_sf_s=capacity%20building
+#Breaking the Silos https://www.unsdglearn.org/courses/?_sfm_sdg=5
+
+
+
+soft_code <- read_csv("data/soft_code.csv")
+soft_code <- na.omit(soft_code)
+
+#descrp_list from courses coding
+#descrp_list
+#merge
+#soft_coded <- merge(soft_code, descrp_list, by.x = "titles", by.y = "titles_acad", all.x = TRUE)
+#soft_coded
+```
+
+
+**Step 3.** Extract information.
+
+```{r}
+
+weblink <- soft_code$website
+# Define the DESCRIPTION worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "resource-contentblock", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "wrapper", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "resource-contentblock", " " ))]//p') %>% 
+    html_text() %>% 
+    enframe("id", "description")  %>%
+    mutate(weblink = weblink) 
+}
+
+
+# Iterate over the urls, applying the function each time
+descrp <- map_dfr(weblink, scraper, .id = "id")
+
+
+
+#Combine into single columns
+
+descrp <- descrp %>%
+ group_by(id) %>%
+ summarize(description = str_c(description, collapse = ", "))
+
+
+descrp$id <- as.numeric(descrp$id)
+
+descrp[order(descrp$id, decreasing = FALSE),] 
+
+descrp$description <- gsub("\n\t\t\t\t\tAbout this course\n\t\t\t\t\t", "", descrp$description)
+
+descrp
+
+```
+
+```{r}
+
+soft_code$id <- seq.int(nrow(soft_code))
+
+soft_coded <- merge(soft_code, descrp, by = "id")
+
+soft_coded
+```
+
+```{r}
+
+#text cleaning punctuation
+soft_coded$description <- gsub('[[:punct:] ]+',' ',soft_coded$description)
+#text cleaning lowercase
+soft_coded$description <- tolower(soft_coded$description)
+
+#text cleaning symbols
+soft_coded$description <- gsub('“',' ',soft_coded$description)
+soft_coded$description <- gsub('”',' ',soft_coded$description)
+soft_coded$description <- gsub('‘',' ',soft_coded$description)
+soft_coded$description <- gsub('’',' ',soft_coded$description)
+soft_coded$description <- gsub('–',' ',soft_coded$description)
+#remove stopwords
+soft_coded$description = removeWords(soft_coded$description, stopwords("english"))
+#remove whitespace
+soft_coded$description = stripWhitespace(soft_coded$description)
+soft_coded$description <- trimws(soft_coded$description)
+soft_coded$description <- gsub('  ',' ',soft_coded$description)
+
+soft_coded$description
+```
