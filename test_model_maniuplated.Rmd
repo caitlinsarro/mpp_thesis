@@ -6,13 +6,18 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-install.packages("naivebayes")
+install.packages("C50")
 library(tidyverse)
 library(tidymodels)
 library(tidytext)
 library(textrecipes)
 library(discrim)
 library(naivebayes)
+
+#use to downsample
+library(themis)
+library(C50)
+
 
 ```
 
@@ -24,13 +29,13 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ```{r}
 #TEST of this https://cfss.uchicago.edu/notes/supervised-text-classification/
-soft_coded_long <- read_csv("data/soft_coded_long2.csv")
-
+#soft_coded_long <- read_csv("data/soft_coded_long2.csv")
+soft_coded_long <- read_csv("exports/full_code.csv")
 theme_set(theme_minimal())
 
 ```
 ```{r}
-set.seed(60)
+set.seed(100)
 
 soft_coded_long <- soft_coded_long %>%
   mutate(major_categ = factor(x = major_categ, levels = major_categ, labels = category))
@@ -97,7 +102,7 @@ nb_wf_s %>%
 
 ```{r}
 #evaluate
-set.seed(60)
+set.seed(100)
 soft_code_train$major_categ
 
 soft_code_folds <- vfold_cv(data = soft_code_train, strata = major_categ, v = 8)
@@ -139,6 +144,14 @@ nb_cvs_predictions %>%
 
 ```
 
+```{r}
+conf_mat_resampled(x = nb_cv_s, tidy = FALSE) %>%
+  autoplot(type = "heatmap") +
+  scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, 20))
+
+```
+
 
 ```{r}
 #Compare to the null model
@@ -173,3 +186,38 @@ ggplot(data = soft_coded_long, mapping = aes(x = fct_infreq(major_categ) %>% fct
   )
 
 ```
+
+```{r}
+##     step_downsample, step_upsample
+# build on existing recipe
+soft_code_rec <- soft_code_rec %>%
+  step_downsample(major_categ)
+soft_code_rec 
+
+#alternative modeling approach
+tree_spec <- decision_tree() %>%
+  set_mode("classification") %>%
+  set_engine("C5.0")
+
+tree_spec
+
+tree_wf <- workflow() %>%
+  add_recipe(soft_code_rec) %>%
+  add_model(tree_spec)
+
+tree_wf
+
+```
+```{r}
+set.seed(50)
+
+tree_cv <- fit_resamples(
+  tree_wf,
+  soft_code_folds,
+  control = control_resamples(save_pred = TRUE)
+)
+tree_cv
+
+```
+
+

@@ -76,7 +76,7 @@ congress_rec <- congress_rec %>%
   step_stopwords(text) %>%
   step_tokenfilter(text, max_tokens = 500) %>%
   step_tfidf(text)
-
+congress_rec
 ```
 
 ```{r}
@@ -138,7 +138,7 @@ nb_cv_metrics
 
 ```{r}
 #receiver operator curve plot that shows the sensitivity at different thresholds. It demonstrates how well a classification model can distinguish between classes.
-
+nb_cv_predictions
 nb_cv_predictions %>%
   group_by(id) %>%
   roc_curve(truth = major, c(starts_with(".pred"), -.pred_class)) %>%
@@ -149,7 +149,13 @@ nb_cv_predictions %>%
     subtitle = "Each resample fold is shown in a different color")
 
 ```
+```{r}
+conf_mat_resampled(x = nb_cv, tidy = FALSE) %>%
+  autoplot(type = "heatmap") +
+  scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, 20))
 
+```
 
 ```{r}
 #Compare to the null model
