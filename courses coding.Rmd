@@ -62,7 +62,6 @@ library(SnowballC)
 library(topicmodels)
 library(quanteda.dictionaries)
 
-quanteda.dictionaries::
 ```
 
 
@@ -459,14 +458,21 @@ df %>% filter(Freq >= 10)
 
 
 ```{r}
-#check overlaps
-#reflex_adpt_keystems
-#democratic_keystems
-#policy_coh_keystems
-#participation_keystems
+#checking which words are the most matched per category 
 
-#intersect(,)
 
+toks <- tokens(tail(descrp_list$stem))
+
+dfm_list <- list()
+for (key in names(dict_descrip)) {
+  this_dfm <- tokens_select(toks, dict_descrip[key], pad = TRUE) %>%
+    tokens_compound(dict_descrip[key]) %>%
+    tokens_replace("", "OTHER") %>%
+    dfm(tolower = FALSE)
+  dfm_list <- c(dfm_list, this_dfm)
+}
+names(dfm_list) <- names(dict_descrip)
+dfm_list
 ```
 
 ```{r}

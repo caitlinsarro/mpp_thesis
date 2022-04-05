@@ -42,7 +42,7 @@ soft_coded_long <- soft_coded_long %>%
 
 soft_coded_long$major_categ <-as.factor(soft_coded_long$major_categ)
 
-soft_code_split <- initial_split(data = soft_coded_long, strata = major_categ, prop = .8)
+soft_code_split <- initial_split(data = soft_coded_long, strata = major_categ, prop = .7)
 
 soft_code_train <- training(soft_code_split)
 

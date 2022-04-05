@@ -1,0 +1,322 @@
+---
+title: "Web Scraping"
+subtitle: "UNSDGLEARN: Capacity Building"
+author: "Caitlin Sarro"
+date: "2/9/2022"
+output: 
+  html_document:
+    toc: TRUE
+    df_print: paged
+    number_sections: FALSE
+    highlight: tango
+    theme: lumen
+    toc_depth: 3
+    toc_float: true
+    css: custom.css 
+    self_contained: false
+    includes:
+      after_body: footer.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+***
+CONTEXT TEXT
+
+In general, remember, the basic **workflow for scraping static webpages** is the following.
+
+**Step 1.** Load the packages
+
+```{r, message=F}
+#install.packages("")
+library(RSelenium)
+library(tidyverse)
+library(rvest)
+library(V8)
+
+
+library(stringr)
+library(readr)
+library(shiny)
+
+library(reshape2)
+library(dplyr)
+
+library(purrr)
+library(tibble)
+
+```
+
+
+
+```{r}
+#https://unpan.un.org/capacity-development/curriculum-on-governance-for-the-SDGs
+
+
+```
+
+# Scraping multiple pages `r emo::ji("robot")`
+
+Whenever you want to really understand what's going on within the functions of a new R package, it is very likely that there is a relevant article published in the [Journal of Statistical Software](https://www.jstatsoft.org/index). Let's say you are interested in how the journal was doing over the past years.
+
+**Step 1.** Inspect the source. Basically, follow steps to extract the Xpath information.
+```{r, eval=F}
+#browseURL("https://www.unsdglearn.org/courses/?_sf_s=capacity%20building")
+```
+
+**Step 2.** Parse the page source.
+
+```{r}
+
+unpan_web <- "https://unpan.un.org/capacity-development/curriculum-on-governance-for-the-SDGs"
+unpan <- read_html(unpan_web)
+
+
+```
+
+```{r}
+#UNPAN
+#start RSelenium
+remDr <- remoteDriver(
+        remoteServerAdd = "localhost",
+        port = 4445L,
+        browser = "chrome"
+)
+
+remDr$open()
+
+#navigate to your page
+remDr$navigate("https://unpan.un.org/capacity-development/curriculum-on-governance-for-the-SDGs")
+
+#scroll down 5 times, waiting for the page to load at each time
+for(i in 1:5){      
+remDr$executeScript(paste("scroll(0,",i*10000,");"))
+Sys.sleep(3)    
+}
+
+#get the page html
+page_source <-remDr$getPageSource()
+
+#pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
+
+unpan <- read_html(page_source[[1]])
+
+unpan
+#parse it
+#html(page_source[[1]]) %>% html_nodes(".product-itm-price-new") %>%
+#  html_text()
+
+
+
+#unsdglearn <- read_html("https://www.unsdglearn.org/courses/?sf_data=results&_sf_s=capacity%20building&sf_paged=2")
+
+#unsdglearn
+```
+**Step 3.** Extract information.
+
+```{r}
+body_nodes <- unpan %>% 
+ html_node("body") %>% 
+ html_children()
+
+body_nodes %>% 
+ html_children()
+
+
+parsed_nodes <- html_nodes(unpan, 
+                           xpath = '//*//*[contains(concat( " ", @class, " " ), concat( " ", "training_title", " " ))]')
+titles_unpan <- html_text(parsed_nodes)
+titles_unpan
+
+weblink <- html_nodes(unpan, 
+                           xpath = '//a') %>% html_attr("href")
+
+
+#remove repeat/ mistake row
+#titles_unpan <- as.data.frame(titles_unpan)
+#titles_unpan <- titles_unpan[-c(1,2),]
+#titles_unpan
+#remove blank row
+
+weblink
+#remove repeat/ mistake row
+weblink <- as.data.frame(weblink)
+weblink <- weblink %>% slice(47:57)
+weblink 
+
+
+
+parsed_nodes <- html_nodes(unpan, 
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "training_content", " " ))]')
+authors_unpan <- html_text(parsed_nodes)
+authors_unpan
+
+parsed_nodes <- html_nodes(unpan, 
+                           xpath = '//*[(@id = "block-custom-content")]//*[contains(concat( " ", @class, " " ), concat( " ", "field__item", " " ))]//div//div//div//img') %>%
+  html_attr("alt" )%>%
+    enframe("id", "SDGs")
+sdgs_unpan <- html_text(parsed_nodes)
+sdgs_unpan
+
+
+html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "goals", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "goal-image", " " ))]//img') %>%
+  html_attr("alt") %>%
+    enframe("id", "SDGs")
+
+
+#add SDGs by hand
+A <- c(16)
+B <- c(16)
+C <- c(14,16,17)
+D <- c(11,16,17)
+E <- c(11,16,17)
+F <- c(10,16)
+G <- c(9,11,13,14,15,16)
+H <- c(1,2,3,4,5,6,7,8,9,11,15,16,17)
+I <- c(16,17)
+J <- c(1,2,13,14,16,17)
+K <- c(NA)
+
+```
+```{r}
+#add in url
+weblink_node <- weblink %>% slice(1:8)
+
+weblink_node$weblink <- paste0("https://unpan.un.org", weblink_node$weblink)
+weblink_node <- as.list(weblink_node)
+
+weblink_node <- (weblink_node$weblink)
+
+```
+
+
+```{r}
+#Parse out content from the courses
+
+scraper <- function(weblink_node) {read_html(weblink_node) %>% 
+    html_nodes(xpath = '//p') %>% 
+    html_text() %>% 
+    enframe("id", "description")
+}
+
+# Iterate over the urls, applying the function each time
+keywords_unpan <- map_dfr(weblink_node, scraper, .id = "id")
+
+
+```
+
+```{r}
+#pull in text from website as large chunk
+parsed_nodes <- html_nodes(unpan, 
+                           xpath = '//a')
+text_unfccc <- html_text(parsed_nodes)
+text_unfccc
+```
+
+```{r}
+#set up dataframe and standardize capitazlisation (to lowercase)
+
+unfccc_df_mess <- text_unfccc %>% enframe("id", "text")
+
+unfccc_df_mess$text = tolower(unfccc_df_mess$text)
+
+#separate title text from body
+unfccc_df <- str_split_fixed(unfccc_df_mess$text, "short info:", 2)
+
+unfccc_df <-as.data.frame(unfccc_df)
+
+unfccc_df <- data.frame(do.call('rbind', strsplit(as.character(unfccc_df$V2),'providing institution',fixed=TRUE)))
+
+unfccc_df <- separate(data = unfccc_df_mess, col = text, into = c("left", "keywords"), sep = "short info:")
+
+unfccc_df <- separate(data = unfccc_df, col = keywords, into = c("keywords", "author"), sep = "providing institution:")
+
+unfccc_df <- separate(data = unfccc_df, col = author, into = c("author", "region"), sep = "region:")
+
+unfccc_df <- separate(data = unfccc_df, col = region, into = c("region", "dump"), sep = "type of activities:")
+
+#remove redundant cols
+unfccc_df <- mutate(unfccc_df, id=NULL, left=NULL, dump=NULL)
+
+
+```
+
+```{r}
+#extract the links
+
+body_nodes <- unfccc %>% 
+ html_node("body") %>% 
+ html_children()
+
+body_nodes %>% 
+ html_children()
+
+weblink <- unfccc  %>% html_nodes("div.embedded-entity-content > a") %>% html_attr("href")
+
+weblink
+
+```
+
+
+
+```{r}
+weblink
+
+weblinks2 <- weblink %>%  enframe("id", "weblink")
+
+#subset for coursera
+coursera_subset <- weblinks2 %>%
+  filter(str_detect(weblink, "coursera"))
+
+#subset for elearning
+elearning_subset <- weblinks2 %>%
+  filter(str_detect(weblink, "elearning"))
+
+#subset for unccelearn
+unccelearn_subset <- weblinks2 %>%
+  filter(str_detect(weblink, "unccelearn.org"))
+
+#subset for worldbank
+worldbank_subset <- weblinks2 %>%
+  filter(str_detect(weblink, "olc.worldbank.org"))
+
+```
+
+
+
+```{r}
+titles_unfccc
+weblink
+
+chart_df <- merge(titles_unfccc, unfccc_df, by="id")
+
+chart_df <- data.frame(titles_unfccc, authors, tags, SDGs, weblink)
+
+knitr::kable(chart_df  %>% head(10))
+
+chart_df <- tibble::rowid_to_column(chart_df, "id")
+
+#titles	authors	tags	SDGs	weblink	keywords	audience
+
+
+```
+
+```{r}
+#export as CSV
+write.csv(coursera_subset,"C:/Users/caitl/Documents/GitHub/thesis/exports/coursera.csv", row.names = TRUE)
+
+```
+
+```{r}
+#not working?
+#system("sudo docker pull selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#system("sudo docker run -d -p 4445:4444 selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#remDr <- remoteDriver(port=4445L, browserName="chrome")
+#Sys.sleep(15)
+#remDr$open()
+#docker run -d -p 4445:4444 selenium/standalone-chrome
+
+```

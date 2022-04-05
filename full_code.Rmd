@@ -72,8 +72,8 @@ library(topicmodels)
 
 
 
-soft_code <- read_csv("data/soft_code.csv")
-soft_code <- na.omit(soft_code)
+full_code <- read_csv("exports/full_coded_long.csv")
+full_code <- na.omit(full_code)
 
 #descrp_list from courses coding
 #descrp_list
@@ -86,7 +86,7 @@ soft_code <- na.omit(soft_code)
 **Step 3.** Extract information.
 
 ```{r}
-
+soft_code<- read_csv("data/soft_coded_long2.csv")
 weblink <- soft_code$website
 # Define the DESCRIPTION worker function
 scraper <- function(weblink) {
@@ -122,44 +122,44 @@ descrp
 
 ```{r}
 
-soft_code$id <- seq.int(nrow(soft_code))
+full_code$id <- seq.int(nrow(full_code))
 
-soft_coded <- merge(soft_code, descrp, by = "id")
+#full_coded <- merge(full_code, descrp, by = "id")
 
-soft_coded
+#full_coded
 ```
 
 ```{r}
 
 #text cleaning punctuation
-soft_coded$description <- gsub('[[:punct:] ]+',' ',soft_coded$description)
+full_code$description <- gsub('[[:punct:] ]+',' ',full_code$description)
 #text cleaning lowercase
-soft_coded$description <- tolower(soft_coded$description)
+full_code$description <- tolower(full_code$description)
 
 #text cleaning symbols
-soft_coded$description <- gsub('“',' ',soft_coded$description)
-soft_coded$description <- gsub('”',' ',soft_coded$description)
-soft_coded$description <- gsub('‘',' ',soft_coded$description)
-soft_coded$description <- gsub('’',' ',soft_coded$description)
-soft_coded$description <- gsub('–',' ',soft_coded$description)
+full_code$description <- gsub('“',' ',full_code$description)
+full_code$description <- gsub('”',' ',full_code$description)
+full_code$description <- gsub('‘',' ',full_code$description)
+full_code$description <- gsub('’',' ',full_code$description)
+full_code$description <- gsub('–',' ',full_code$description)
 #remove stopwords
-soft_coded$description = removeWords(soft_coded$description, stopwords("english"))
+full_code$description = removeWords(full_code$description, stopwords("english"))
 #remove whitespace
-soft_coded$description = stripWhitespace(soft_coded$description)
-soft_coded$description <- trimws(soft_coded$description)
-soft_coded$description <- gsub('  ',' ',soft_coded$description)
+full_code$description = stripWhitespace(full_code$description)
+full_code$description <- trimws(full_code$description)
+full_code$description <- gsub('  ',' ',full_code$description)
 
-head(soft_coded$description)
+head(full_code$description)
 ```
 ```{r}
 #move to long format
-soft_coded_long <- soft_coded %>% 
-  mutate(category = strsplit(as.character(category), ",")) %>%
-  unnest(category)
-soft_coded_long
+#soft_coded_long <- soft_coded %>% 
+#  mutate(category = strsplit(as.character(category), ",")) %>%
+#  unnest(category)
+#soft_coded_long
 ```
 
 ```{r}
 #long export 
-write.csv(soft_coded_long,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/soft_coded_long.csv", row.names = TRUE)
+write.csv(full_code,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/full_code.csv", row.names = TRUE)
 ```
