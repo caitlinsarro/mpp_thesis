@@ -635,6 +635,30 @@ au_matrix <- table(au_diff_main_long$max.col, au_diff_main_long$au_category)
 au_matrix <- as.data.frame(au_matrix)
 au_matrix
 
+
+#change to characters
+au_matrix$Var1 <- as.character(au_matrix$Var1)
+au_matrix$Var2 <- as.character(au_matrix$Var2)
+
+#simply categories
+au_matrix$Var2[au_matrix$Var2 == "cultural institution"] <- "civil society"
+au_matrix$Var2[au_matrix$Var2 == "ngo"] <- "civil society"
+au_matrix$Var2[au_matrix$Var2 == "business"] <- "business/finance"
+au_matrix$Var2[au_matrix$Var2 == "finance"] <- "business/finance"
+au_matrix$Var2[au_matrix$Var2 == "un ngo"] <- "un"
+
+#create facet groups
+au_matrix$facet[au_matrix$Var2 == "private university"] <- "Gr1"
+au_matrix$facet[au_matrix$Var2 == "public university"] <- "Gr1"
+au_matrix$facet[au_matrix$Var2 == "business/finance"] <- "Gr2"
+au_matrix$facet[au_matrix$Var2 == "research  policy institutes"] <- "Gr2"
+au_matrix$facet[au_matrix$Var2 == "civil society"] <- "Gr3"
+au_matrix$facet[au_matrix$Var2 == "government"] <- "Gr3"
+au_matrix$facet[au_matrix$Var2 == "un"] <- "Gr4"
+
+
+au_matrix
+
 write.csv(au_matrix,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_matrix.csv", row.names = TRUE)
 au_matrix_simple <- read_csv("data/au_matrix_simplified.csv")
 au_matrix_simple
@@ -686,21 +710,23 @@ ggcorr(au_matrix, method="circle")
 
 au_matrix
 
-ggplot(au_matrix, aes(Freq)) +
-  geom_bar(fill = "#0073C2FF") +
-  theme_minimal()
 
+#add in un only type
 au_matrix_un$Var2 <- "un only"
 au_matrix
 au_matrix_un
+
+au_matrix
+#do the plot
 ggplot(au_matrix, aes(fill=Var2, y=Freq, x=Var1)) +
   geom_point(size=2, shape=23) +
-  geom_line(aes(group = Var2)) + 
-  geom_line(data= au_matrix_un, aes(x=Var1, y=Freq, group = Var1)) +
-  theme_minimal() 
+  geom_line(aes(group = Var2), color="gray") + 
+  geom_line(data= au_matrix_un, aes(x=Var1, y=Freq, group = Var1), color = "black") +
+  theme_minimal()  + facet_wrap( ~ facet)
+au_matrix
 
 
-
+au_matrix
 ```
 
 
