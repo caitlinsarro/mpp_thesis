@@ -75,11 +75,11 @@ library(topicmodels)
 full_code <- read_csv("exports/full_coded_long.csv")
 full_code <- na.omit(full_code)
 
-#descrp_list from courses coding
-#descrp_list
+#import descrp_list from courses coding
+descrp_list
 #merge
-#soft_coded <- merge(soft_code, descrp_list, by.x = "titles", by.y = "titles_acad", all.x = TRUE)
-#soft_coded
+soft_coded <- merge(soft_code, descrp_list, by = "titles", by.y = "titles")
+soft_coded
 ```
 
 

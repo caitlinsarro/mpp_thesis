@@ -148,8 +148,6 @@ weblink_acad
 titles_acad <- map_dfr(weblink_acad, scraper, .id = "id")
 
 
-
-
 ```
 
 

@@ -333,10 +333,17 @@ keywords_combined <- keywords %>%
  summarize(keywords = str_c(keywords, collapse = ", "))
 
 #df3 <- merge(audience, keywords_combined, by = "id")
+```
 
-chart_df <- merge(chart_df, keywords_combined, by = "id")
+
+```{r}
+descrp
+chart_df
+chart_df$id <- seq.int(nrow(chart_df))
+
 chart_df <- merge(chart_df, descrp, by = "id")
-combined <- merge(chart_df, audience, by = "id", all = TRUE)
+#chart_df <- merge(chart_df, descrp, by = "id")
+#combined <- merge(chart_df, audience, by = "id", all = TRUE)
 
 write.csv(combined,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/unsdglearn.csv", row.names = TRUE)
 

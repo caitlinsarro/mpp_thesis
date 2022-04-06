@@ -62,6 +62,9 @@ library(SnowballC)
 library(topicmodels)
 library(quanteda.dictionaries)
 
+#plots
+library(GGally)
+
 ```
 
 
@@ -591,7 +594,115 @@ au_diff_main <- left_join(au_diff_main, descrip_comb, by= "titles", x.all = "TRU
 
 au_diff_un_only
 
+
+#how many of each
+table(au_diff_un_only$max.col)
+
+au_matrix_un <- table(au_diff_un_only$max.col)
+au_matrix_un
+
+au_matrix_un <- as.data.frame(au_matrix_un)
+au_matrix_un
 ```
+
+```{r}
+table(au_diff_main$max.col)
+
+au_diff_main
+#to long data
+au_diff_main_long <- au_diff_main %>% 
+  mutate(au_category = strsplit(as.character(au_category), ",")) %>%
+  unnest(au_category)
+
+
+#remove white spaces
+au_diff_main_long$au_category <- trimws(au_diff_main_long$au_category)
+au_diff_main_long
+
+write.csv(au_diff_main_long,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_main_long.csv", row.names = TRUE)
+
+#remove duplicates
+#au_diff_main_long <- unique(au_diff_main_long)
+
+au_diff_main_long
+table(au_diff_main_long$max.col)
+
+au_diff_main_long
+
+#summary table
+au_matrix <- table(au_diff_main_long$max.col, au_diff_main_long$au_category)
+#table to dataframe
+au_matrix <- as.data.frame(au_matrix)
+au_matrix
+
+write.csv(au_matrix,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_matrix.csv", row.names = TRUE)
+au_matrix_simple <- read_csv("data/au_matrix_simplified.csv")
+au_matrix_simple
+#fix/rename cols
+#au_matrix <- colnames(au_matrix$Var1)[1] <- "category"
+#au_matrix <- colnames(au_matrix$Var2)[2] <- "author"
+
+```
+
+
+
+```{r}
+library(ggplot2)
+ 
+# create a dataset
+specie <- c(rep("sorgho" , 3) , rep("poacee" , 3) , rep("banana" , 3) , rep("triticum" , 3) )
+condition <- rep(c("normal" , "stress" , "Nitrogen") , 4)
+value <- abs(rnorm(12 , 0 , 15))
+data <- data.frame(specie,condition,value)
+ 
+# Stacked
+ggplot(au_matrix_simple, aes(fill=Var1, y=Freq, x=Var2)) + 
+    geom_bar(position="stack", stat="identity")
+
+au_matrix_simple
+au_matrix
+
+
+
+```
+
+```{r}
+
+ggplot(au_matrix, aes(fill=Var1, y=Freq, x=Var2)) + 
+    geom_bar(position="stack", stat="identity")
+
+# Quick display of two cabapilities of GGally, to assess the distribution and correlation of variables 
+
+ 
+# Create data 
+data <- data.frame( var1 = 1:100 + rnorm(100,sd=20), v2 = 1:100 + rnorm(100,sd=27), v3 = rep(1, 100) + rnorm(100, sd = 1)) 
+data$v4 = data$var1 ** 2 
+data$v5 = -(data$var1 ** 2) 
+ 
+# Check correlations (as scatterplots), distribution and print corrleation coefficient 
+ggpairs(au_matrix, title="correlogram with ggpairs()") 
+
+ggcorr(au_matrix, method="circle")
+
+au_matrix
+
+ggplot(au_matrix, aes(Freq)) +
+  geom_bar(fill = "#0073C2FF") +
+  theme_minimal()
+
+au_matrix_un$Var2 <- "un only"
+au_matrix
+au_matrix_un
+ggplot(au_matrix, aes(fill=Var2, y=Freq, x=Var1)) +
+  geom_point(size=2, shape=23) +
+  geom_line(aes(group = Var2)) + 
+  geom_line(data= au_matrix_un, aes(x=Var1, y=Freq, group = Var1)) +
+  theme_minimal() 
+
+
+
+```
+
 
 ```{r}
 #old code

@@ -307,7 +307,7 @@ unpan_df <- chart_df %>% mutate(authors_unpan = "un")
 
 ```{r}
 #export as CSV
-write.csv(unpan_df,"C:/Users/caitl/Documents/GitHub/thesis/exports/unpan_df.csv", row.names = TRUE)
+write.csv(unpan_df,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/unpan.csv", row.names = TRUE)
 
 ```
 

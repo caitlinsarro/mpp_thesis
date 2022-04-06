@@ -1,0 +1,73 @@
+"","Var1","Var2","Freq"
+"1","democratic_keystems"," business",1
+"2","participation_keystems"," business",1
+"3","policy_coh_keystems"," business",2
+"4","reflex_adpt_keystems"," business",0
+"5","democratic_keystems"," cultural institution",2
+"6","participation_keystems"," cultural institution",1
+"7","policy_coh_keystems"," cultural institution",0
+"8","reflex_adpt_keystems"," cultural institution",0
+"9","democratic_keystems"," finance",2
+"10","participation_keystems"," finance",1
+"11","policy_coh_keystems"," finance",0
+"12","reflex_adpt_keystems"," finance",0
+"13","democratic_keystems"," government",5
+"14","participation_keystems"," government",2
+"15","policy_coh_keystems"," government",5
+"16","reflex_adpt_keystems"," government",3
+"17","democratic_keystems"," ngo",15
+"18","participation_keystems"," ngo",6
+"19","policy_coh_keystems"," ngo",8
+"20","reflex_adpt_keystems"," ngo",2
+"21","democratic_keystems"," private university",16
+"22","participation_keystems"," private university",6
+"23","policy_coh_keystems"," private university",5
+"24","reflex_adpt_keystems"," private university",1
+"25","democratic_keystems"," public university",17
+"26","participation_keystems"," public university",13
+"27","policy_coh_keystems"," public university",11
+"28","reflex_adpt_keystems"," public university",1
+"29","democratic_keystems"," research  policy institutes",8
+"30","participation_keystems"," research  policy institutes",2
+"31","policy_coh_keystems"," research  policy institutes",6
+"32","reflex_adpt_keystems"," research  policy institutes",1
+"33","democratic_keystems"," un",9
+"34","participation_keystems"," un",5
+"35","policy_coh_keystems"," un",15
+"36","reflex_adpt_keystems"," un",1
+"37","democratic_keystems"," un ngo",0
+"38","participation_keystems"," un ngo",3
+"39","policy_coh_keystems"," un ngo",2
+"40","reflex_adpt_keystems"," un ngo",0
+"41","democratic_keystems","cultural institution",0
+"42","participation_keystems","cultural institution",1
+"43","policy_coh_keystems","cultural institution",0
+"44","reflex_adpt_keystems","cultural institution",1
+"45","democratic_keystems","finance",0
+"46","participation_keystems","finance",0
+"47","policy_coh_keystems","finance",0
+"48","reflex_adpt_keystems","finance",1
+"49","democratic_keystems","government",5
+"50","participation_keystems","government",1
+"51","policy_coh_keystems","government",1
+"52","reflex_adpt_keystems","government",2
+"53","democratic_keystems","ngo",1
+"54","participation_keystems","ngo",0
+"55","policy_coh_keystems","ngo",0
+"56","reflex_adpt_keystems","ngo",0
+"57","democratic_keystems","private university",11
+"58","participation_keystems","private university",8
+"59","policy_coh_keystems","private university",6
+"60","reflex_adpt_keystems","private university",3
+"61","democratic_keystems","public university",8
+"62","participation_keystems","public university",5
+"63","policy_coh_keystems","public university",4
+"64","reflex_adpt_keystems","public university",10
+"65","democratic_keystems","research  policy institutes",5
+"66","participation_keystems","research  policy institutes",7
+"67","policy_coh_keystems","research  policy institutes",5
+"68","reflex_adpt_keystems","research  policy institutes",0
+"69","democratic_keystems","un",0
+"70","participation_keystems","un",0
+"71","policy_coh_keystems","un",3
+"72","reflex_adpt_keystems","un",0

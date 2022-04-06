@@ -114,9 +114,12 @@ titles
 
 
 parsed_nodes2 <- html_nodes(unsdglearn_silos, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-institutions", " " ))]//span')
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-institutions", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "tippy", " " ))]')
 authors <- html_text(parsed_nodes2)
 authors
+authors <-gsub('[\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t]', ',', authors)
+authors <-gsub('[\n\t\t\t\t\t]', ',', authors)
+authors <-gsub('[\n\t\t\t\t\t\t]', ',', authors)
 
 parsed_nodes2 <- html_nodes(unsdglearn_silos, 
                            xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " )) and (((count(preceding-sibling::*) + 1) = 1) and parent::*)]')

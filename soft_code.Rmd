@@ -71,11 +71,6 @@ library(topicmodels)
 soft_code <- read_csv("data/soft_code.csv")
 soft_code <- na.omit(soft_code)
 
-#descrp_list from courses coding
-#descrp_list
-#merge
-#soft_coded <- merge(soft_code, descrp_list, by.x = "titles", by.y = "titles_acad", all.x = TRUE)
-#soft_coded
 ```
 
 
