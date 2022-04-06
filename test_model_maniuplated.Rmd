@@ -30,12 +30,12 @@ When you click the **Knit** button a document will be generated that includes bo
 ```{r}
 #TEST of this https://cfss.uchicago.edu/notes/supervised-text-classification/
 #soft_coded_long <- read_csv("data/soft_coded_long2.csv")
-soft_coded_long <- read_csv("exports/full_code.csv")
+soft_coded_long <- read_csv("data/soft_hard_codes_combined.csv")
 theme_set(theme_minimal())
 
 ```
 ```{r}
-set.seed(100)
+set.seed(160)
 
 soft_coded_long <- soft_coded_long %>%
   mutate(major_categ = factor(x = major_categ, levels = major_categ, labels = category))
@@ -102,10 +102,10 @@ nb_wf_s %>%
 
 ```{r}
 #evaluate
-set.seed(100)
+set.seed(160)
 soft_code_train$major_categ
 
-soft_code_folds <- vfold_cv(data = soft_code_train, strata = major_categ, v = 8)
+soft_code_folds <- vfold_cv(data = soft_code_train, strata = major_categ, v = 10)
 soft_code_folds
 
 ```

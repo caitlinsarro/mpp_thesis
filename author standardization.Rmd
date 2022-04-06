@@ -63,12 +63,14 @@ coursera <- read_csv("exports/coursera_c.csv")
 unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
 unsdglearn <- read_csv("exports/unsdglearn.csv")
 sdgacademy <- read_csv("exports/sdgacademy.csv")
+unpan <- read_csv("exports/unpan.csv")
 
 
 authors_cour <- coursera %>% select(titles, author)
 authors_unsdglearn_silos <- unsdglearn_silos %>% select(titles, authors) #fix this s
 authors_unsdglearn <- unsdglearn %>% select(titles, authors) #fix this s
 authors_sdgacademy <- sdgacademy %>% select(titles_acad, author) #fix this standardize
+authors_unpan <- unpan %>% select(titles_unpan, authors_unpan)
 
 #fix nonstandard names to titles and authors
 authors_sdgacademy <- authors_sdgacademy %>%
@@ -80,9 +82,14 @@ authors_sdgacademy <- authors_sdgacademy %>%
 authors_cour <- authors_cour %>%
   rename(authors = author)
 
+authors_unpan <- authors_unpan %>%
+  rename(authors = authors_unpan)
+
+authors_unpan <- authors_unpan %>%
+  rename(titles = titles_unpan)
 
 #combine into one set
-combined <- rbind(authors_cour, authors_unsdglearn_silos, authors_unsdglearn, authors_sdgacademy)
+combined <- rbind(authors_cour, authors_unsdglearn_silos, authors_unsdglearn, authors_sdgacademy, authors_unpan)
 
 ```
 
@@ -282,29 +289,7 @@ write.csv(results_urls_fix,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/r
 
 ```
 
-```{r}
-# OLD CODE DON'T RUN
-weblink_au_t <- results_urls_t$weblink_au
 
-
-# Define the AUTHORS CATEGORY worker function
-scraper <- function(weblink_au_t) {read_html(weblink_au_t) %>% 
-    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
-    html_text() %>% 
-    enframe("id", "category")
-}
-
-
-# Iterate over the urls, applying the function each time
-au_category_t <- map_dfr(weblink_au_t, scraper, .id = "id") 
-
-au_category_t
-
-#    html_text() %>% 
-#    enframe("id", "category"),
-#    error = function(err) {print(NA)}
-#  )}
-```
 
 ```{r}
 #THIS IS THE RIGHT ONE - already exported, try to load it first
@@ -325,10 +310,6 @@ au_category_t2 <- map_dfr(weblink_au_t, scraper, .id ="id")
 
 au_category_t2
 
-#    html_text() %>% 
-#    enframe("id", "category"),
-#    error = function(err) {print(NA)}
-#  )}
 
 
 #export so don't have to do again
@@ -337,41 +318,6 @@ write.csv(au_category_t2,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_
 
 
 ```
-
-
-
-
-
-
-
-
-
-```{r}
-#Not currently using - old code
-# Define the AUTHORS CATEGORY worker function
-scraper <- function(weblink_au) { tryCatch(
-  read_html(weblink_au) %>% 
-    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
-    html_text() %>% 
-    enframe("id", "category"),
-    error = function(err) return(NULL))
-}
-
-
-# Iterate over the urls, applying the function each time
-au_category <- map_dfr(weblink_au, scraper, .id = "id")
-
-au_category
-
-#    html_text() %>% 
-#    enframe("id", "category"),
-#    error = function(err) {print(NA)}
-#  )}
-```
-
-
-
-
 
 
 
@@ -456,7 +402,7 @@ results_urls_fix_complete <- read_csv("exports/results_urls_fix_complete.csv")
 results_urls_fix_complete
 #merge with titles
 authors_list_B <- merge(authors_list, results_urls_fix_complete, by.x = "weblink", by.y = "weblink_au", all.y = TRUE)
-#authors_list_A
+authors_list_A
 #authors_list_A <- unique(authors_list_A)
 
 #authors_list_A 
@@ -752,6 +698,14 @@ au_category_clean <- unique(au_category_clean)
 write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_category_clean.csv", row.names = TRUE)
 
 ```
+
+```{r}
+#if adding in new courses post-authorship (softcode)
+au_category_clean <- read_csv("exports/au_category_clean.csv")
+au_category_clean
+
+
+```
 ```{r}
 #simplified categories
 
@@ -878,21 +832,7 @@ chart_df <- tibble::rowid_to_column(chart_df, "id")
 #unsdglearn_subpage <- read_html("https://www.unsdglearn.org/courses/unido-industrial-analytics-platform-iap/")
 ```
 
-```{r}
-#old code
-#keywords_nodes <- html_nodes(unsdglearn_subpage, 
-#                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", #"keyword", " " ))]')
-#keywords <- html_text(keywords_nodes)
-#keywords
 
-
-#audience_nodes <- html_nodes(unsdglearn_subpage, 
-#                           xpath = '//*[(@id = "content")]//li')
-#audience <- html_text(audience_nodes)
-#audience
-
-
-```
 ```{r}
 
 # Define the KEYWORDS worker function
@@ -1099,4 +1039,68 @@ authors_list_A %>%
 data2 <- iris[iris$Species %like% "virg", ]
 
 ```
+
+```{r}
+# OLD CODE DON'T RUN
+weblink_au_t <- results_urls_t$weblink_au
+
+
+# Define the AUTHORS CATEGORY worker function
+scraper <- function(weblink_au_t) {read_html(weblink_au_t) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "category")
+}
+
+
+# Iterate over the urls, applying the function each time
+au_category_t <- map_dfr(weblink_au_t, scraper, .id = "id") 
+
+au_category_t
+
+#    html_text() %>% 
+#    enframe("id", "category"),
+#    error = function(err) {print(NA)}
+#  )}
+```
+
+
+```{r}
+#old code
+#keywords_nodes <- html_nodes(unsdglearn_subpage, 
+#                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", #"keyword", " " ))]')
+#keywords <- html_text(keywords_nodes)
+#keywords
+
+
+#audience_nodes <- html_nodes(unsdglearn_subpage, 
+#                           xpath = '//*[(@id = "content")]//li')
+#audience <- html_text(audience_nodes)
+#audience
+
+
+```
+
+
+```{r}
+#Not currently using - old code
+# Define the AUTHORS CATEGORY worker function
+scraper <- function(weblink_au) { tryCatch(
+  read_html(weblink_au) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "category"),
+    error = function(err) return(NULL))
+}
+
+
+# Iterate over the urls, applying the function each time
+au_category <- map_dfr(weblink_au, scraper, .id = "id")
+
+au_category
+
+#    html_text() %>% 
+#    enframe("id", "category"),
+#    error = function(err) {print(NA)}
+#  )}
 ```

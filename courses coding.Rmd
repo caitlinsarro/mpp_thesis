@@ -74,22 +74,23 @@ coursera <- read_csv("exports/coursera_c.csv")
 unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
 unsdglearn <- read_csv("exports/unsdglearn.csv")
 sdgacademy <- read_csv("exports/sdgacademy.csv")
+unpan <- read_csv("exports/unpan.csv")
 
 #quick fixes
 coursera$description <- coursera$keywords
 sdgacademy$titles <- sdgacademy$titles_acad
-
+unpan$titles <- unpan$titles_unpan
 
 keywords_cour <- coursera %>% select(titles, description)
 keywords_unsdglearn_silos <- unsdglearn_silos %>% select(titles, description) 
 keywords_unsdglearn <- unsdglearn %>% select(titles, description) 
 keywords_sdgacademy <- sdgacademy %>% select(titles, description)
-
+keywords_unpan <- unpan %>% select(titles, description)
 # descrp_acad
 
 
 #combine into one set
-combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn, keywords_sdgacademy)
+combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn, keywords_sdgacademy, keywords_unpan)
 
 ```
 
@@ -384,10 +385,10 @@ reflex_adpt_keystems
 #All in one dictionary
 dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos","assess","relev", "associ","compet","represent","stakehold", "collabor","consensus","decis", "facilit", "aspect","form",  "concept", "activ", "matter","indirect","affair","vote", "extend","engag", "multi-stakehold", "cooper", "divers inclus","vulner popul", "cultur heritag", "youth indigen peopl", "reduc inequ",  "build trust",  "stakehold priorit",   "social inclus", "cultur divers", "discuss forum","convers", "interact platform", "live heritag", "interdisciplinari issu", "interdisciplinari", "delib", "process", "citizen", "repres","deliber", "collect", "panel", "institution",  "juri", "trust", "participatori","involv","communiti", "societi", "ballot","dialogu", "discuss", "inclus","youth", "broad", "assembl", "confer","method","communic","trainer", "confid","emot",  "listen","reflect", "relationship", "rapport", "deliveri","negoti", "conflict","techniqu","deleg", "expect", "behaviour","behavior","creativ", "frontlin", "indigen", "union", "disabl","elder", "marginla","marginlais"  
 ),
-                             policy_coh_keystems = c("coher", "extent", "structur", "foster", "coordin", "implement", "interministeri", "systemat", "mutual"  ,"reinforc" ,  "synergi"    , "integr", "overcom",             "silo",                 "unintend consequ" ,    "diverg", "interrel" , "trade off" ,           "feedback loop" ,       "institut", "level"  , "strategi" ,            "horizont" , "framework" ,           "practic", "vertic" ,              "align"   ,             "approach" ,            "applic", "balanc"  ,             "conceptu" ,            "link"  ,               "operationalis", "operation" ,           "prioriti"  ,           "subnat"  ,             "aspir"  ,  "mechan"    ,           "partnership",          "complement",           "connect",  "contradictori",        "leverage point" ,      "integr plan" ,         "depart", "ensur"   ,             "system"     ,          "comprehens",           "consist", "duplic" ,              "exist"   ,             "interlink",            "lever" ,  "relat" ,               "consensus"  ,          "commit",               "intern" , "reiter",               "treati"  ,             "contradict",           "reaffirm" , "shift" ,               "symbiosi" ,            "reciproc",             "solidar"  , "cooper"    ,           "polici coher" ,        "align polici decis",   "polici sequenc", "polici align" ,        "interconnect" ,        "increas coher",        "across govern depart", "institut structur" ,   "common goal" ,         "complex issu" ,        "govern depart", "transgovernance"),
+                             policy_coh_keystems = c("coher", "extent", "structur", "foster", "coordin", "implement", "interministeri", "systemat", "mutual"  ,"reinforc" ,  "synergi"    , "integr", "overcom",             "silo",                 "unintend consequ" ,    "diverg", "interrel" , "trade off" ,           "feedback loop" ,       "institut", "level"  , "strategi" ,            "horizont framework" ,           "practic", "vertic" ,              "align"   ,             "approach" ,            "applic", "balanc"  ,             "conceptu" ,            "link"  ,               "operationalis", "operation" ,           "prioriti"  ,           "subnat"  ,             "aspir"  ,  "mechan"    ,           "partnership",          "complement",           "connect",  "contradictori",        "leverage point" ,      "integr plan" ,         "depart", "ensur"   ,             "comprehens system"     ,          "comprehens",           "consist", "duplic" ,              "exist"   ,             "interlink",            "lever" ,  "relat" ,               "consensus"  ,          "commit",               "intern" , "reiter",               "treati"  ,             "contradict",           "reaffirm" , "shift" ,               "symbiosi" ,            "reciproc",             "solidar"  , "cooper"    ,           "polici coher" ,        "align polici decis",   "polici sequenc", "polici align" ,        "interconnect" ,        "increas coher",        "across govern depart", "institut structur" ,   "common goal" ,         "complex issu" ,        "govern depart", "transgovernance"),
                              
                              
-                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl", "express", "fair", "legislatur","check" , "balanc", "altern", "respect", "independ", "judiciari", "legitim", "liber", "democrat", "democraci" , "voter" , "franchis"  , "pluralist" ,  "competit" , "equal" , "autocraci" , "regim"   ,"repres","peac","institut" ,"qualiti","includ","process", "access" , "inform" , "polit" ,"account"  ,"effici"   ,"effect"   ,"countri"  , "facilit"  ,         "collect"  ,         "action"   ,         "reduct"  ,          "transact" ,"public"  ,          "free"    ,          "elect"  ,           "inclus"    ,        "human"    ,"theori" ,           "peopl"   ,          "univ"     ,         "franchi"  ,         "citizen"     ,"hold"    ,          "system"  ,          "civil liberti" ,    "democrat institut", "negoti skill" ,"ethic leadership",  "contract negoti",   "govern negoti" ,    "transact cost" ,    "human right"   ,"free elect", "polit philosoph"  , "polit polar"  ,     "popul"      ,       "repres democraci"),
+                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl", "express", "fair", "legislatur","check" , "balanc", "altern", "respect", "independ", "judiciari", "legitim", "liber", "democrat", "democraci" , "voter" , "franchis"  , "pluralist" ,  "competit" , "equal" , "autocraci" , "regim"   ,"repres","peac","institut" ,"qualiti","includ","process", "access" , "inform" , "polit" ,"account"  ,"effici"   ,"effect"   ,"countri"  , "facilit"  ,         "collect"  ,         "action"   ,         "reduct"  ,          "transact" ,"public"  ,          "free elect"    ,           "inclus"    ,         "univ"     ,         "franchi"  ,         "citizen"     ,"hold"    ,          "civil liberti" ,    "democrat institut", "negoti skill" ,"ethic leadership",  "contract negoti",   "govern negoti" ,    "transact cost" ,    "human right"   ,"free elect", "polit philosoph"  , "polit polar"  ,     "popul"      ,       "repres democraci"),
 
                              
                                 
@@ -425,7 +426,8 @@ descrp_list <- descrp_list %>%
   mutate(stem = stemDocument(descrp_list$key_category))
 
 
-dfmat_descrip <- dfm(tokens(descrp_list$stem, remove_punct = TRUE))
+dfmat_descrip <- dfm(tokens(descrp_list$stem, remove_punct = TRUE) %>% 
+  tokens_ngrams(1:2))
 d_descrip_ref <- dfm_lookup(dfmat_descrip, dict_descrip,  valuetype = c("glob"))
 d_descrip_ref <- as.data.frame(as.matrix(d_descrip_ref))
 d_descrip_ref$id <- seq.int(nrow(d_descrip_ref))
@@ -461,7 +463,8 @@ df %>% filter(Freq >= 10)
 #checking which words are the most matched per category 
 
 
-toks <- tokens(tail(descrp_list$stem))
+toks <- tokens(tail(descrp_list$stem, remove_punct = TRUE)) %>% 
+  tokens_ngrams(1:2)
 
 dfm_list <- list()
 for (key in names(dict_descrip)) {
@@ -511,12 +514,20 @@ table(descrip_comb$max.col)
 #wider export (useful for checking)
 write.csv(descrip_comb,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/descrip_comb.csv", row.names = TRUE)
 descrip_comb
+
+
 ```
+
+
+###start to combine with authors
+
 
 ```{r}
 #try to combine with authors
 descrip_comb
 au_category_clean
+
+au_diff_coding <- left_join(descrip_comb, au_category_clean, by= "titles")
 
 try <- left_join(descrip_comb, au_category_clean, by= "titles")
 
@@ -525,6 +536,8 @@ try <- try %>% select (titles, max.col, authors, au_category)
 quick_sum <- try %>%
   group_by(au_category) %>%
   count(max.col)
+
+
 write.csv(quick_sum,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/quick_sum.csv", row.names = TRUE)
 
 au_category_clean <- au_category %>%
@@ -534,9 +547,49 @@ au_category_clean
 
 
 
+au_diff_coding <- au_diff_coding %>% select (titles, max.col, authors, au_category)
+
+au_diff_coding
+
+au_diff_coding_export <- au_diff_coding %>%
+ group_by(titles) %>%
+ summarize(au_category = str_c(au_category, collapse = ", "))
 
 
+au_category_clean 
+```
 
+```{r}
+#export file to fix the missing authors
+
+write.csv(au_diff_coding_export,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_coding_export.csv", row.names = TRUE)
+
+au_diff_coding_missing <- read_csv("data/au_diff_coding_export_fixed.csv")
+au_diff_coding_main <- read_csv("data/au_diff_coding_export_main.csv")
+
+#combine back together
+au_diff_coding <- rbind(au_diff_coding_main, au_diff_coding_missing)
+au_diff_coding
+#fix/rename id col
+colnames(au_diff_coding)[1] <- "id"
+au_diff_coding <- au_diff_coding[order(au_diff_coding$id, decreasing = FALSE),]
+au_diff_coding
+
+write.csv(au_diff_coding,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_coding.csv", row.names = TRUE)
+```
+
+```{r}
+#in excel I separated out the UN ONLY courses
+au_diff_un_only <- read_csv("data/au_diff_coding_un_only.csv")
+au_diff_main <- read_csv("data/au_diff_coding_removed_un_only.csv")
+
+#there are some NAs - come back to figure out why
+au_diff_un_only
+
+au_diff_un_only <- left_join(au_diff_un_only, descrip_comb, by= "titles", x.all = "TRUE")
+au_diff_main <- left_join(au_diff_main, descrip_comb, by= "titles", x.all = "TRUE")
+
+au_diff_un_only
 
 ```
 
@@ -680,187 +733,23 @@ write.csv(descrip_comb,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/descr
 
 
 
-
-
-
-
-
-
-
-```{r}
-#don't push - lots of tried attempts
-dfmat_ex <- dfm(tokens(participation$Terms, remove_punct = TRUE))
-dfmat_ex
-
-
-stopWords <- stopwords("en")
-
-participation$dict<- as.character(participation$Terms)
- '%nin%' <- Negate('%in%')
- participation$Terms<-lapply(participation$Terms, function(x) {
-  chk <- unlist(strsplit(x," "))
-  p <- chk[chk %nin% stopWords]
-  paste(p,collapse = " ")
-})
-
-
-dfmat_ex <- dfm(tokens(participation$Terms, remove_punct = TRUE))
-
-participation$dict<- gsub("[[:punct:]]|[[:digit:]]|^http:\\/\\/.*|^https:\\/\\/.*","",participation$dict)
-participation$dict<- gsub("\u0092","",participation$dict)
-
-participation$dict
-
-
-
-
-
-participation_corpus <- Corpus(VectorSource(as.vector(participation$dict))) 
-participation_corpus
-
-participation_corpus <- tm_map(participation_corpus, removeWords, stopwords("english"))
-trump_corpus <- tm_map(trump_corpus, content_transformer(removePunctuation))
-
-
-tidy_trump_tweets<- participation %>%
-    unnest_tokens("word", text)
- 
-participation_source <- VectorSource(participation)
-df_source <- DataframeSource(participation_source)
-
-
-```
-
-
-
-
-
-
-
+###combining with authors
 
 
 
 ```{r}
-#transform into a leaner dataframe
-#authors_list_A_comb <- mutate(authors_list_A, titles=NULL, piece=NULL, weblink=NULL, au_category=NULL)
-
-#adding index as a col for matching
-authors_list_A$id <- seq.int(nrow(authors_list_A))
-
-#start to combine
- 
-authors_list_A_comb <- left_join(authors_list_A,df_au, by = "id") 
-authors_list_A_comb <- left_join(authors_list_A_comb,df_cat, by = "id") 
-
-
-#authors_list_A_comb <- left_join(authors_list_A,df, by = "authors") 
-#authors_list_A_comb <- merge(authors_list_A,df, by = "authors")
-#authors_list_A_comb <- left_join(authors_list_A_comb,df_agent, by = "authors")
-#authors_list_A_comb <- left_join(authors_list_A_comb,df_ngo, by = "category")
-#authors_list_A_comb <- left_join(authors_list_A_comb,df_un, by = "authors")
-#authors_list_A_comb
-
-authors_list_A_comb$category[authors_list_A_comb$un_programs=="1"] <- "un program"
-authors_list_A_comb$category[authors_list_A_comb$un_specialized_agencies=="1"] <- "un specialized agency"
-authors_list_A_comb$category[authors_list_A_comb$ngo=="1"] <- "ngo"
-authors_list_A_comb$category[authors_list_A_comb$un=="1"] <- "un"
-
-
-authors_list_A_comb
-```
-
-```{r}
-#cut unnessesary columns before fixing
-
-#authors_list_A_comb <- mutate(authors_list_A_comb, un_programs=NULL, un_specialized_agencies=NULL, ngo=NULL, un=NULL)
-
-#authors_list_A_comb <- unique(authors_list_A_comb)
-#authors_list_A_comb
-
-```
+au_category_clean <- read_csv("exports/au_category_clean.csv")
+descrip_comb <- descrip_comb %>% mutate(titles = titles_acad)
 
 
 
-
-
-```{r}
-#manual fixing based on authors
-authors_list_A_comb$category[authors_list_A_comb$authors=="Academy of Korean Studies"] <- "research institute" 
-
-
-
-```
-
-```{r}
-#------------- category cleanups
-authors_list_A_comb$category[authors_list_A_comb$category=="public"] <- "public university"
-
-
-
-
-authors_list_A_comb
-
-```
-
-```{r}
-#wider export (useful for checking)
-#write.csv(authors_list_A_comb,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/authors_list_A_comb.csv", row.names = TRUE)
-
-```
-
-
-```{r}
-#move to wider au_category title
-authors_list_A_comb$au_category <-authors_list_A_comb$category
-
-#subet clean
-au_category_clean <- authors_list_A_comb[c("titles","authors","au_category")]
-au_category_clean
-
+descrip_comb
 
 
 ```
 
 
 ```{r}
-#export
-write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_category_clean.csv", row.names = TRUE)
-
-```
-
-
-
-
-
-
-
-
-```{r}
-#remove duplicates from a cell
-
-#rem_dup_word <- function(x){
-#x <- tolower(x)
-#paste(unique(trimws(unlist(strsplit(x,split=" ",fixed=F,perl=T)))),collapse = 
-#" ")
-#}
-
-#duptest <- "Samsung WA80E5LEC samsung Top Loading with Diamond Drum, 6 kg 
-#(Silver)"
-
-#capacities<- descrip_comb_test$capacity
-#capacities <- as.data.frame(capacities)
-
-#test <- map_dfr(capacities, rem_dup_word, .id = "id")
-#test
-
-```
-
-
-
-
-
-```{r}
-
 au_category_clean <- au_category %>%
  group_by(id) %>%
  summarize(category = str_c(category, collapse = ", "))
@@ -1095,3 +984,8 @@ df_ngo
 
 ```
 
+```{r}
+#toolbox
+#soft_code$id <- seq.int(nrow(soft_code))
+
+```

@@ -122,9 +122,10 @@ titles
 
 
 parsed_nodes2 <- html_nodes(unsdglearn, 
-                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-institutions", " " ))]//span')
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-institutions", " " ))]')
 authors <- html_text(parsed_nodes2)
 authors
+
 
 parsed_nodes2 <- html_nodes(unsdglearn, 
                            xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " )) and (((count(preceding-sibling::*) + 1) = 1) and parent::*)]')
@@ -150,8 +151,13 @@ lang
 ```{r}
 #extract the links
 
-weblink <- unsdglearn  %>% html_nodes("div.card-content > h4 > a") %>% html_attr("href")
+weblink <- html_nodes(unsdglearn, 
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-title-course", " " ))]//a') %>% html_attr("href")
 
+
+#weblink <- unsdglearn  %>% #html_nodes("div.card-content > h4 > a") %>% #html_attr("href")
+
+weblink
 
 ```
 

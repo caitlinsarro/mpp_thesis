@@ -88,7 +88,7 @@ page_source <-remDr$getPageSource()
 
 #pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
 
-unsdglearn <- read_html(page_source[[1]])
+unsdglearn_silos <- read_html(page_source[[1]])
 
 
 #parse it
@@ -106,19 +106,19 @@ unsdglearn <- read_html(page_source[[1]])
 **Step 3.** Extract information.
 
 ```{r}
-parsed_nodes <- html_nodes(unsdglearn, 
+parsed_nodes <- html_nodes(unsdglearn_silos, 
                            xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-title-course", " " ))]//a')
 titles <- html_text(parsed_nodes)
 titles
 
 
 
-parsed_nodes2 <- html_nodes(unsdglearn, 
+parsed_nodes2 <- html_nodes(unsdglearn_silos, 
                            xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-institutions", " " ))]//span')
 authors <- html_text(parsed_nodes2)
 authors
 
-parsed_nodes2 <- html_nodes(unsdglearn, 
+parsed_nodes2 <- html_nodes(unsdglearn_silos, 
                            xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " )) and (((count(preceding-sibling::*) + 1) = 1) and parent::*)]')
 SDGs <- html_text(parsed_nodes2)
 SDGs <-gsub('[\n\t\t\t\t\t\t\t\t\t\t\t\t\t]', ',', SDGs)
@@ -127,12 +127,12 @@ SDGs
 ```
 
 ```{r}
-parsed_nodes2 <- html_nodes(unsdglearn, 
+parsed_nodes2 <- html_nodes(unsdglearn_silos, 
                            xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " )) and (((count(preceding-sibling::*) + 1) = 2) and parent::*)]')
 tags <- html_text(parsed_nodes2)
 tags
 
-parsed_nodes2 <- html_nodes(unsdglearn, 
+parsed_nodes2 <- html_nodes(unsdglearn_silos, 
                            xpath = '//*~[contains(concat( " ", @class, " " ), concat( " ", "card-tags-row", " " ))]')
 lang <- html_text(parsed_nodes2)
 lang
@@ -142,7 +142,7 @@ lang
 ```{r}
 #extract the links
 
-weblink <- html_nodes(unsdglearn, 
+weblink <- html_nodes(unsdglearn_silos, 
                            xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "card-title-course", " " ))]//a') %>% html_attr("href")
 
 
@@ -238,7 +238,7 @@ descrp_silos$description <- gsub("\n\t\t\t\t\tAbout this course\n\t\t\t\t\t", ""
 ```
 
 ```{r}
-weblink <- unsdglearn_silos$weblink
+
 # Define the AUDIENCE worker function
 scraper <- function(weblink) {
   read_html(weblink) %>% 

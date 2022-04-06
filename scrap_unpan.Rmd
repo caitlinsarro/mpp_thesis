@@ -152,6 +152,16 @@ parsed_nodes <- html_nodes(unpan,
 authors_unpan <- html_text(parsed_nodes)
 authors_unpan
 
+#cleanup
+authors_unpan <- gsub("\nTraining of Trainers | EnglishAccess the Toolkit\n ", "", authors_unpan)
+authors_unpan <- gsub("| EnglishAccess the Toolkit\n ", "", authors_unpan)
+authors_unpan
+
+
+```
+
+
+```{r}
 parsed_nodes <- html_nodes(unpan, 
                            xpath = '//*[(@id = "block-custom-content")]//*[contains(concat( " ", @class, " " ), concat( " ", "field__item", " " ))]//div//div//div//img') %>%
   html_attr("alt" )%>%
@@ -180,13 +190,19 @@ K <- c(NA)
 
 ```
 ```{r}
-#add in url
+#remove 
+#https://egov4women.unescapsdd.org/toolkit
+#https://www.unitar.org/event/full-catalog/toolkit-integrated-policies-and-policy-coherence-sdgs
+#https://www.unitar.org/event/full-catalog/integrated-recovery-planning-and-policy-coherence-towards-sdgs\n
+
 weblink_node <- weblink %>% slice(1:8)
 
 weblink_node$weblink <- paste0("https://unpan.un.org", weblink_node$weblink)
 weblink_node <- as.list(weblink_node)
 
 weblink_node <- (weblink_node$weblink)
+
+
 
 ```
 
@@ -207,95 +223,82 @@ keywords_unpan <- map_dfr(weblink_node, scraper, .id = "id")
 ```
 
 ```{r}
-#pull in text from website as large chunk
-parsed_nodes <- html_nodes(unpan, 
-                           xpath = '//a')
-text_unfccc <- html_text(parsed_nodes)
-text_unfccc
-```
+#Combine into single columns
 
-```{r}
-#set up dataframe and standardize capitazlisation (to lowercase)
+descrp_unpan <- keywords_unpan %>%
+ group_by(id) %>%
+ summarize(description = str_c(description, collapse = ", "))
 
-unfccc_df_mess <- text_unfccc %>% enframe("id", "text")
 
-unfccc_df_mess$text = tolower(unfccc_df_mess$text)
+descrp_unpan$id <- as.numeric(descrp_unpan$id)
 
-#separate title text from body
-unfccc_df <- str_split_fixed(unfccc_df_mess$text, "short info:", 2)
+descrp_unpan[order(descrp_unpan$id, decreasing = FALSE),] 
 
-unfccc_df <-as.data.frame(unfccc_df)
-
-unfccc_df <- data.frame(do.call('rbind', strsplit(as.character(unfccc_df$V2),'providing institution',fixed=TRUE)))
-
-unfccc_df <- separate(data = unfccc_df_mess, col = text, into = c("left", "keywords"), sep = "short info:")
-
-unfccc_df <- separate(data = unfccc_df, col = keywords, into = c("keywords", "author"), sep = "providing institution:")
-
-unfccc_df <- separate(data = unfccc_df, col = author, into = c("author", "region"), sep = "region:")
-
-unfccc_df <- separate(data = unfccc_df, col = region, into = c("region", "dump"), sep = "type of activities:")
-
-#remove redundant cols
-unfccc_df <- mutate(unfccc_df, id=NULL, left=NULL, dump=NULL)
-
+descrp_unpan
 
 ```
 
 ```{r}
-#extract the links
+#quick pull from the last three
+#1) https://egov4women.unescapsdd.org/toolkit -- which is actually https://egov4women.unescapsdd.org/toolkit/introduction
+#2) https://www.unitar.org/event/full-catalog/toolkit-integrated-policies-and-policy-coherence-sdgs which is https://www.unitar.org/event/print/full-catalog/toolkit-integrated-policies-and-policy-coherence-sdgs
+#3) https://www.unitar.org/event/full-catalog/integrated-recovery-planning-and-policy-coherence-towards-sdgs\n which is actually https://www.unitar.org/event/print/full-catalog/integrated-recovery-planning-and-policy-coherence-towards-sdgs
 
-body_nodes <- unfccc %>% 
- html_node("body") %>% 
- html_children()
 
-body_nodes %>% 
- html_children()
+AL <- read_html("https://egov4women.unescapsdd.org/toolkit/introduction") %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "field-body", " " ))] | //p[(((count(preceding-sibling::*) + 1) = 1) and parent::*)]') %>% 
+    html_text() %>% 
+    enframe("id", "description") %>% 
+ summarize(description = str_c(description, collapse = ", "))
 
-weblink <- unfccc  %>% html_nodes("div.embedded-entity-content > a") %>% html_attr("href")
+AL
+AL$id <- seq.int(nrow(AL))
 
+### second one
+BL <- read_html("https://www.unitar.org/event/print/full-catalog/toolkit-integrated-policies-and-policy-coherence-sdgs") %>% 
+    html_nodes(xpath = '//li | //p | //*[contains(concat( " ", @class, " " ), concat( " ", "table-row", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "field-value", " " ))] | //h2') %>% 
+    html_text() %>% 
+    enframe("id", "description") %>% 
+ summarize(description = str_c(description, collapse = ", "))
+
+BL
+BL$id <- seq.int(nrow(BL))
+
+### third one
+
+CL <- read_html("https://www.unitar.org/event/print/full-catalog/integrated-recovery-planning-and-policy-coherence-towards-sdgs") %>% 
+    html_nodes(xpath = '//li | //p | //*[contains(concat( " ", @class, " " ), concat( " ", "table-row", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "field-value", " " ))] | //h2') %>% 
+    html_text() %>% 
+    enframe("id", "description") %>% 
+ summarize(description = str_c(description, collapse = ", "))
+
+CL
+CL$id <- seq.int(nrow(CL))
+
+descrp_unpan <- rbind(descrp_unpan, AL, BL, CL)
+descrp_unpan$id <- seq.int(nrow(descrp_unpan))
+descrp_unpan
+
+```
+
+
+
+```{r}
+titles_unpan
 weblink
 
-```
 
 
+chart_df <- data.frame(titles_unpan, authors_unpan, weblink, descrp_unpan)
 
-```{r}
-weblink
-
-weblinks2 <- weblink %>%  enframe("id", "weblink")
-
-#subset for coursera
-coursera_subset <- weblinks2 %>%
-  filter(str_detect(weblink, "coursera"))
-
-#subset for elearning
-elearning_subset <- weblinks2 %>%
-  filter(str_detect(weblink, "elearning"))
-
-#subset for unccelearn
-unccelearn_subset <- weblinks2 %>%
-  filter(str_detect(weblink, "unccelearn.org"))
-
-#subset for worldbank
-worldbank_subset <- weblinks2 %>%
-  filter(str_detect(weblink, "olc.worldbank.org"))
-
-```
+#clean up authors
+unpan_df <- chart_df %>% mutate(authors_unpan = "un")
 
 
+#unpan_df <- merge(chart_df, descrp_unpan, by="id")
 
-```{r}
-titles_unfccc
-weblink
 
-chart_df <- merge(titles_unfccc, unfccc_df, by="id")
-
-chart_df <- data.frame(titles_unfccc, authors, tags, SDGs, weblink)
-
-knitr::kable(chart_df  %>% head(10))
-
-chart_df <- tibble::rowid_to_column(chart_df, "id")
+#chart_df <- tibble::rowid_to_column(chart_df, "id")
 
 #titles	authors	tags	SDGs	weblink	keywords	audience
 
@@ -304,7 +307,7 @@ chart_df <- tibble::rowid_to_column(chart_df, "id")
 
 ```{r}
 #export as CSV
-write.csv(coursera_subset,"C:/Users/caitl/Documents/GitHub/thesis/exports/coursera.csv", row.names = TRUE)
+write.csv(unpan_df,"C:/Users/caitl/Documents/GitHub/thesis/exports/unpan_df.csv", row.names = TRUE)
 
 ```
 
@@ -318,5 +321,8 @@ write.csv(coursera_subset,"C:/Users/caitl/Documents/GitHub/thesis/exports/course
 #Sys.sleep(15)
 #remDr$open()
 #docker run -d -p 4445:4444 selenium/standalone-chrome
+
+#tend to keep using
+#df_cat$id <- seq.int(nrow(df_cat))
 
 ```
