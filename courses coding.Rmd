@@ -527,8 +527,10 @@ descrip_comb
 
 ```{r}
 #try to combine with authors
-descrip_comb
-au_category_clean
+#descrip_comb
+#au_category_clean
+au_category_clean <- read_csv("exports/au_category_clean.csv")
+
 
 au_diff_coding <- left_join(descrip_comb, au_category_clean, by= "titles")
 
@@ -543,10 +545,6 @@ quick_sum <- try %>%
 
 write.csv(quick_sum,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/quick_sum.csv", row.names = TRUE)
 
-au_category_clean <- au_category %>%
- group_by(id) %>%
- summarize(category = str_c(category, collapse = ", "))
-au_category_clean 
 
 
 
@@ -559,7 +557,6 @@ au_diff_coding_export <- au_diff_coding %>%
  summarize(au_category = str_c(au_category, collapse = ", "))
 
 
-au_category_clean 
 ```
 
 ```{r}
@@ -603,6 +600,13 @@ au_matrix_un
 
 au_matrix_un <- as.data.frame(au_matrix_un)
 au_matrix_un
+
+
+#add in un only type
+au_matrix_un$Var2 <- "un only"
+au_matrix
+au_matrix_un
+
 ```
 
 ```{r}
@@ -647,6 +651,7 @@ au_matrix$Var2[au_matrix$Var2 == "business"] <- "business/finance"
 au_matrix$Var2[au_matrix$Var2 == "finance"] <- "business/finance"
 au_matrix$Var2[au_matrix$Var2 == "un ngo"] <- "un"
 
+
 #create facet groups
 au_matrix$facet[au_matrix$Var2 == "private university"] <- "Gr1"
 au_matrix$facet[au_matrix$Var2 == "public university"] <- "Gr1"
@@ -656,6 +661,10 @@ au_matrix$facet[au_matrix$Var2 == "civil society"] <- "Gr3"
 au_matrix$facet[au_matrix$Var2 == "government"] <- "Gr3"
 au_matrix$facet[au_matrix$Var2 == "un"] <- "Gr4"
 
+#sum up repeats
+au_matrix <- au_matrix %>% 
+  group_by(Var1, Var2, facet) %>%
+  summarize_all(sum)
 
 au_matrix
 
@@ -711,22 +720,48 @@ ggcorr(au_matrix, method="circle")
 au_matrix
 
 
-#add in un only type
-au_matrix_un$Var2 <- "un only"
-au_matrix
-au_matrix_un
+
+
+line_unonly = lm(Var1 ~ Freq )'data= au_matrix_un, aes(x=Var1, y=Freq, group = Var1), color = "black"'
 
 au_matrix
 #do the plot
 ggplot(au_matrix, aes(fill=Var2, y=Freq, x=Var1)) +
   geom_point(size=2, shape=23) +
-  geom_line(aes(group = Var2), color="gray") + 
-  geom_line(data= au_matrix_un, aes(x=Var1, y=Freq, group = Var1), color = "black") +
-  theme_minimal()  + facet_wrap( ~ facet)
+  geom_line(aes(group = Var2), color="gray") +
+  theme_minimal()  + facet_wrap( ~ facet) +
+  geom_line(data = au_matrix_un, aes(x=Var1, y=Freq))
 au_matrix
 
 
+line2 = data.frame(x=xl,y=yl,type)
+
+ggplot(data, aes(x,y)) + geom_line() + facet_wrap(~type) +
+   geom_line(data = line_unonly)
+
+au_matrix_un
+
+###
 au_matrix
+#do the plot
+ggplot(au_matrix, aes(fill=Var2, y=Freq, x=Var1)) +
+  geom_point(size=2, shape=23) +
+  geom_line(aes(group = Var2), color="gray") +
+  theme_minimal()  + facet_wrap( ~ facet)  +
+  geom_point(data = au_matrix_un, aes(x=Var1, y=Freq)) +
+  geom_point(size=2, shape=23)
+au_matrix
+
+
+xl    = c( 4,  1)
+yl    = c( 1,  4)
+type =rep(LETTERS[1:4], each=2)
+line2 = data.frame(x=au_matrix_un$Var1,y=au_matrix_un$Freq,au_matrix_un)
+
+ggplot(data, aes(x,y)) + geom_line() + facet_wrap(~type) +
+   geom_line(data = line2)
+au_matrix_un
+
 ```
 
 
