@@ -78,26 +78,47 @@ unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
 unsdglearn <- read_csv("exports/unsdglearn.csv")
 sdgacademy <- read_csv("exports/sdgacademy.csv")
 unpan <- read_csv("exports/unpan.csv")
-
+unssc <- read_csv("exports/unssc.csv")
+unfccc <- read_csv("exports/unfccc.csv")
+unfccc
 #quick fixes
 coursera$description <- coursera$keywords
 sdgacademy$titles <- sdgacademy$titles_acad
 unpan$titles <- unpan$titles_unpan
+unssc$titles <- unssc$titles_unssc
+unfccc$titles <- unfccc$titles_unfccc
 
 keywords_cour <- coursera %>% select(titles, description)
 keywords_unsdglearn_silos <- unsdglearn_silos %>% select(titles, description) 
 keywords_unsdglearn <- unsdglearn %>% select(titles, description) 
 keywords_sdgacademy <- sdgacademy %>% select(titles, description)
 keywords_unpan <- unpan %>% select(titles, description)
+keywords_unssc <- unssc %>% select(titles, description)
+keywords_unfccc <- unfccc %>% select(titles,description)
 # descrp_acad
 
 
 #combine into one set
-combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn, keywords_sdgacademy, keywords_unpan)
+combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn, keywords_sdgacademy, keywords_unpan, keywords_unssc)
 
 ```
 
+```{r}
+#remove words that could skew analysis 
 
+
+combined <- combined %>%
+    mutate(description = str_remove_all(description, "participants"))
+
+#use | to add more
+
+#export to fix translation problem
+write.csv(combined,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/combined_for_coding.csv", row.names = TRUE)
+
+#import back in after translation
+combined <- read_csv("data/combined_for_coding.csv")
+
+```
 
 
 
@@ -531,11 +552,22 @@ descrip_comb
 #au_category_clean
 au_category_clean <- read_csv("exports/au_category_clean.csv")
 
-
 au_diff_coding <- left_join(descrip_comb, au_category_clean, by= "titles")
+au_diff_coding <- au_diff_coding %>% select (titles, max.col, authors, au_category)
+
+
+au_diff_coding
+
+au_diff_coding_export <- au_diff_coding %>%
+ group_by(titles) %>%
+ summarize(au_category = str_c(au_category, collapse = ", "))
+au_diff_coding_export
+
+```
+
+```{r}
 
 try <- left_join(descrip_comb, au_category_clean, by= "titles")
-
 
 try <- try %>% select (titles, max.col, authors, au_category)
 quick_sum <- try %>%
@@ -544,17 +576,13 @@ quick_sum <- try %>%
 
 
 write.csv(quick_sum,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/quick_sum.csv", row.names = TRUE)
+```
 
 
 
+```{r}
 
-au_diff_coding <- au_diff_coding %>% select (titles, max.col, authors, au_category)
 
-au_diff_coding
-
-au_diff_coding_export <- au_diff_coding %>%
- group_by(titles) %>%
- summarize(au_category = str_c(au_category, collapse = ", "))
 
 
 ```
@@ -579,6 +607,9 @@ write.csv(au_diff_coding,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_
 ```
 
 ```{r}
+#in excel I added in unpan, unssc, unfccc
+
+
 #in excel I separated out the UN ONLY courses
 au_diff_un_only <- read_csv("data/au_diff_coding_un_only.csv")
 au_diff_main <- read_csv("data/au_diff_coding_removed_un_only.csv")
@@ -815,7 +846,7 @@ au_category_clean
 
 
 ```{r}
-#I AM HEREE
+
 descrip_comb
 authors_list
 
@@ -887,11 +918,6 @@ descrip_comb_test
 
 
 ```
-
-
-
-
-
 
 
 

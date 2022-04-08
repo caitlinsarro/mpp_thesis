@@ -349,21 +349,38 @@ weblink$id <- seq.int(nrow(weblink))
 
 chart_df <- merge(titles_unfccc, unfccc_df, by="id")
 unfccc_sub_df <- merge(chart_df, unfccc_subsets, by="id", all.y = TRUE)
-
-weblink <- data.frame(weblink)
-
-knitr::kable(chart_df  %>% head(10))
-
-weblink <- tibble::rowid_to_column(weblink, "id")
-
-#titles	authors	tags	SDGs	weblink	keywords	audience
+```
 
 
+```{r}
+#categorize the authors by hand
+unfccc_authors <- unfccc_sub_df %>% select(titles_unfccc, author)
+write.csv(unfccc_authors,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/unfccc_authors.csv", row.names = TRUE)
+unfccc_authors <- read_csv("exports/unfccc_authors_fixed.csv")
+
+
+unfccc_authors$authors <- unfccc_authors$author
+
+unfccc_sub_df
+unfccc_authors$id <- seq.int(nrow(unfccc_authors))
+unfccc_sub_df$id <- seq.int(nrow(unfccc_sub_df))
+
+unfccc_sub_df2 <- merge(unfccc_sub_df, unfccc_authors, by="id")
+
+#didn't merge correctly, have to pick out
+
+unfccc_sub_df <- unfccc_sub_df2 %>% select(id, titles_unfccc.x, keywords, weblink,description, authors)
+
+#rename fix titles colname
+colnames(unfccc_sub_df)[2] <- "titles_unfccc"
+unfccc_sub_df 
 ```
 
 ```{r}
 #export as CSV
-write.csv(coursera_subset,"C:/Users/caitl/Documents/GitHub/thesis/exports/coursera.csv", row.names = TRUE)
+write.csv(coursera_subset,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/coursera.csv", row.names = TRUE)
+write.csv(unfccc_sub_df,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/unfccc.csv", row.names = TRUE)
+
 
 ```
 

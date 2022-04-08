@@ -64,17 +64,31 @@ unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
 unsdglearn <- read_csv("exports/unsdglearn.csv")
 sdgacademy <- read_csv("exports/sdgacademy.csv")
 unpan <- read_csv("exports/unpan.csv")
-
+unssc <- read_csv("exports/unssc.csv")
+unfccc <- read_csv("exports/unfccc.csv")
 
 authors_cour <- coursera %>% select(titles, author)
 authors_unsdglearn_silos <- unsdglearn_silos %>% select(titles, authors) #fix this s
 authors_unsdglearn <- unsdglearn %>% select(titles, authors) #fix this s
 authors_sdgacademy <- sdgacademy %>% select(titles_acad, author) #fix this standardize
 authors_unpan <- unpan %>% select(titles_unpan, authors_unpan)
+authors_unssc <- unssc %>% select(titles_unssc, authors)
+authors_unfccc <- unfccc %>% select(titles_unfccc, author)
 
 #fix nonstandard names to titles and authors
 authors_sdgacademy <- authors_sdgacademy %>%
   rename(titles = titles_acad)
+
+authors_unpan <- authors_unpan %>%
+  rename(titles = titles_unpan)
+
+authors_unssc <- authors_unssc %>%
+  rename(titles = titles_unssc)
+
+authors_unfccc <- authors_unfccc %>%
+  rename(titles = titles_unfccc)
+
+## authors
 
 authors_sdgacademy <- authors_sdgacademy %>%
   rename(authors = author)
@@ -85,8 +99,8 @@ authors_cour <- authors_cour %>%
 authors_unpan <- authors_unpan %>%
   rename(authors = authors_unpan)
 
-authors_unpan <- authors_unpan %>%
-  rename(titles = titles_unpan)
+authors_unfccc <- authors_unfccc %>%
+  rename(authors = authors)
 
 #combine into one set
 combined <- rbind(authors_cour, authors_unsdglearn_silos, authors_unsdglearn, authors_sdgacademy, authors_unpan)
@@ -435,8 +449,6 @@ authors_list_A$category <- removePunctuation(authors_list_A$category)
 ```
 
 
-
-
 ```{r}
 #author dictionaries
 #------------------------
@@ -740,6 +752,8 @@ au_category_clean$au_category[au_category_clean$au_category=="un internal agency
 ```
 
 
+
+
 ```{r}
 #group by author category
 
@@ -906,6 +920,14 @@ write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/
 write.csv(authors_list_A,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/authors_list_A.csv", row.names = TRUE)
 
 ```
+
+
+
+
+
+
+
+
 
 ```{r}
 #long way
