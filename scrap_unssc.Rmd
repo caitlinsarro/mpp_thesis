@@ -1,0 +1,311 @@
+---
+title: "Web Scraping"
+subtitle: "UNSDGLEARN: Capacity Building"
+author: "Caitlin Sarro"
+date: "2/9/2022"
+output: 
+  html_document:
+    toc: TRUE
+    df_print: paged
+    number_sections: FALSE
+    highlight: tango
+    theme: lumen
+    toc_depth: 3
+    toc_float: true
+    css: custom.css 
+    self_contained: false
+    includes:
+      after_body: footer.html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+***
+CONTEXT TEXT
+
+In general, remember, the basic **workflow for scraping static webpages** is the following.
+
+**Step 1.** Load the packages
+
+```{r, message=F}
+#install.packages("")
+library(RSelenium)
+library(tidyverse)
+library(rvest)
+library(V8)
+
+
+library(stringr)
+library(readr)
+library(shiny)
+
+library(reshape2)
+library(dplyr)
+
+library(purrr)
+library(tibble)
+
+```
+
+
+
+```{r}
+#https://www.unssc.org/courses?f%5B0%5D=theme%3A661&f%5B1%5D=type%3A662
+
+
+```
+
+# Scraping multiple pages `r emo::ji("robot")`
+
+Whenever you want to really understand what's going on within the functions of a new R package, it is very likely that there is a relevant article published in the [Journal of Statistical Software](https://www.jstatsoft.org/index). Let's say you are interested in how the journal was doing over the past years.
+
+**Step 1.** Inspect the source. Basically, follow steps to extract the Xpath information.
+```{r, eval=F}
+#browseURL("https://www.unssc.org/courses?f%5B0%5D=theme%3A661&f%5B1%5D=type%3A662")
+```
+
+**Step 2.** Parse the page source.
+
+```{r}
+
+unsscpage <- "https://www.unssc.org/courses?f%5B0%5D=theme%3A661&f%5B1%5D=type%3A662"
+unssc <- read_html(unsscpage)
+
+
+```
+
+```{r}
+#UNFCCC 
+#start RSelenium
+remDr <- remoteDriver(
+        remoteServerAdd = "localhost",
+        port = 4445L,
+        browser = "chrome"
+)
+
+remDr$open()
+
+#navigate to your page
+remDr$navigate("https://www.unssc.org/courses?f%5B0%5D=theme%3A661&f%5B1%5D=type%3A662")
+
+#scroll down 5 times, waiting for the page to load at each time
+for(i in 1:5){      
+remDr$executeScript(paste("scroll(0,",i*10000,");"))
+Sys.sleep(3)    
+}
+
+#get the page html
+page_source <-remDr$getPageSource()
+
+#pageEls  <- remDr$findElements(using = "css", "#contents #details #meta")
+
+unssc <- read_html(page_source[[1]])
+
+unssc
+
+```
+**Step 3.** Extract information.
+
+```{r}
+
+body_nodes <- unssc %>% 
+ html_node("body") %>% 
+ html_children()
+
+body_nodes %>% 
+ html_children()
+
+
+parsed_nodes <- html_nodes(unssc, 
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "field--type-string", " " ))]')
+titles_unssc <- html_text(parsed_nodes)
+titles_unssc
+
+```
+
+
+```{r}
+#extract the links
+
+weblink <- read_html(unsscpage) %>% html_nodes( 
+                           xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "group-link", " " ))]') %>% html_attr("href")
+
+
+weblink
+```
+
+
+
+```{r}
+weblink
+
+weblinks2 <- weblink %>%  enframe("id", "weblink")
+
+#subset for coursera
+coursera_subset <- weblinks2 %>%
+  filter(str_detect(weblink, "coursera"))
+
+#subset for elearning
+elearning_subset <- weblinks2 %>%
+  filter(str_detect(weblink, "elearning"))
+
+#subset for unccelearn
+unccelearn_subset <- weblinks2 %>%
+  filter(str_detect(weblink, "unccelearn.org"))
+
+#subset for worldbank
+worldbank_subset <- weblinks2 %>%
+  filter(str_detect(weblink, "olc.worldbank.org"))
+
+
+elearning_subset
+#fix mistake in elearning
+
+elearning_subset <- elearning_subset[-c(4), ] 
+
+unccelearn_subset
+worldbank_subset
+
+worldbank_subset[nrow(worldbank_subset) + 1,] = c(56,"https://olc.worldbank.org/content/elearning-course-passive-urban-cooling-solutions")
+worldbank_subset
+```
+
+```{r}
+#Pull out longer descriptions ELEARN
+weblink_e <- elearning_subset$weblink
+
+# Define the DESCRIPTION worker function
+scraper <- function(weblink_e) {
+  read_html(weblink_e) %>% 
+    html_nodes(xpath = '//h1 | //*[contains(concat( " ", @class, " " ), concat( " ", "thematic-area", " " ))]//span | //*[contains(concat( " ", @class, " " ), concat( " ", "content", " " ))]//p') %>% 
+    html_text() %>% 
+    enframe("id", "description") %>%
+    mutate(weblink_e = weblink_e) 
+}
+
+# Iterate over the urls, applying the function each time
+descrp_elearning <- map_dfr(weblink_e, scraper, .id = "id")
+descrp_elearning
+
+descrp_elearning <- descrp_elearning %>%
+  group_by(id) %>%
+  summarize(description = str_c(description, collapse = ", ")) %>%
+    mutate(weblink_e = weblink_e) 
+
+
+```
+
+```{r}
+#Pull out longer descriptions ELEARN
+weblink <- unccelearn_subset$weblink
+
+# Define the DESCRIPTION worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//h1 | //*[(@id = "section-5")]//*[contains(concat( " ", @class, " " ), concat( " ", "no-overflow", " " ))] | //*[(@id = "section-4")]//li | //*[(@id = "section-3")]//p | //*[(@id = "section-0")]//p') %>% 
+    html_text() %>% 
+    enframe("id", "description") %>%
+    mutate(weblink = weblink) 
+}
+
+# Iterate over the urls, applying the function each time
+descrp_unccelearn <- map_dfr(weblink, scraper, .id = "id")
+descrp_unccelearn
+
+descrp_unccelearn <- descrp_unccelearn %>%
+ group_by(id) %>%
+ summarize(description = str_c(description, collapse = ", ")) %>%
+    mutate(weblink = weblink) 
+
+```
+
+
+
+```{r}
+#Pull out longer descriptions WORLDBANK
+weblink <- worldbank_subset$weblink
+
+# Define the DESCRIPTION worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "field-type-taxonomy-term-reference", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "series-content", " " ))]//h2 | //*[contains(concat( " ", @class, " " ), concat( " ", "field-type-text-with-summary", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "even", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "description") %>%
+    mutate(weblink = weblink) 
+}
+
+# Iterate over the urls, applying the function each time
+descrp_worldbank <- map_dfr(weblink, scraper, .id = "id")
+descrp_worldbank
+
+descrp_worldbank <- descrp_worldbank %>%
+ group_by(id) %>%
+ summarize(description = str_c(description, collapse = ", ")) %>%
+    mutate(weblink = weblink) 
+descrp_worldbank
+
+```
+
+```{r}
+#combine back the subsets
+
+unfccc_subsets <- rbind(elearning_subset, unccelearn_subset, worldbank_subset)
+
+
+colnames(descrp_elearning)[3] <- "weblink"
+
+descrp_subsets <- rbind(descrp_worldbank, descrp_elearning, descrp_unccelearn)
+
+unfccc_subsets <- merge(unfccc_subsets, descrp_subsets, by="weblink" )
+
+unfccc_subsets
+
+#rename true id col
+colnames(unfccc_subsets)[2] <- "id"
+
+#remove incorrect id col
+unfccc_subsets <- unfccc_subsets %>% select(c(-3))
+
+```
+
+
+```{r}
+titles_unfccc
+weblink
+unfccc_df
+unfccc_df$id <- seq.int(nrow(unfccc_df))
+titles_unfccc$id <- seq.int(nrow(titles_unfccc))
+weblink$id <- seq.int(nrow(weblink))
+
+chart_df <- merge(titles_unfccc, unfccc_df, by="id")
+unfccc_sub_df <- merge(chart_df, unfccc_subsets, by="id", all.y = TRUE)
+
+weblink <- data.frame(weblink)
+
+knitr::kable(chart_df  %>% head(10))
+
+weblink <- tibble::rowid_to_column(weblink, "id")
+
+#titles	authors	tags	SDGs	weblink	keywords	audience
+
+
+```
+
+```{r}
+#export as CSV
+write.csv(coursera_subset,"C:/Users/caitl/Documents/GitHub/thesis/exports/coursera.csv", row.names = TRUE)
+
+```
+
+```{r}
+#not working?
+#system("sudo docker pull selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#system("sudo docker run -d -p 4445:4444 selenium/standalone-chrome",wait=T)
+#Sys.sleep(5)
+#remDr <- remoteDriver(port=4445L, browserName="chrome")
+#Sys.sleep(15)
+#remDr$open()
+
+```
