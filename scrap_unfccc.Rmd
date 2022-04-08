@@ -242,22 +242,25 @@ worldbank_subset
 
 ```{r}
 #Pull out longer descriptions ELEARN
-weblink <- elearning_subset$weblink
+weblink_e <- elearning_subset$weblink
 
 # Define the DESCRIPTION worker function
-scraper <- function(weblink) {
-  read_html(weblink) %>% 
+scraper <- function(weblink_e) {
+  read_html(weblink_e) %>% 
     html_nodes(xpath = '//h1 | //*[contains(concat( " ", @class, " " ), concat( " ", "thematic-area", " " ))]//span | //*[contains(concat( " ", @class, " " ), concat( " ", "content", " " ))]//p') %>% 
     html_text() %>% 
     enframe("id", "description") %>%
-    mutate(weblink = weblink) 
+    mutate(weblink_e = weblink_e) 
 }
 
 # Iterate over the urls, applying the function each time
-descrp_elearning <- map_dfr(weblink, scraper, .id = "id")
+descrp_elearning <- map_dfr(weblink_e, scraper, .id = "id")
 descrp_elearning
 
-
+descrp_elearning <- descrp_elearning %>%
+  group_by(id) %>%
+  summarize(description = str_c(description, collapse = ", ")) %>%
+    mutate(weblink_e = weblink_e) 
 
 
 ```
@@ -279,9 +282,15 @@ scraper <- function(weblink) {
 descrp_unccelearn <- map_dfr(weblink, scraper, .id = "id")
 descrp_unccelearn
 
-
+descrp_unccelearn <- descrp_unccelearn %>%
+ group_by(id) %>%
+ summarize(description = str_c(description, collapse = ", ")) %>%
+    mutate(weblink = weblink) 
 
 ```
+
+
+
 ```{r}
 #Pull out longer descriptions WORLDBANK
 weblink <- worldbank_subset$weblink
@@ -299,10 +308,36 @@ scraper <- function(weblink) {
 descrp_worldbank <- map_dfr(weblink, scraper, .id = "id")
 descrp_worldbank
 
-
-
+descrp_worldbank <- descrp_worldbank %>%
+ group_by(id) %>%
+ summarize(description = str_c(description, collapse = ", ")) %>%
+    mutate(weblink = weblink) 
+descrp_worldbank
 
 ```
+
+```{r}
+#combine back the subsets
+
+unfccc_subsets <- rbind(elearning_subset, unccelearn_subset, worldbank_subset)
+
+
+colnames(descrp_elearning)[3] <- "weblink"
+
+descrp_subsets <- rbind(descrp_worldbank, descrp_elearning, descrp_unccelearn)
+
+unfccc_subsets <- merge(unfccc_subsets, descrp_subsets, by="weblink" )
+
+unfccc_subsets
+
+#rename true id col
+colnames(unfccc_subsets)[2] <- "id"
+
+#remove incorrect id col
+unfccc_subsets <- unfccc_subsets %>% select(c(-3))
+
+```
+
 
 ```{r}
 titles_unfccc
@@ -313,7 +348,7 @@ titles_unfccc$id <- seq.int(nrow(titles_unfccc))
 weblink$id <- seq.int(nrow(weblink))
 
 chart_df <- merge(titles_unfccc, unfccc_df, by="id")
-chart_df <- left_join(chart_df, weblink, by="id")
+unfccc_sub_df <- merge(chart_df, unfccc_subsets, by="id", all.y = TRUE)
 
 weblink <- data.frame(weblink)
 
