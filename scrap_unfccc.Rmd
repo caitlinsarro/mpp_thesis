@@ -227,21 +227,99 @@ unccelearn_subset <- weblinks2 %>%
 worldbank_subset <- weblinks2 %>%
   filter(str_detect(weblink, "olc.worldbank.org"))
 
+
+elearning_subset
+#fix mistake in elearning
+
+elearning_subset <- elearning_subset[-c(4), ] 
+
+unccelearn_subset
+worldbank_subset
+
+worldbank_subset[nrow(worldbank_subset) + 1,] = c(56,"https://olc.worldbank.org/content/elearning-course-passive-urban-cooling-solutions")
+worldbank_subset
 ```
 
+```{r}
+#Pull out longer descriptions ELEARN
+weblink <- elearning_subset$weblink
 
+# Define the DESCRIPTION worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//h1 | //*[contains(concat( " ", @class, " " ), concat( " ", "thematic-area", " " ))]//span | //*[contains(concat( " ", @class, " " ), concat( " ", "content", " " ))]//p') %>% 
+    html_text() %>% 
+    enframe("id", "description") %>%
+    mutate(weblink = weblink) 
+}
+
+# Iterate over the urls, applying the function each time
+descrp_elearning <- map_dfr(weblink, scraper, .id = "id")
+descrp_elearning
+
+
+
+
+```
+
+```{r}
+#Pull out longer descriptions ELEARN
+weblink <- unccelearn_subset$weblink
+
+# Define the DESCRIPTION worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//h1 | //*[(@id = "section-5")]//*[contains(concat( " ", @class, " " ), concat( " ", "no-overflow", " " ))] | //*[(@id = "section-4")]//li | //*[(@id = "section-3")]//p | //*[(@id = "section-0")]//p') %>% 
+    html_text() %>% 
+    enframe("id", "description") %>%
+    mutate(weblink = weblink) 
+}
+
+# Iterate over the urls, applying the function each time
+descrp_unccelearn <- map_dfr(weblink, scraper, .id = "id")
+descrp_unccelearn
+
+
+
+```
+```{r}
+#Pull out longer descriptions WORLDBANK
+weblink <- worldbank_subset$weblink
+
+# Define the DESCRIPTION worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "field-type-taxonomy-term-reference", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "series-content", " " ))]//h2 | //*[contains(concat( " ", @class, " " ), concat( " ", "field-type-text-with-summary", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "even", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "description") %>%
+    mutate(weblink = weblink) 
+}
+
+# Iterate over the urls, applying the function each time
+descrp_worldbank <- map_dfr(weblink, scraper, .id = "id")
+descrp_worldbank
+
+
+
+
+```
 
 ```{r}
 titles_unfccc
 weblink
+unfccc_df
+unfccc_df$id <- seq.int(nrow(unfccc_df))
+titles_unfccc$id <- seq.int(nrow(titles_unfccc))
+weblink$id <- seq.int(nrow(weblink))
 
 chart_df <- merge(titles_unfccc, unfccc_df, by="id")
+chart_df <- left_join(chart_df, weblink, by="id")
 
-chart_df <- data.frame(titles_unfccc, authors, tags, SDGs, weblink)
+weblink <- data.frame(weblink)
 
 knitr::kable(chart_df  %>% head(10))
 
-chart_df <- tibble::rowid_to_column(chart_df, "id")
+weblink <- tibble::rowid_to_column(weblink, "id")
 
 #titles	authors	tags	SDGs	weblink	keywords	audience
 
