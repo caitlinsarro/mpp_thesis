@@ -174,10 +174,10 @@ nb_wf_s %>%
 
 ```{r}
 #evaluate
-set.seed(80)
+set.seed(200)
 soft_code_train$major_categ
 
-soft_code_folds <- vfold_cv(data = soft_code_train, strata = major_categ, v = 10)
+soft_code_folds <- vfold_cv(data = soft_code_train, strata = major_categ, v = 8)
 soft_code_folds
 
 ```
