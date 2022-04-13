@@ -72,11 +72,12 @@ all_courses_coded$description <- gsub(',',' ',all_courses_coded$description)
 #remove stopwords
 all_courses_coded$description = removeWords(all_courses_coded$description, stopwords("english"))
 
+#fix one entry that keeps breaking the code
 
+all_courses_coded$category[all_courses_coded$titles == "M.A. Development Studies and Diplomacy"] <- "democratic institutions"
 
-
-#export 
-write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded.csv", row.names = TRUE)
+#export to fix problems
+#write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded.csv", row.names = TRUE)
 
 
 ```
@@ -92,9 +93,9 @@ write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/
 #soft_coded_long <- read_csv("data/soft_coded_long2.csv")
 #soft_coded_long <- read_csv("data/soft_hard_codes_combined.csv")
 theme_set(theme_minimal())
-all_courses_coded <- read_csv("exports/all_courses_coded.csv")
+#all_courses_coded <- read_csv("exports/all_courses_coded.csv")
 
-all_courses_coded <- read_csv("data/soft_hard_codes_combined.csv")
+#all_courses_coded <- read_csv("data/soft_hard_codes_combined.csv")
 
 all_courses_coded <- all_courses_coded %>% select(id, titles,category,description, major_categ)
 
