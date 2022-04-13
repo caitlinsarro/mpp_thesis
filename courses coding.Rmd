@@ -402,22 +402,23 @@ reflex_adpt_keystems <- as.list(tidy_reflex_adapt)
 names(reflex_adpt_keystems)
 reflex_adpt_keystems
 
+wordStem("participatory")
 
 ```
 
 ```{r}
 #All in one dictionary
-dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos","assess","relev", "associ","compet","represent","stakehold", "collabor","consensus","decis", "facilit", "aspect","form",  "concept", "activ", "matter","indirect","affair","vote", "extend","engag", "multi-stakehold", "cooper", "divers inclus","vulner popul", "cultur heritag", "youth indigen peopl", "reduc inequ",  "build trust",  "stakehold priorit",   "social inclus", "cultur divers", "discuss forum","convers", "interact platform", "live heritag", "interdisciplinari issu", "interdisciplinari", "delib", "process", "citizen", "repres","deliber", "collect", "panel", "institution",  "juri", "trust", "participatori","involv","communiti", "societi", "ballot","dialogu", "discuss", "inclus","youth", "broad", "assembl", "confer","method","communic","trainer", "confid","emot",  "listen","reflect", "relationship", "rapport", "deliveri","negoti", "conflict","techniqu","deleg", "expect", "behaviour","behavior","creativ", "frontlin", "indigen", "union", "disabl","elder", "marginla","marginlais"  
+dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos","assess","relev", "associ","compet","represent","stakehold", "collabor","consensus","decis", "facilit", "aspect","form",  "concept", "activ", "matter","indirect","affair","vote", "extend","engag","stakeholder engag", "multi-stakehold", "cooper", "divers inclus","vulner popul", "cultur heritag", "indigen", "youth indigen", "reduc inequ",  "build trust",  "stakehold priorit",   "social inclus", "cultur divers", "discuss forum","convers", "interact platform", "live heritag", "interdisciplinari issu", "interdisciplinari", "delib", "process", "citizen", "repres","deliber", "collect", "panel", "institution",  "juri", "trust", "participatori","participatori process", "involv","communiti", "societi", "ballot","dialogu", "discuss", "inclus","youth", "assembl", "confer","facilit method","communic","trainer", "confid","emot",  "listen","reflect", "relationship", "rapport", "deliveri","negoti", "conflict","techniqu","deleg", "expect", "behaviour","behavior","creativ", "frontlin", "indigen", "union", "disabl","elder", "marginla","marginlais"  
 ),
-                             policy_coh_keystems = c("coher", "extent", "structur", "foster", "coordin", "implement", "interministeri", "systemat", "mutual"  ,"reinforc" ,  "synergi"    , "integr", "overcom",             "silo",                 "unintend consequ" ,    "diverg", "interrel" , "trade off" ,           "feedback loop" ,       "institut", "level"  , "strategi" ,            "horizont framework" ,           "practic", "vertic" ,              "align"   ,             "approach" ,            "applic", "balanc"  ,             "conceptu" ,            "link"  ,               "operationalis", "operation" ,           "prioriti"  ,           "subnat"  ,             "aspir"  ,  "mechan"    ,           "partnership",          "complement",           "connect",  "contradictori",        "leverage point" ,      "integr plan" ,         "depart", "ensur"   ,             "comprehens system"     ,          "comprehens",           "consist", "duplic" ,              "exist"   ,             "interlink",            "lever" ,  "relat" ,               "consensus"  ,          "commit",               "intern" , "reiter",               "treati"  ,             "contradict",           "reaffirm" , "shift" ,               "symbiosi" ,            "reciproc",             "solidar"  , "cooper"    ,           "polici coher" ,        "align polici decis",   "polici sequenc", "polici align" ,        "interconnect" ,        "increas coher",        "across govern depart", "institut structur" ,   "common goal" ,         "complex issu" ,        "govern depart", "transgovernance"),
+                             policy_coh_keystems = c("coher", "extent", "structur", "foster", "coordin", "implement", "interministeri", "systemat", "mutual"  ,"reinforc" ,  "synergi"    , "integr", "overcom",             "silo",                 "unintend consequ" ,    "diverg", "interrel" , "trade off" ,           "feedback loop" ,       "institut", "level"  , "strategi" ,            "horizont framework" ,           "practic", "vertic" ,              "align"   ,             "approach" ,            "applic", "balanc"  ,             "conceptu" ,            "link"  ,               "operationalis", "operation" ,           "prioriti"  ,           "subnat"  ,             "aspir"  ,  "mechan"    ,           "partnership",          "complement",           "connect",  "contradictori",        "leverage point" ,      "integr plan" ,         "depart", "ensur"   ,             "comprehens system"     ,          "comprehens",           "consist", "duplic" ,              "exist"   ,             "interlink",            "lever" ,  "relat" ,               "consensus"  ,          "commit",               "intern" , "reiter",               "treati"  ,             "contradict",           "reaffirm" , "shift" ,               "symbiosi" ,            "reciproc",             "solidar"  , "cooper"    ,           "polici coher" ,        "align polici decis",   "polici sequenc", "polici align" ,        "interconnect" ,        "increas coher",        "across govern depart", "institut structur" ,   "common goal" ,         "complex issu" ,        "govern depart", "transgovernance", "integrated plan"),
                              
                              
-                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl", "express", "fair", "legislatur","check" , "balanc", "altern", "respect", "independ", "judiciari", "legitim", "liber", "democrat", "democraci" , "voter" , "franchis"  , "pluralist" ,  "competit" , "equal" , "autocraci" , "regim"   ,"repres","peac","institut" ,"qualiti","includ","process", "access" , "inform" , "polit" ,"account"  ,"effici"   ,"effect"   ,"countri"  , "facilit"  ,         "collect"  ,         "action"   ,         "reduct"  ,          "transact" ,"public"  ,          "free elect"    ,           "inclus"    ,         "univ"     ,         "franchi"  ,         "citizen"     ,"hold"    ,          "civil liberti" ,    "democrat institut", "negoti skill" ,"ethic leadership",  "contract negoti",   "govern negoti" ,    "transact cost" ,    "human right"   ,"free elect", "polit philosoph"  , "polit polar"  ,     "popul"      ,       "repres democraci"),
+                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl", "corrupt", "express", "fair", "legislatur", "checks bal", "altern", "respect", "independ", "judiciari", "legitim", "liber", "diplomaci", "democrat", "democraci" , "voter" , "franchis"  , "pluralist" ,  "competit" , "equal" , "autocraci" , "regim"   ,"repres","peac","institut" ,"inclus process", "equal access" , "govern regul", "good govern", "polit" ,"account"  ,"effici govern"   ,"effect govern"   ,"countri"  ,         "collect action"  ,         "reduct"  ,          "transact" ,"public offic"  ,          "free elect"    ,           "inclus"    ,         "universal right"     ,         "franchi"  ,         "citizen"     , "civil liberti" ,    "democrat institut", "negoti skill" ,"ethic leadership",  "contract negoti",   "govern negoti" ,    "transact cost" ,    "human right"   ,"free elect", "polit philosoph"  , "polit polar"  ,       "repres democraci"),
 
                              
                                 
                              
-                               reflex_adpt_keystems = c("reflex", "monitor","reform","regulatori","instrument", "trajectori","perform","transdisciplinari", "process improv","self-monitor", "strateg plan","impact assess","organiz reform","adapt", "evidence-bas", "self-awar", "develop strategi", "long term", "assess","data", "measur","account","system chang","structur chang","structur shift" , "polici instrument","inform manag","system think","python program","help compani", "scienc base", "program polici","metric","cycl",  "strategic plan" ,"human resourc","guidelin",  "integr","daily practic","public servic", "longterm",  "development plan", "domest","evidencebas", "report", "progress",  "evalu", "statist","indic", "impact", "evid",  "reflect","result","analysi","actor", "me","collect","criteria") 
+                               reflex_adpt_keystems = c("reflex", "monitor","reform","regulatori","instrument", "trajectori","perform","transdisciplinari", "process improv","self monitor", "strateg plan","impact assess","organiz reform","adapt", "evidence-bas", "self-awar", "develop strategi", "long term", "assess","data", "measur","account","system chang","structur chang","structur shift" , "polici instrument","inform manag","system think","python","help compani", "scienc base", "program polici","metric","cycl",  "strategic plan" ,"human resourc","guidelin",  "integr","daily practic","public servic", "long term",  "development plan", "domest","evidence bas", "report", "progress",  "evalu", "statist","indic", "impact", "evid",  "reflect","result","analysi","actor", "me","collect","criteria") 
    ))
 
 
@@ -500,6 +501,8 @@ for (key in names(dict_descrip)) {
 }
 names(dfm_list) <- names(dict_descrip)
 dfm_list
+
+dfm_list_df <- as.data.frame(dfm_list)
 ```
 
 ```{r}
@@ -541,6 +544,69 @@ descrip_comb
 
 
 ```
+
+```{r}
+#I AM HEREEE
+#check top keywords per topic
+#Relative frequency analysis (keyness)
+dfmat_descrip
+names(dfm_list) <- names(dict_descrip)
+dfm_list
+
+dfm_list_df
+
+dfmat_descrip_trim <- dfm_trim(dfmat_descrip, min_termfreq = 10, min_docfreq = 5)
+
+dfmat_descrip_trim
+
+docvars(dfmat_descrip)
+
+dfmat_descrip
+dict_descrip
+dfm_list
+
+tidy(dfm_list)
+class(dfmat_descrip)
+
+######
+
+descrip_comb
+top_words_partic <- filter(descrip_comb, max.col == "participation_keystems") 
+top_words_pol_co <- filter(descrip_comb, max.col == "policy_coh_keystems") 
+top_words_demo <- filter(descrip_comb, max.col == "democratic_keystems") 
+top_words_reflex <- filter(descrip_comb, max.col == "reflex_adpt_keystems") 
+
+
+descrip_comb
+
+words_as_tokens <-  setNames(lapply(sapply(top_words_partic$description, 
+                                 tokenize_words, 
+                                 stopwords = stopwords(language = "en", source = "smart")), 
+                          function(x) as.data.frame(sort(table(x), TRUE), stringsAsFactors = F)), top_words_partic$titles)
+
+# tidyverse's job
+df <- words_as_tokens %>%
+  bind_rows(, .id = "id") %>%
+  rename(word = x)
+
+# output
+
+df %>% filter(Freq >= 8) %>% arrange(desc(Freq))
+
+
+
+
+```
+
+
+```{r}
+#check keywords in context
+
+
+
+```
+
+
 
 
 ###start to combine with authors

@@ -1,0 +1,294 @@
+---
+title: "test"
+author: "Caitlin Sarro"
+date: "3/30/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+install.packages("C50")
+library(tidyverse)
+library(tidymodels)
+library(tidytext)
+library(textrecipes)
+library(discrim)
+library(naivebayes)
+
+#use to downsample
+library(themis)
+library(C50)
+
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+soft_coded_long <- read_csv("data/soft_coded_long2.csv")
+soft_coded_long
+hard_coded <- read_csv("exports/descrip_comb.csv")
+
+#add in new columns
+hard_coded$category <- "category"
+hard_coded$major_categ <- 4
+
+#transform info to columns
+hard_coded$category[hard_coded$max.col == "participation_keystems"] <- "participation"
+hard_coded$category[hard_coded$max.col == "policy_coh_keystems"] <- "policy coherence"
+hard_coded$category[hard_coded$max.col == "democratic_keystems"] <- "democratic institutions"
+hard_coded$category[hard_coded$max.col == "reflex_adpt_keystems"] <- "reflexivity and adaptation"
+
+hard_coded$major_categ[hard_coded$max.col == "participation_keystems"] <- 1
+hard_coded$major_categ[hard_coded$max.col == "policy_coh_keystems"] <- 2
+hard_coded$major_categ[hard_coded$max.col == "democratic_keystems"] <- 3
+hard_coded$major_categ[hard_coded$max.col == "reflex_adpt_keystems"] <- 4
+#convert to numeric
+as.numeric(hard_coded$major_categ)
+
+hard_coded$id <- seq.int(nrow(hard_coded))
+hard_coded <- hard_coded %>% select(id, titles, category,description, major_categ)
+soft_coded_long <- soft_coded_long %>% select(id, titles, category,description, major_categ)
+#combine them
+all_courses_coded <- rbind(soft_coded_long, hard_coded)
+all_courses_coded$id <- seq.int(nrow(all_courses_coded))
+#uniques
+all_courses_coded <- unique(all_courses_coded)
+
+#convert to numeric
+as.factor(all_courses_coded$major_categ)
+
+
+#text cleaning punctuation
+all_courses_coded$description <- gsub('[[:punct:] ]+',' ',all_courses_coded$description)
+#text cleaning lowercase
+all_courses_coded$description <- tolower(all_courses_coded$description)
+#text cleaning symbols
+all_courses_coded$description <- gsub(',',' ',all_courses_coded$description)
+
+#remove stopwords
+all_courses_coded$description = removeWords(all_courses_coded$description, stopwords("english"))
+
+
+
+
+#export 
+write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded.csv", row.names = TRUE)
+
+
+```
+
+
+
+
+
+```{r}
+#need to add in (at least) three new subsets before doing the model test
+
+#TEST of this https://cfss.uchicago.edu/notes/supervised-text-classification/
+#soft_coded_long <- read_csv("data/soft_coded_long2.csv")
+#soft_coded_long <- read_csv("data/soft_hard_codes_combined.csv")
+theme_set(theme_minimal())
+all_courses_coded <- read_csv("exports/all_courses_coded.csv")
+
+all_courses_coded <- read_csv("data/soft_hard_codes_combined.csv")
+
+all_courses_coded <- all_courses_coded %>% select(id, titles,category,description, major_categ)
+
+all_courses_coded$major_categ <- as.factor(all_courses_coded$major_categ)
+
+soft_coded_long <- all_courses_coded
+```
+
+
+
+```{r}
+set.seed(200)
+
+soft_coded_long <- soft_coded_long %>%
+  mutate(major_categ = factor(x = major_categ, levels = major_categ, labels = category))
+
+soft_coded_long$major_categ <-as.factor(soft_coded_long$major_categ)
+
+soft_code_split <- initial_split(data = soft_coded_long, strata = major_categ, prop = .7)
+
+soft_code_train <- training(soft_code_split)
+
+#congress_test <- testing(congress_split)
+```
+
+```{r}
+#preprocessing the data frame
+
+
+soft_code_rec <- recipe(category ~ description, data = soft_code_train)
+
+#congress_rec <- recipe(major ~ text, data = congress_train)
+```
+
+```{r}
+
+#process the text of the legislation summaries
+
+soft_code_rec <- soft_code_rec %>%
+  step_tokenize(description) %>%
+  step_stopwords(description) %>%
+  step_tokenfilter(description) %>%
+  step_tfidf(description)
+soft_code_rec
+
+```
+
+```{r}
+#train a model
+nb_spec <- naive_Bayes() %>%
+  set_mode("classification") %>%
+  set_engine("naivebayes")
+
+nb_spec
+```
+
+```{r}
+## Naive Bayes Model Specification (classification)
+## 
+## Computational engine: naivebayes
+nb_wf_s <- workflow() %>%
+  add_recipe(soft_code_rec) %>%
+  add_model(nb_spec)
+nb_wf_s
+
+```
+
+
+```{r}
+#train
+nb_wf_s %>%
+  fit(data = soft_code_train)
+
+```
+
+
+```{r}
+#evaluate
+set.seed(80)
+soft_code_train$major_categ
+
+soft_code_folds <- vfold_cv(data = soft_code_train, strata = major_categ, v = 10)
+soft_code_folds
+
+```
+
+```{r}
+nb_cv_s <- nb_wf_s %>%
+  fit_resamples(
+    soft_code_folds,
+    control = control_resamples(save_pred = TRUE)
+  )
+
+```
+
+```{r}
+#We can extract relevant information using collect_metrics() and collect_predictions().
+
+nb_cvs_metrics <- collect_metrics(nb_cv_s)
+nb_cvs_predictions <- collect_predictions(nb_cv_s)
+
+nb_cvs_metrics
+nb_cvs_predictions
+
+```
+
+```{r}
+#receiver operator curve plot that shows the sensitivity at different thresholds. It demonstrates how well a classification model can distinguish between classes.
+
+nb_cvs_predictions %>%
+  group_by(id) %>%
+  roc_curve(truth = category, c(starts_with(".pred"), -.pred_class)) %>%
+  autoplot() +
+  labs(
+    color = NULL,
+    title = "Receiver operator curve for Congressional bills",
+    subtitle = "Each resample fold is shown in a different color")
+
+```
+
+```{r}
+conf_mat_resampled(x = nb_cv_s, tidy = FALSE) %>%
+  autoplot(type = "heatmap") +
+  scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
+  scale_x_discrete(labels = function(x) str_wrap(x, 20))
+
+```
+
+
+```{r}
+#Compare to the null model
+null_classification <- null_model() %>%
+  set_engine("parsnip") %>%
+  set_mode("classification")
+
+null_cv <- workflow() %>%
+  add_recipe(soft_code_rec) %>%
+  add_model(null_classification) %>%
+  fit_resamples(
+    soft_code_folds
+  )
+
+null_cv %>%
+  collect_metrics()
+
+#Notice the accuracy is the same as for the naive Bayes model. This is because naive Bayes still leads to every observation predicted as “Health”, which is the exact same result as the null model. Clearly we need a better modeling strategy.
+
+```
+
+
+```{r}
+ggplot(data = soft_coded_long, mapping = aes(x = fct_infreq(major_categ) %>% fct_rev())) +
+  geom_bar() +
+  coord_flip() +
+  labs(
+    title = "Distribution of Governance Category",
+    subtitle = "By major policy topic",
+    x = NULL,
+    y = "Number of training courses"
+  )
+
+```
+
+```{r}
+##     step_downsample, step_upsample
+# build on existing recipe
+soft_code_rec <- soft_code_rec %>%
+  step_downsample(major_categ)
+soft_code_rec 
+
+#alternative modeling approach
+tree_spec <- decision_tree() %>%
+  set_mode("classification") %>%
+  set_engine("C5.0")
+
+tree_spec
+
+tree_wf <- workflow() %>%
+  add_recipe(soft_code_rec) %>%
+  add_model(tree_spec)
+
+tree_wf
+
+```
+```{r}
+set.seed(100)
+
+tree_cv <- fit_resamples(
+  tree_wf,
+  soft_code_folds,
+  control = control_resamples(save_pred = TRUE)
+)
+tree_cv
+
+```
+
+
