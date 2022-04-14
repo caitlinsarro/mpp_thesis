@@ -99,10 +99,10 @@ authors_unpan <- authors_unpan %>%
   rename(authors = authors_unpan)
 
 authors_unfccc <- authors_unfccc %>%
-  rename(authors = authors)
+  rename(authors = author)
 
 #combine into one set
-combined <- rbind(authors_cour, authors_unsdglearn_silos, authors_unsdglearn, authors_sdgacademy, authors_unpan, authors_unsdglearn_systems)
+combined <- rbind(authors_cour, authors_unsdglearn_silos, authors_unsdglearn, authors_sdgacademy, authors_unpan, authors_unsdglearn_systems, authors_unssc, authors_unfccc)
 
 ```
 
@@ -125,7 +125,7 @@ authors_list <- combined
 #make a dataframe
 #duplicate column
 authors_list$au_category <- authors_list$authors
-
+authors_list
 ```
 
 
@@ -722,6 +722,7 @@ au_category_clean
 
 #government
 au_category_clean$au_category[au_category_clean$au_category=="government network"] <- "government" 
+au_category_clean$au_category[au_category_clean$au_category=="city"] <- "government" 
 au_category_clean$au_category[au_category_clean$au_category=="intergovernmental organization"] <- "government"
 au_category_clean$au_category[au_category_clean$au_category=="supranational union"] <- "government"
 #ngo
@@ -730,6 +731,7 @@ au_category_clean$au_category[au_category_clean$au_category=="philanthropic init
 #research & policy institute
 au_category_clean$au_category[au_category_clean$au_category=="policy institute"] <- "research  policy institutes"
 au_category_clean$au_category[au_category_clean$au_category=="public policy think tank"] <- "research  policy institutes"
+au_category_clean$au_category[au_category_clean$au_category=="think tank"] <- "research  policy institutes"
 au_category_clean$au_category[au_category_clean$au_category=="research institute"] <- "research  policy institutes"
 
 #private university
@@ -745,9 +747,10 @@ au_category_clean$au_category[au_category_clean$au_category=="un primary organ"]
 au_category_clean$au_category[au_category_clean$au_category=="un specialized agency"] <- "un" 
 au_category_clean$au_category[au_category_clean$au_category=="un program"] <- "un" 
 au_category_clean$au_category[au_category_clean$au_category=="un internal agency"] <- "un" 
+# recode for the UN university
+au_category_clean$au_category[au_category_clean$au_category=="graduate school"] <- "un" 
 
-
-
+au_category_clean
 ```
 
 
@@ -760,7 +763,13 @@ table(au_category_clean$au_category)
 
 ```
 
+```{r}
 
+write.csv(au_category_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_category_clean.csv", row.names = TRUE)
+
+
+
+```
 
 
 

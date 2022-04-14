@@ -122,6 +122,48 @@ soft_coded
 
 ```{r}
 
+weblink <- soft_code$website
+# Define the AUTHOR worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "institution", " " ))]//span') %>% 
+    html_text() %>% 
+    enframe("id", "authors")  %>%
+    mutate(weblink = weblink) 
+}
+
+
+# Iterate over the urls, applying the function each time
+authors_soft <- map_dfr(weblink, scraper, .id = "id")
+
+
+
+#Combine into single columns
+
+authors_soft <- authors_soft %>%
+ group_by(id) %>%
+ summarize(authors = str_c(authors, collapse = ", ")) %>%
+    mutate(weblink = weblink) 
+
+authors_soft
+
+soft_code$weblink <- soft_code$website
+soft_code <- left_join(soft_code, authors_soft, by = "weblink")
+
+
+
+
+```
+
+```{r}
+#export as CSV
+write.csv(soft_code,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/soft_code_auths.csv", row.names = TRUE)
+
+```
+
+
+```{r}
+
 #text cleaning punctuation
 soft_coded$description <- gsub('[[:punct:] ]+',' ',soft_coded$description)
 #text cleaning lowercase
