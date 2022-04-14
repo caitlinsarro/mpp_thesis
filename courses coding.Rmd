@@ -703,6 +703,11 @@ write.csv(au_diff_coding_export,"C:/Users/caitl/Documents/GitHub/mpp_thesis/expo
 au_diff_coding_missing <- read_csv("data/au_diff_coding_export_fixed.csv")
 au_diff_coding_main <- read_csv("data/au_diff_coding_export_main.csv")
 
+colnames(au_diff_coding_missing)[1] <- "id"
+colnames(au_diff_coding_main)[1] <- "id"
+
+au_diff_coding_missing <- au_diff_coding_missing %>% select(id,titles,au_category)
+
 #combine back together
 au_diff_coding <- rbind(au_diff_coding_main, au_diff_coding_missing)
 au_diff_coding
@@ -711,7 +716,16 @@ colnames(au_diff_coding)[1] <- "id"
 au_diff_coding <- au_diff_coding[order(au_diff_coding$id, decreasing = FALSE),]
 au_diff_coding
 
+
+au_diff_coding$titles <- iconv(au_diff_coding$titles, 'utf-8', 'ascii', sub = '')
+
+au_diff_coding$titles <- tolower(au_diff_coding$titles)
+au_diff_coding$titles <- gsub('sustainable development goals','sdgs',au_diff_coding$titles)
+
+
 write.csv(au_diff_coding,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_coding.csv", row.names = TRUE)
+
+
 ```
 
 ```{r}
@@ -743,7 +757,6 @@ au_matrix_un
 
 #add in un only type
 au_matrix_un$Var2 <- "un only"
-au_matrix
 au_matrix_un
 
 ```
