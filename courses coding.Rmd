@@ -75,6 +75,7 @@ library(GGally)
 
 coursera <- read_csv("exports/coursera_c.csv")
 unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
+unsdglearn_systems <- read_csv("exports/unsdglearn_systems.csv")
 unsdglearn <- read_csv("exports/unsdglearn.csv")
 sdgacademy <- read_csv("exports/sdgacademy.csv")
 unpan <- read_csv("exports/unpan.csv")
@@ -90,6 +91,7 @@ unfccc$titles <- unfccc$titles_unfccc
 
 keywords_cour <- coursera %>% select(titles, description)
 keywords_unsdglearn_silos <- unsdglearn_silos %>% select(titles, description) 
+keywords_unsdglearn_systems <- unsdglearn_systems %>% select(titles, description) 
 keywords_unsdglearn <- unsdglearn %>% select(titles, description) 
 keywords_sdgacademy <- sdgacademy %>% select(titles, description)
 keywords_unpan <- unpan %>% select(titles, description)
@@ -99,7 +101,7 @@ keywords_unfccc <- unfccc %>% select(titles,description)
 
 
 #combine into one set
-combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn, keywords_sdgacademy, keywords_unpan, keywords_unssc)
+combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn, keywords_sdgacademy, keywords_unpan, keywords_unssc, keywords_unsdglearn_systems)
 
 ```
 
@@ -112,8 +114,15 @@ combined$titles <- iconv(combined$titles, 'utf-8', 'ascii', sub = '')
 combined$titles <- tolower(combined$titles)
 combined$titles <- gsub('sustainable development goals','sdgs',combined$titles)
 unique(combined$titles)
-#remove duplicates
 
+#remove duplicate trainings by titles
+combined <- distinct(combined, titles, .keep_all = TRUE)
+
+#remove row 136
+combined <-as.data.frame(combined)
+combined <- slice(combined, -c(20, 136))
+
+combined
 
 ```
 
@@ -127,13 +136,12 @@ unique(combined$titles)
 combined <- combined %>%
     mutate(description = str_remove_all(description, "participants"))
 
-#use | to add more
+#import back in translated subset
+translated_courses <- read_csv("data/combined_for_coding_translated.csv")
 
-#export to fix translation problem
-write.csv(combined,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/combined_for_coding.csv", row.names = TRUE)
-
-#import back in after translation
-combined <- read_csv("data/combined_for_coding.csv")
+#combine
+combined <- rbind(combined, translated_courses)
+combined$id <- seq.int(nrow(combined))
 
 ```
 
@@ -435,7 +443,7 @@ dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos",
                              
                                 
                              
-                               reflex_adpt_keystems = c("reflex", "monitor","reform","regulatori","instrument", "trajectori","perform","transdisciplinari", "process improv","self monitor", "strateg plan","impact assess","organiz reform","adapt", "evidence-bas", "self-awar", "develop strategi", "long term", "assess","data", "measur","account","system chang","structur chang","structur shift" , "polici instrument","inform manag","system think","python","help compani", "scienc base", "program polici","metric","cycl",  "strategic plan" ,"human resourc","guidelin",  "integr","daily practic","public servic", "long term",  "development plan", "domest","evidence bas", "report", "progress",  "evalu", "statist","indic", "impact", "evid",  "reflect","result","analysi","actor", "me","collect","criteria") 
+                               reflex_adpt_keystems = c("reflex", "monitor","reform","regulatori","instrument", "trajectori","perform","transdisciplinari", "process improv","self monitor", "strateg plan","impact assess","organiz reform","adapt", "evidence-bas", "self-awar", "develop strategi", "long term", "assess","data analysi", "measur","account","system chang","structur chang","structur shift" , "polici instrument","inform manag","system think","python","help compani", "scienc base", "program polici","metric","cycl",  "strategic plan" ,"human resourc","guidelin",  "integr","daily practic","public servic", "long term",  "development plan", "domest","evidence bas", "report", "progress",  "evalu", "statist","indic", "impact", "evid",  "reflect","result","analysi","collect") 
    ))
 
 
