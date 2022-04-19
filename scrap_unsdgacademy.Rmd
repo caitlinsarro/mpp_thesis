@@ -404,6 +404,29 @@ write.csv(sdgacad_df,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/sdgacad
 ```
 
 ```{r}
+#adding in post-coding for the comparative analysis
+sdgacad_df <- read_csv("exports/sdgacademy.csv")
+descrip_comb <- read_csv("exports/descrip_comb.csv")
+#standardize titles
+descrip_comb 
+sdgacad_df
+colnames(sdgacad_df)[3] <- "titles"
+sdgacad_df$titles <- iconv(sdgacad_df$titles, 'utf-8', 'ascii', sub = '')
+
+sdgacad_df$titles <- tolower(sdgacad_df$titles)
+sdgacad_df$titles <- gsub('sustainable development goals','sdgs',sdgacad_df$titles)
+unique(sdgacad_df$titles)
+
+sdgacad_df_coded <- left_join(sdgacad_df, descrip_comb, by = "titles", all.x= TRUE)
+
+
+
+write.csv(sdgacad_df_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/sdgacad_df_coded.csv", row.names = TRUE)
+```
+
+
+
+```{r}
 #missing keywords and tags
 
 ```

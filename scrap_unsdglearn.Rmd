@@ -350,6 +350,27 @@ write.csv(combined,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/unsdglear
 ```
 
 ```{r}
+#adding in post-coding for the comparative analysis
+unsdglearn <- read_csv("exports/unsdglearn.csv")
+descrip_comb <- read_csv("exports/descrip_comb.csv")
+#standardize titles
+descrip_comb 
+
+unsdglearn$titles <- iconv(unsdglearn$titles, 'utf-8', 'ascii', sub = '')
+
+unsdglearn$titles <- tolower(unsdglearn$titles)
+unsdglearn$titles <- gsub('sustainable development goals','sdgs',unsdglearn$titles)
+unique(unsdglearn$titles)
+
+unsdglearn_coded <- left_join(unsdglearn, descrip_comb, by = "titles", all.x= TRUE)
+
+
+
+write.csv(unsdglearn_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/unsdglearn_coded.csv", row.names = TRUE)
+```
+
+
+```{r}
 #not working?
 system("sudo docker pull selenium/standalone-chrome",wait=T)
 Sys.sleep(5)

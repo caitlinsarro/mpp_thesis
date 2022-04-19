@@ -775,6 +775,8 @@ au_diff_main_long <- au_diff_main %>%
 au_diff_main_long$au_category <- trimws(au_diff_main_long$au_category)
 au_diff_main_long
 
+au_diff_main_long <- as.data.frame(au_diff_main_long, headers=TRUE)
+
 write.csv(au_diff_main_long,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_main_long.csv", row.names = TRUE)
 
 #remove duplicates
@@ -827,9 +829,25 @@ au_matrix_simple
 #au_matrix <- colnames(au_matrix$Var1)[1] <- "category"
 #au_matrix <- colnames(au_matrix$Var2)[2] <- "author"
 
+
+
 ```
 
+```{r}
+au_diff_main_long
 
+
+Estimate e|ect of covariates
+# estimate effect
+stm_effects <- estimateEffect(au_category ~ max.col,
+stmobj = stm_object,
+meta = stm_blogs$meta,
+uncertainty = "Global")
+summary(stm_effects)
+
+
+
+```
 
 ```{r}
 library(ggplot2)
