@@ -185,7 +185,7 @@ audience <- as.vector(audience_acad$audience)
 
 
 ```{r}
-test_alt <- read_html("https://sdgacademy.org/course/governance-for-transboundary-freshwater-security/")%>% html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 2) and parent::*)] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 3) and parent::*)] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 4) and parent::*)] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p[(((count(preceding-sibling::*) + 1) = 1) and parent::*)]') %>% 
+test_alt <- read_html("https://sdgacademy.org/course/transforming-our-world/")%>% html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "title-number", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "course-detail", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label') %>% 
     html_text()
 test_alt
 ```
@@ -196,7 +196,7 @@ test_alt
 # Define the KEYWORDS worker function
 scraper <- function(weblink_acad) {
   read_html(weblink_acad) %>% 
-    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "chapter-title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "no", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label | //*[contains(concat( " ", @class, " " ), concat( " ", "yes", " " ))]//*[contains(concat( " ", @class, " " ), concat( " ", "title", " " ))]') %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "title-number", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))]') %>% 
     html_text() %>% 
     enframe("id", "keywords")
 }
@@ -227,7 +227,7 @@ keywords <- as.vector(keywords_acad$keywords)
 # Define the DESCRIPTION worker function
 scraper <- function(weblink_acad) {
   read_html(weblink_acad) %>% 
-    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "title-number", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))]') %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "title-number", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "course-detail", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "middle-text", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "bottom-text", " " ))]//p | //*[contains(concat( " ", @class, " " ), concat( " ", "preview-right", " " ))]//label') %>% 
     html_text() %>% 
     enframe("id", "description")  %>%
     mutate(weblink_acad = weblink_acad) 
@@ -395,6 +395,12 @@ descrp_acad$id <- as.integer(descrp_acad$id)
 sdgacad_df_mini <- left_join(sdg_acad_list, descrp_acad, by = "id")
 sdgacad_df_mini$titles <- sdgacad_df_mini$weblink_acad
 sdgacad_df_mini
+
+sdgacad_df <- read_csv("exports/sdgacademy.csv")
+sdgacad_df <- sdgacad_df[,-1]
+sdgacad_df <- sdgacad_df[,-7]
+sdgacad_df <- left_join(sdgacad_df,descrp_acad, by="id" )
+
 ```
 
 ```{r}
@@ -403,7 +409,7 @@ write.csv(sdgacad_df,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/sdgacad
 
 ```
 
-```{r}
+```{r} 
 #adding in post-coding for the comparative analysis
 sdgacad_df <- read_csv("exports/sdgacademy.csv")
 descrip_comb <- read_csv("exports/descrip_comb.csv")
@@ -411,15 +417,17 @@ descrip_comb <- read_csv("exports/descrip_comb.csv")
 descrip_comb 
 sdgacad_df
 colnames(sdgacad_df)[3] <- "titles"
+sdgacad_df <- sdgacad_df[,-8]
 sdgacad_df$titles <- iconv(sdgacad_df$titles, 'utf-8', 'ascii', sub = '')
 
 sdgacad_df$titles <- tolower(sdgacad_df$titles)
 sdgacad_df$titles <- gsub('sustainable development goals','sdgs',sdgacad_df$titles)
 unique(sdgacad_df$titles)
 
+
 sdgacad_df_coded <- left_join(sdgacad_df, descrip_comb, by = "titles", all.x= TRUE)
 
-
+sdgacad_df_coded
 
 write.csv(sdgacad_df_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/sdgacad_df_coded.csv", row.names = TRUE)
 ```
