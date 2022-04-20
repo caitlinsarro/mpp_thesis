@@ -182,7 +182,9 @@ descrp_list$key_category <- gsub('“',' ',descrp_list$key_category)
 descrp_list$key_category <- gsub('”',' ',descrp_list$key_category)
 descrp_list$key_category <- gsub('‘',' ',descrp_list$key_category)
 descrp_list$key_category <- gsub('’',' ',descrp_list$key_category)
-descrp_list$key_category <- gsub('–',' ',descrp_list$key_category)
+descrp_list$key_category <- gsub('–',' ',descrp_list$key_category) 
+descrp_list$key_category <- gsub('<U+FFFD>',' ',descrp_list$key_category)
+
 #remove stopwords
 descrp_list$key_category = removeWords(descrp_list$key_category, stopwords("english"))
 #remove whitespace
@@ -433,24 +435,27 @@ reflex_adpt_keystems <- as.list(tidy_reflex_adapt)
 names(reflex_adpt_keystems)
 reflex_adpt_keystems
 
-wordStem("citizen")
-wordStem("engagement")
- 
+wordStem("climate")
+wordStem("modeling")
+wordStem("plan")
+
+   
+
 ```
 
 ```{r}
 #All in one dictionary
-dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos","relev", "associ","compet","represent","stakehold", "collabor","consensus","decis", "facilit", "aspect","form", "activ", "matter","indirect","affair","vote", "extend","engag","stakeholder engag", "multi-stakehold", "cooper", "divers inclus","participatori mechan","vulner popul", "cultur heritag", "indigen", "youth indigen", "reduc inequ",  "build trust",  "stakehold priorit", "civil societi",  "social inclus", "cultur divers", "discuss forum","convers", "interact platform", "live heritag", "interdisciplinari issu", "interdisciplinari", "delib", "delib process", "citizen","citizen engag", "repres","deliber", "panel", "institution",  "juri", "trust", "participatori","participatori process", "involv","communiti", "societi", "ballot","dialogu", "discuss", "inclus","youth", "assembl", "confer","facilit method","communic","trainer", "confid","emot",  "listen","reflect", "relationship", "rapport", "deliveri","negoti", "techniqu","deleg", "behaviour","behavior","creativ", "frontlin", "indigen", "union", "disabl","elder", "marginla","marginlais"  
+dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos","relev stakehold", "communiti associ","compet","represent","stakehold", "collabor","consensus","decis", "facilit dialogu", "aspect","form", "activ", "matter","indirect", "vote", "engag", "engag stakeholder","stakeholder engag", "multi-stakehold", "cooper", "divers inclus","participatori mechan","vulner popul", "cultur heritag", "indigen", "youth indigen","young entrepreneur"  , "reduc inequ",  "build trust",  "stakehold priorit", "civil societi",  "social inclus", "cultur divers","outreach communic", "discuss forum","convers", "interact platform","live heritag", "stakehold analysi","peer peer exchang", "interdisciplinari issu", "interdisciplinari", "delib", "delib process", "citizen","citizen engag", "repres","deliber", "panel", "institution",  "juri", "trust", "participatori","participatori process", "involv","communiti organ","communiti engag","societi", "ballot","dialogu", "communiti discuss", "inclus","youth", "assembl", "confer","facilit method","develop communic","communic design","communic import","trainer", "confid","emot",  "listen","reflect", "relationship", "rapport", "deliveri","negoti", "techniqu","deleg", "behaviour","behavior","creativ", "frontlin", "indigen", "union", "disabl","elder", "marginla","marginlais"  
 ),
-                             policy_coh_keystems = c("coher", "extent", "coher structur", "foster", "coordin", "implement", "interministeri", "systemat", "mutual"  ,"reinforc" ,"intern cooper",  "synergi"    , "integr", "overcom",             "silo",                 "unintend consequ" ,    "diverg", "interrel" , "trade off" ,           "feedback loop" ,       "institut chang", "strategi" ,            "horizont framework" , "vertic" ,              "align"   , "balanc"  ,     "intersector interact", "intersector",        "conceptu" , "coher polici plan",           "link"  , "system think",        "good practic promot",      "operationalis", "operation" ,           "prioriti"  , "approach across",  "integr coherent plan",        "subnat"  ,             "aspir"  ,  "mechan"    ,           "partnership",  "cooper framework",        "complement",     "coordin offic",      "connect",  "contradictori",        "leverag point" ,      "integr plan" ,         "cross depart",   "strateg polici",          "comprehens system"     ,          "comprehens",           "consist", "duplic" ,              "exist"   ,             "interlink",            "lever" ,  "relat" ,          "commit", "reiter",                    "contradict",           "reaffirm" , "shift" ,               "symbiosi" ,    "transform polici pathway",        "reciproc",             "solidar"  , "cooper"    ,           "polici coher" ,        "align polici decis",   "polici sequenc", "polici align" ,        "interconnect" ,        "increas coher",        "across govern depart", "institut structur" ,   "common goal" ,         "complex issu" ,        "govern depart", "transgovernance", "integr plan"),
+                             policy_coh_keystems = c("coher", "extent", "coher structur", "foster", "coordin", "coordin implement", "interministeri", "systemat", "mutual"  ,"reinforc" ,"intern cooper",  "synergi"    , "integr", "overcom",  "silo", "unintend consequ" ,    "diverg", "interrel" , "trade off" ,  "feedback loop" , "across sector", "across various sector",      "institut chang", "strategi" ,            "horizont framework" , "vertic" , "align"   ,"align polici", "balanc"  ,     "intersector interact", "intersector",  "scienc polici interfac",      "conceptu" , "coher polici plan",           "link"  , "system think",        "good practic promot",      "operationalis", "operation" ,           "prioriti"  , "approach across",  "integr coherent plan",  "assess govern institut capac",      "subnat"  ,   "aspir"  , "intergovernment partnership", "appropri polici option", "cooper framework",        "complement", "coordin offic",      "connect",  "contradictori",      "leverag point" ,      "integr plan" , "cross depart",   "strateg polici",          "comprehens system"     ,          "comprehens", "consist", "duplic" ,       "align strateg plan",       "exist resourc"   ,     "nation adapt plan"  ,      "interlink",            "lever" ,  "reiter", "contradict", "reaffirm" , "shift" , "symbiosi" ,    "transform polici pathway",   "polici pathway",     "reciproc",             "solidar"  , "polici coher" ,        "align polici decis",   "polici sequenc", "polici align" ,        "interconnect" ,        "increas coher",        "across govern depart", "institut structur" ,   "common goal" ,         "complex issu" ,        "govern depart", "transgovernance", "integr plan"),
                              
                              
-                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl",  "conflict", "corrupt", "express", "fair", "legislatur", "checks bal", "altern", "respect", "independ", "judiciari", "legitim", "liber", "diplomaci", "democrat", "democraci" , "voter" , "franchis"  ,"polit economi", "pluralist" ,  "competit" , "equal" , "autocraci" , "regim"   ,"repres","peac", "peacebuild",        "treati"  , "institut" ,"inclus process", "equal access" , "govern regul", "good govern", "polit" ,"account"  ,"effici govern"   ,"effect govern"   ,"countri"  ,         "collect action"  ,         "reduct"  ,          "transact" ,"public offic"  ,          "free elect"    ,           "inclus"    ,         "universal right"     ,         "franchi"  ,         "citizen"     , "civil liberti" ,    "democrat institut", "negoti skill" ,"ethic leadership",  "contract negoti",   "govern negoti" ,    "transact cost" ,    "human right"   ,"free elect", "polit philosoph"  , "polit polar"  ,       "repres democraci", "public account"),
+                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl",  "conflict", "corrupt", "express", "fair", "legislatur", "checks bal", "altern", "respect", "independ", "judiciari", "legitim", "liber", "diplomaci", "democrat", "democraci" , "voter" , "franchis"  ,"polit economi", "pluralist" ,  "competit" , "equal" , "autocraci" , "regim", "law student", "power imbal"   ,"repres","peac", "peacebuild",        "treati"  , "institut" ,"inclus process", "equal access" , "govern regul", "good govern", "polit" ,"account"  ,"effici govern"   ,"effect govern"   ,"countri"  ,         "collect action"  ,         "reduct"  ,          "transact" ,"public offic"  ,          "free elect"    ,           "inclus"    ,         "universal right"     ,         "franchi"  ,  "public servic",       "citizen"     , "civil liberti" ,    "democrat institut", "negoti skill" ,"ethic leadership",  "contract negoti",   "govern negoti" ,    "transact cost" ,    "human right"   ,"free elect", "polit philosoph"  , "polit polar"  ,       "repres democraci", "public account"),
 
                              
                                 
                              
-                               reflex_adpt_keystems = c("reflex", "monitor","reform","regulatori","regulatori instrument", "trajectori","perform","transdisciplinari", "process improv","self monitor", "strateg plan","impact assess","organiz reform","organiz adapt", "evidence-bas", "self-awar", "develop strategi", "long term", "assess","data analysi","big data","leverag big data","web data", "data collect","collect data", "data applic","data design", "understand data","data inform","measur","account","system chang","applic tool assess","assess valu add","structur chang","structur shift" , "polici instrument","inform manag","python","help compani", "scienc base", "program polici","metric","cycl",  "strategic plan" ,"human resourc","guidelin",  "integr","daily practic","public servic", "long term",  "development plan", "domest","evidence bas", "report", "progress evalu",  "evalu", "statist","indic", "impact evalu", "evid",  "reflect","result","analysi") 
+                               reflex_adpt_keystems = c("reflex", "monitor","regulatori","regulatori instrument", "interpret data", "trajectori", "perform","transdisciplinari","explor state art",  "process improv","self monitor", "strateg plan","impact assess","organiz reform","organiz adapt","use measur monitor", "evidence-bas", "self-awar", "develop strategi", "long term", "reform", "assess", "share latest knowledg approach",   "identifi technic resourc", "risk inform", "data analysi","big data","leverag big data","web data", "data collect","collect data","skill identifi act", "result base", "data applic","data design", "understand data","data inform","measur", "system chang","applic tool assess","assess valu add","structur chang","structur shift" , "polici instrument","inform manag","python","climat model","help compani", "scienc base", "program polici", "metric","plan cycl",  "strategic plan" ,"human resourc","guidelin", "daily practic", "long term",  "development plan", "domest","evidence bas", "progress report", "progress evalu",  "evalu", "statist","indic", "impact evalu", "evid",  "reflect","result","analysi") 
    ))
 
 
@@ -509,13 +514,17 @@ df <- words_as_tokens %>%
 # output
 
 df %>% filter(Freq >= 10)
+```
+```{r}
+write.csv(df,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/deletelater.csv", row.names = TRUE)
+
 
 ```
 
 
 
 ```{r}
-#checking which words are the most matched per category 
+#quick check on which words are the matched per category 
 
 
 toks <- tokens(tail(descrp_list$stem, remove_punct = TRUE)) %>% 
@@ -778,6 +787,8 @@ au_diff_main_long
 au_diff_main_long <- as.data.frame(au_diff_main_long, headers=TRUE)
 
 write.csv(au_diff_main_long,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_main_long.csv", row.names = TRUE)
+
+write.csv(au_diff_main,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_main.csv", row.names = TRUE)
 
 #remove duplicates
 #au_diff_main_long <- unique(au_diff_main_long)
