@@ -431,7 +431,28 @@ sdgacad_df_coded
 
 write.csv(sdgacad_df_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/sdgacad_df_coded.csv", row.names = TRUE)
 ```
+```{r} 
+#adding in post-coding for the comparative analysis AUTHORS
+sdgacad_df <- read_csv("exports/sdgacademy.csv")
+au_diff_coding_export <- read_csv("exports/au_diff_coding_export.csv")
+#standardize titles
+descrip_comb 
+sdgacad_df
+colnames(sdgacad_df)[3] <- "titles"
+sdgacad_df <- sdgacad_df[,-8]
+sdgacad_df$titles <- iconv(sdgacad_df$titles, 'utf-8', 'ascii', sub = '')
 
+sdgacad_df$titles <- tolower(sdgacad_df$titles)
+sdgacad_df$titles <- gsub('sustainable development goals','sdgs',sdgacad_df$titles)
+unique(sdgacad_df$titles)
+
+
+sdgacad_df_coded_au <- left_join(sdgacad_df, au_diff_coding_export, by = "titles", all.x= TRUE)
+
+sdgacad_df_coded_au
+
+write.csv(sdgacad_df_coded_au,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/sdgacad_df_coded_au.csv", row.names = TRUE)
+```
 
 
 ```{r}
