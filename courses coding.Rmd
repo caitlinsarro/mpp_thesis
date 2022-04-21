@@ -607,7 +607,7 @@ dfmat_descrip
 dict_descrip
 dfm_list
 
-tidy(dfm_list)
+
 class(dfmat_descrip)
 
 ######
@@ -676,13 +676,27 @@ au_diff_coding <- left_join(descrip_comb, au_category_clean, by= "titles")
 au_diff_coding <- au_diff_coding %>% select (titles, max.col, authors, au_category)
 
 
+#code out UN ONLY
+au_un_only <- read_csv("data/au_diff_coding_un_only.csv")
+au_un_only <- merge(descrip_comb, au_un_only, by= "titles", all.y = TRUE)
+au_un_only <- au_un_only %>% select (titles, max.col)
+
+#code out NON UN (only)
+au_main <- read_csv("data/au_diff_coding_removed_un_only.csv")
+au_main <- merge(descrip_comb, au_main, by= "titles", all.y= TRUE)
+au_main <- au_main %>% select (titles, max.col)
+
+
 au_diff_coding
 
 au_diff_coding_export <- au_diff_coding %>%
  group_by(titles) %>%
  summarize(au_category = str_c(au_category, collapse = ", "))
+
 au_diff_coding_export
 
+write.csv(au_un_only,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_un_only.csv", row.names = TRUE)
+write.csv(au_main,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_main.csv", row.names = TRUE)
 ```
 
 ```{r}
@@ -695,7 +709,7 @@ quick_sum <- try %>%
   count(max.col)
 
 try 
-write.csv(quick_sum,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/quick_sum.csv", row.names = TRUE)
+write.csv(try,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/quick_sum.csv", row.names = TRUE)
 ```
 
 
