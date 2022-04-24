@@ -29,7 +29,16 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ```{r}
 soft_coded_long <- read_csv("data/soft_coded_long2.csv")
-soft_coded_long
+
+#lowercase titles
+#text cleaning lowercase
+soft_coded_long$titles <- tolower(soft_coded_long$titles)
+
+#fix one entry that keeps breaking the code
+
+soft_coded_long$category[soft_coded_long$titles == "m.a. development studies and diplomacy"] <- "democratic institutions"
+
+
 hard_coded <- read_csv("exports/descrip_comb.csv")
 
 #add in new columns
@@ -72,14 +81,11 @@ all_courses_coded$description <- gsub(',',' ',all_courses_coded$description)
 #remove stopwords
 all_courses_coded$description = removeWords(all_courses_coded$description, stopwords("english"))
 
-#fix one entry that keeps breaking the code
-
-all_courses_coded$category[all_courses_coded$titles == "M.A. Development Studies and Diplomacy"] <- "democratic institutions"
 
 #export to fix problems
 #write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded.csv", row.names = TRUE)
 
-
+all_courses_coded
 ```
 
 
@@ -90,8 +96,8 @@ all_courses_coded$category[all_courses_coded$titles == "M.A. Development Studies
 #need to add in (at least) three new subsets before doing the model test
 
 #TEST of this https://cfss.uchicago.edu/notes/supervised-text-classification/
-#soft_coded_long <- read_csv("data/soft_coded_long2.csv")
-#soft_coded_long <- read_csv("data/soft_hard_codes_combined.csv")
+#all_courses_coded <- read_csv("data/all_courses_coded2.csv")
+#all_courses_coded <- read_csv("data/soft_hard_codes_combined.csv")
 theme_set(theme_minimal())
 #all_courses_coded <- read_csv("exports/all_courses_coded.csv")
 
@@ -101,7 +107,7 @@ all_courses_coded <- all_courses_coded %>% select(id, titles,category,descriptio
 
 all_courses_coded$major_categ <- as.factor(all_courses_coded$major_categ)
 
-soft_coded_long <- all_courses_coded
+all_courses_coded <- all_courses_coded
 ```
 
 
@@ -109,12 +115,12 @@ soft_coded_long <- all_courses_coded
 ```{r}
 set.seed(200)
 
-soft_coded_long <- soft_coded_long %>%
+all_courses_coded <- all_courses_coded %>%
   mutate(major_categ = factor(x = major_categ, levels = major_categ, labels = category))
 
-soft_coded_long$major_categ <-as.factor(soft_coded_long$major_categ)
+all_courses_coded$major_categ <-as.factor(all_courses_coded$major_categ)
 
-soft_code_split <- initial_split(data = soft_coded_long, strata = major_categ, prop = .7)
+soft_code_split <- initial_split(data = all_courses_coded, strata = major_categ, prop = .7)
 
 soft_code_train <- training(soft_code_split)
 
@@ -247,7 +253,7 @@ null_cv %>%
 
 
 ```{r}
-ggplot(data = soft_coded_long, mapping = aes(x = fct_infreq(major_categ) %>% fct_rev())) +
+ggplot(data = all_courses_coded, mapping = aes(x = fct_infreq(major_categ) %>% fct_rev())) +
   geom_bar() +
   coord_flip() +
   labs(

@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-install.packages("C50")
+#install.packages("groupdata2")
 library(tidyverse)
 library(tidymodels)
 library(tm) #for stopwords
@@ -23,6 +23,13 @@ library(themis)
 library(C50)
 
 
+#picking folds
+library(cvms)  # version >= 1.2.2 
+library(groupdata2)  # version >= 1.4.1
+library(dplyr)
+library(ggplot2)
+
+
 ```
 
 ## R Markdown
@@ -33,7 +40,16 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ```{r}
 soft_coded_long <- read_csv("data/soft_coded_long2.csv")
-soft_coded_long
+
+#lowercase titles
+#text cleaning lowercase
+soft_coded_long$titles <- tolower(soft_coded_long$titles)
+
+#fix one entry that keeps breaking the code
+
+soft_coded_long$category[soft_coded_long$titles == "m.a. development studies and diplomacy"] <- "democratic institutions"
+
+
 hard_coded <- read_csv("exports/descrip_comb.csv")
 
 #add in new columns
@@ -59,12 +75,7 @@ soft_coded_long <- soft_coded_long %>% select(id, titles, category,description, 
 #combine them
 all_courses_coded <- rbind(soft_coded_long, hard_coded)
 all_courses_coded$id <- seq.int(nrow(all_courses_coded))
-
-#standardize titles and then only keep uniques
-all_courses_coded$titles <- iconv(all_courses_coded$titles, 'utf-8', 'ascii', sub = '')
-
-all_courses_coded$titles <- tolower(all_courses_coded$titles)
-all_courses_coded$titles <- gsub('sustainable development goals','sdgs',all_courses_coded$titles)
+#uniques
 all_courses_coded <- unique(all_courses_coded)
 
 #convert to numeric
@@ -81,9 +92,6 @@ all_courses_coded$description <- gsub(',',' ',all_courses_coded$description)
 #remove stopwords
 all_courses_coded$description = removeWords(all_courses_coded$description, stopwords("english"))
 
-#fix one entry that keeps breaking the code
-
-all_courses_coded$category[all_courses_coded$titles == "m.a. development studies and diplomacy"] <- "democratic institutions"
 
 #export to fix problems
 #write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded.csv", row.names = TRUE)
@@ -102,6 +110,8 @@ all_courses_coded
 #soft_coded_long <- read_csv("data/soft_coded_long2.csv")
 #soft_coded_long <- read_csv("data/soft_hard_codes_combined.csv")
 theme_set(theme_minimal())
+set.seed(444)
+
 #all_courses_coded <- read_csv("exports/all_courses_coded.csv")
 
 #all_courses_coded <- read_csv("data/soft_hard_codes_combined.csv")
@@ -110,104 +120,41 @@ all_courses_coded <- all_courses_coded %>% select(id, titles,category,descriptio
 
 all_courses_coded$major_categ <- as.factor(all_courses_coded$major_categ)
 
-soft_coded_long <- all_courses_coded
 
 all_courses_coded
 ```
 
 
-```{r}
-# Split Data into Training and Testing in R 
-sample_size = floor(0.8*nrow(all_courses_coded))
-set.seed(444)
-
-# randomly split data in r
-picked <- sample(seq_len(nrow(all_courses_coded)),size = sample_size)
-train_picked <- all_courses_coded[picked,]
-#training set
-dfmat_train <- dfm(tokens(train_picked$description, remove_punct = TRUE))
-
-
-#unlabeled test set
-dfmat_test <- all_courses_coded[-picked,]
-dfmat_test <- dfmat_test %>% select(-c(category,))
-dfmat_test <- dfmat_test %>% select(-c(major_categ,))
-#testing set
-dfmat_test <- dfm(tokens(dfmat_test$description, remove_punct = TRUE))
-
-#set category levels
-
-class <- c("participation","policy coherence","democratic institutions","reflexivity and adaptation")
-
-#train model 
-tmod_nb <- textmodel_nb(dfmat_train, class)
-
-#predict class
-tmod_nb_predict <- predict(tmod_nb, dfmat_test, force = TRUE)
-
-#convert(dfmat_train, to= "data.frame")
-
-
-
-```
-
 
 ```{r}
-#create a cross-table
+#split the dataset 
 
-train_cat_table <- train_picked$category
-tmod_nb_predict
+all_courses_coded_split <- initial_split(data = all_courses_coded, strata = major_categ, prop = .8)
 
-train_cat_table <- table(train_cat_table)
-train_cat_table <- as.data.frame(train_cat_table)
+courses_train <- training(all_courses_coded_split)
 
-tmod_nb_predict_table <- table(tmod_nb_predict)
-train_cat_table
-tmod_nb_predict_table <- as.data.frame(tmod_nb_predict_table)
-
-
-tab <- table(actual = train_cat_table,
-             predicted = tmod_nb_predict_table)
-
-print(tab)
-
-```
-
-
-```{r}
-set.seed(200)
-
-soft_coded_long <- soft_coded_long %>%
-  mutate(major_categ = factor(x = major_categ, levels = major_categ, labels = category))
-
-soft_coded_long$major_categ <-as.factor(soft_coded_long$major_categ)
-
-soft_code_split <- initial_split(data = soft_coded_long, strata = major_categ, prop = .7)
-
-soft_code_train <- training(soft_code_split)
-
-#congress_test <- testing(congress_split)
+courses_test <- testing(all_courses_coded_split)
 ```
 
 ```{r}
 #preprocessing the data frame
 
 
-soft_code_rec <- recipe(category ~ description, data = soft_code_train)
+courses_rec <- recipe(category ~ description, data = courses_train)
 
 #congress_rec <- recipe(major ~ text, data = congress_train)
 ```
 
 ```{r}
 
-#process the text of the legislation summaries
+#final redundant processing the text
 
-soft_code_rec <- soft_code_rec %>%
+courses_rec <- courses_rec %>%
   step_tokenize(description) %>%
   step_stopwords(description) %>%
   step_tokenfilter(description) %>%
   step_tfidf(description)
-soft_code_rec
+
 
 ```
 
@@ -225,7 +172,7 @@ nb_spec
 ## 
 ## Computational engine: naivebayes
 nb_wf_s <- workflow() %>%
-  add_recipe(soft_code_rec) %>%
+  add_recipe(courses_rec) %>%
   add_model(nb_spec)
 nb_wf_s
 
@@ -235,25 +182,37 @@ nb_wf_s
 ```{r}
 #train
 nb_wf_s %>%
-  fit(data = soft_code_train)
+  fit(data = courses_train)
+```
+
+
+```{r}
+# Generate sequence of `k` settings in the 3-50 range
+fold_counts <- round(seq(from = 3, to = 50, length.out = 10))
+# Repeat each 3 times
+fold_counts <- rep(fold_counts, each = 3)
+
+fold_counts
 
 ```
 
 
 ```{r}
 #evaluate
-set.seed(200)
-soft_code_train$major_categ
+set.seed(444)
 
-soft_code_folds <- vfold_cv(data = soft_code_train, strata = major_categ, v = 10)
-soft_code_folds
+
+courses_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 15)
+courses_folds
+
+#soft_code_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 10)
 
 ```
 
 ```{r}
 nb_cv_s <- nb_wf_s %>%
   fit_resamples(
-    soft_code_folds,
+    courses_folds,
     control = control_resamples(save_pred = TRUE)
   )
 
@@ -300,10 +259,10 @@ null_classification <- null_model() %>%
   set_mode("classification")
 
 null_cv <- workflow() %>%
-  add_recipe(soft_code_rec) %>%
+  add_recipe(courses_rec) %>%
   add_model(null_classification) %>%
   fit_resamples(
-    soft_code_folds
+    courses_folds
   )
 
 null_cv %>%
@@ -315,7 +274,8 @@ null_cv %>%
 
 
 ```{r}
-ggplot(data = soft_coded_long, mapping = aes(x = fct_infreq(major_categ) %>% fct_rev())) +
+all_courses_coded$major_categ <- as.factor(all_courses_coded$major_categ)
+ggplot(data = all_courses_coded, mapping = aes(x = fct_infreq(major_categ) %>% fct_rev())) +
   geom_bar() +
   coord_flip() +
   labs(
@@ -330,10 +290,26 @@ ggplot(data = soft_coded_long, mapping = aes(x = fct_infreq(major_categ) %>% fct
 ```{r}
 ##     step_downsample, step_upsample
 # build on existing recipe
-soft_code_rec <- soft_code_rec %>%
+courses_rec <- courses_rec %>%
   step_downsample(major_categ)
-soft_code_rec 
+courses_rec
+```
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
 #alternative modeling approach
 tree_spec <- decision_tree() %>%
   set_mode("classification") %>%
@@ -342,7 +318,7 @@ tree_spec <- decision_tree() %>%
 tree_spec
 
 tree_wf <- workflow() %>%
-  add_recipe(soft_code_rec) %>%
+  add_recipe(courses_rec) %>%
   add_model(tree_spec)
 
 tree_wf
@@ -353,11 +329,100 @@ set.seed(100)
 
 tree_cv <- fit_resamples(
   tree_wf,
-  soft_code_folds,
+  courses_folds,
   control = control_resamples(save_pred = TRUE)
 )
 tree_cv
 
+collect_notes(tree_cv)
 ```
 
 
+
+```{r}
+# Split Data into Training and Testing in R 
+sample_size = floor(0.8*nrow(all_courses_coded))
+set.seed(444)
+
+# randomly split data in r
+picked <- sample(seq_len(nrow(all_courses_coded)),size = sample_size)
+train_picked <- all_courses_coded[picked,]
+#training set
+dfmat_train <- dfm(tokens(train_picked$description, remove_punct = TRUE))
+
+
+#unlabeled test set
+dfmat_test <- all_courses_coded[-picked,]
+dfmat_test <- dfmat_test %>% select(-c(category,))
+dfmat_test <- dfmat_test %>% select(-c(major_categ,))
+#testing set
+dfmat_test <- dfm(tokens(dfmat_test$description, remove_punct = TRUE))
+
+#set category levels
+
+class <- c("participation","policy coherence","democratic institutions","reflexivity and adaptation")
+
+#train model 
+tmod_nb <- textmodel_nb(dfmat_train, class)
+
+#predict class
+tmod_nb_predict <- predict(tmod_nb, dfmat_test, force = TRUE)
+
+#convert(dfmat_train, to= "data.frame")
+
+
+
+```
+
+```{r}
+
+#create a cross-table
+
+train_cat_table <- train_picked$category
+tmod_nb_predict
+
+train_cat_table <- table(train_cat_table)
+train_cat_table <- as.data.frame(train_cat_table)
+
+tmod_nb_predict_table <- table(tmod_nb_predict)
+train_cat_table
+tmod_nb_predict_table <- as.data.frame(tmod_nb_predict_table)
+
+colnames(train_cat_table)[1] <- "category"
+colnames(tmod_nb_predict_table)[1] <- "category"
+
+tab <- table(actual = train_cat_table,
+             predicted = tmod_nb_predict_table)
+
+print(tab)
+```
+
+
+
+```{r}
+#create a cross-table
+
+train_cat_table <- train_picked$category
+
+train_cat_table <- table(train_cat_table)
+train_cat_table <- as.data.frame(train_cat_table)
+
+tmod_nb_predict_table <- table(tmod_nb_predict)
+train_cat_table
+tmod_nb_predict_table <- as.data.frame(tmod_nb_predict_table)
+
+colnames(train_cat_table)[1] <- "category"
+colnames(tmod_nb_predict_table)[1] <- "category"
+
+train_cat_table$model <- "actual"
+tmod_nb_predict_table$model <- "predicted"
+
+crosstab <- rbind(train_cat_table,tmod_nb_predict_table)
+
+
+tab <- table(actual = crosstab$category[crosstab$model=="actual"],
+             predicted = crosstab$category[crosstab$model=="predicted"])
+
+print(tab)
+
+```
