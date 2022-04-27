@@ -1,29 +1,25 @@
 "","Var1","Var2","facet","Freq"
-"1","democratic_keystems","business/finance","Gr2",4
-"2","democratic_keystems","civil society","Gr3",14
-"3","democratic_keystems","government","Gr3",10
-"4","democratic_keystems","private university","Gr1",21
-"5","democratic_keystems","public university","Gr1",27
-"6","democratic_keystems","research  policy institutes","Gr2",18
-"7","democratic_keystems","un","Gr4",12
-"8","participation_keystems","business/finance","Gr2",4
-"9","participation_keystems","civil society","Gr3",15
-"10","participation_keystems","government","Gr3",9
-"11","participation_keystems","private university","Gr1",20
-"12","participation_keystems","public university","Gr1",28
-"13","participation_keystems","research  policy institutes","Gr2",6
-"14","participation_keystems","un","Gr4",19
-"15","policy_coh_keystems","business/finance","Gr2",1
-"16","policy_coh_keystems","civil society","Gr3",6
-"17","policy_coh_keystems","government","Gr3",2
-"18","policy_coh_keystems","private university","Gr1",7
-"19","policy_coh_keystems","public university","Gr1",8
-"20","policy_coh_keystems","research  policy institutes","Gr2",1
-"21","policy_coh_keystems","un","Gr4",9
-"22","reflex_adpt_keystems","business/finance","Gr2",2
-"23","reflex_adpt_keystems","civil society","Gr3",1
-"24","reflex_adpt_keystems","government","Gr3",19
-"25","reflex_adpt_keystems","private university","Gr1",2
-"26","reflex_adpt_keystems","public university","Gr1",7
-"27","reflex_adpt_keystems","research  policy institutes","Gr2",7
-"28","reflex_adpt_keystems","un","Gr4",5
+"1","democratic_keystems","civil society","Gr3",19
+"2","democratic_keystems","government","Gr3",12
+"3","democratic_keystems","private university","Gr1",22
+"4","democratic_keystems","public university","Gr1",37
+"5","democratic_keystems","research  business","Gr2",25
+"6","democratic_keystems","un","Gr4",11
+"7","participation_keystems","civil society","Gr3",14
+"8","participation_keystems","government","Gr3",6
+"9","participation_keystems","private university","Gr1",17
+"10","participation_keystems","public university","Gr1",20
+"11","participation_keystems","research  business","Gr2",8
+"12","participation_keystems","un","Gr4",16
+"13","policy_coh_keystems","civil society","Gr3",3
+"14","policy_coh_keystems","government","Gr3",5
+"15","policy_coh_keystems","private university","Gr1",5
+"16","policy_coh_keystems","public university","Gr1",4
+"17","policy_coh_keystems","research  business","Gr2",1
+"18","policy_coh_keystems","un","Gr4",6
+"19","reflex_adpt_keystems","civil society","Gr3",6
+"20","reflex_adpt_keystems","government","Gr3",17
+"21","reflex_adpt_keystems","private university","Gr1",5
+"22","reflex_adpt_keystems","public university","Gr1",8
+"23","reflex_adpt_keystems","research  business","Gr2",7
+"24","reflex_adpt_keystems","un","Gr4",3

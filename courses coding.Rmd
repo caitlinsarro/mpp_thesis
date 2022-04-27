@@ -25,7 +25,6 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 
 
 **Step 1.** Load the packages `rvest` and `stringr`.
-
 ```{r, message=F}
 #install.packages("")
 library(RSelenium)
@@ -439,9 +438,9 @@ reflex_adpt_keystems <- as.list(tidy_reflex_adapt)
 names(reflex_adpt_keystems)
 reflex_adpt_keystems
 
-wordStem("increasing")
-wordStem("reduced")
-wordStem("inequality")
+wordStem("run")
+wordStem("running")
+wordStem("lover")
  
  
 ```
@@ -586,6 +585,71 @@ descrip_comb
 
 
 ```
+```{r}
+library(rvest)
+library(stringr)
+library(jsonlite)
+library(purrr)
+
+descrip_comb
+
+
+
+coursera <- read_csv("exports/coursera_c.csv")
+unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
+unsdglearn_systems <- read_csv("exports/unsdglearn_systems.csv")
+unsdglearn <- read_csv("exports/unsdglearn.csv")
+sdgacademy <- read_csv("exports/sdgacademy.csv")
+unpan <- read_csv("exports/unpan.csv")
+unssc <- read_csv("exports/unssc.csv")
+unfccc <- read_csv("exports/unfccc.csv")
+unfccc
+
+
+weblink<- coursera$weblinks_coursera
+# Define the DATE worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+   html_text() 
+data <- jsonlite::parse_json(str_match_all(p,'resultListModel: (.*\\})')[[1]][,2])
+results <- data$searchResponseModel$resultlist.resultlist$resultlistEntries[[1]]$resultlistEntry %>% 
+    enframe("id", "date")
+}
+
+
+# Iterate
+
+df <- map_df(results, function(item) {
+
+  data.frame(property = item$resultlist.realEstate$address$description$text,
+             datePublished = item$`@publishDate`,
+             stringsAsFactors=FALSE)
+})
+
+
+
+# Iterate over the urls, applying the function each time
+audience <- map_dfr(weblink, scraper, .id = "id")
+audience
+
+
+
+p <- read_html('https://www.immobilienscout24.de/Suche/S-2/Wohnung-Miete/Rheinland-Pfalz/Koblenz') %>% html_text()
+data <- jsonlite::parse_json(str_match_all(p,'resultListModel: (.*\\})')[[1]][,2])
+results <- data$searchResponseModel$resultlist.resultlist$resultlistEntries[[1]]$resultlistEntry
+
+df <- map_df(results, function(item) {
+
+  data.frame(property = item$resultlist.realEstate$address$description$text,
+             datePublished = item$`@publishDate`,
+             stringsAsFactors=FALSE)
+})
+
+View(df)
+
+```
+
+
 
 ```{r}
 #I AM HEREEE
@@ -815,6 +879,73 @@ table(au_diff_main_long$max.col)
 
 au_diff_main_long
 
+#simply categories
+au_diff_main_long$au_category[au_diff_main_long$au_category == "cultural institution"] <- "civil society"
+au_diff_main_long$au_category[au_diff_main_long$au_category == "ngo"] <- "civil society"
+au_diff_main_long$au_category[au_diff_main_long$au_category == "business"] <- "research  business"
+au_diff_main_long$au_category[au_diff_main_long$au_category == "finance"] <- "research  business"
+au_diff_main_long$au_category[au_diff_main_long$au_category == "research policy institutes"] <- "research  business"
+au_diff_main_long$au_category[au_diff_main_long$au_category == "un ngo"] <- "civil society"
+
+# add in un only courses
+
+au_diff_allcourses <- rbind(au_diff_main_long, au_diff_un_only)
+
+
+table(au_diff_allcourses$au_category, au_diff_allcourses$max.col)
+
+
+chisq.test(au_diff_allcourses$au_category, au_diff_allcourses$max.col, correct=FALSE)
+
+#X-squared = 41.712, df = 15, p-value = 0.0002489
+authors <- au_diff_allcourses$au_category
+govern <- au_diff_allcourses$max.col
+
+#freq_table <- au_diff_allcourses %>% select(id.x, au_category, max.col)
+
+#freq_table <- na.omit(freq_table)
+freq_table <- table(au_diff_allcourses$au_category, au_diff_allcourses$max.col)
+
+mosaicplot(freq_table,
+  main = "Mosaic plot",
+  color = TRUE
+)
+
+```
+```{r}
+chisq.test(freq_table)$expected
+
+```
+```{r}
+
+fishtest <- fisher.test(freq_table,simulate.p.value=TRUE,B=1e7)
+fishtest
+
+```
+```{r}
+# Fisher's exact test with raw data
+test <- fisher.test(table(df))
+
+# combine plot and statistical test with ggbarstats
+library(ggstatsplot)
+ggbarstats(
+  df, Smoking_habits, Sport_habits,
+  results.subtitle = FALSE,
+  subtitle = paste0(
+    "Fisher's exact test", ", p-value = ",
+    ifelse(test$p.value < 0.001, "< 0.001", round(test$p.value, 3))
+  )
+)
+
+
+```
+
+
+
+
+
+```{r}
+
 #summary table
 au_matrix <- table(au_diff_main_long$max.col, au_diff_main_long$au_category)
 #table to dataframe
@@ -829,16 +960,16 @@ au_matrix$Var2 <- as.character(au_matrix$Var2)
 #simply categories
 au_matrix$Var2[au_matrix$Var2 == "cultural institution"] <- "civil society"
 au_matrix$Var2[au_matrix$Var2 == "ngo"] <- "civil society"
-au_matrix$Var2[au_matrix$Var2 == "business"] <- "business/finance"
-au_matrix$Var2[au_matrix$Var2 == "finance"] <- "business/finance"
-au_matrix$Var2[au_matrix$Var2 == "un ngo"] <- "un"
+au_matrix$Var2[au_matrix$Var2 == "business"] <- "research  business"
+au_matrix$Var2[au_matrix$Var2 == "finance"] <- "research  business"
+au_matrix$facet[au_matrix$Var2 == "research policy institutes"] <- "research  business"
+au_matrix$Var2[au_matrix$Var2 == "un ngo"] <- "civil society"
 
 
 #create facet groups
 au_matrix$facet[au_matrix$Var2 == "private university"] <- "Gr1"
 au_matrix$facet[au_matrix$Var2 == "public university"] <- "Gr1"
-au_matrix$facet[au_matrix$Var2 == "business/finance"] <- "Gr2"
-au_matrix$facet[au_matrix$Var2 == "research  policy institutes"] <- "Gr2"
+au_matrix$facet[au_matrix$Var2 == "research  business"] <- "Gr2"
 au_matrix$facet[au_matrix$Var2 == "civil society"] <- "Gr3"
 au_matrix$facet[au_matrix$Var2 == "government"] <- "Gr3"
 au_matrix$facet[au_matrix$Var2 == "un"] <- "Gr4"
@@ -856,6 +987,9 @@ au_matrix_simple
 #fix/rename cols
 #au_matrix <- colnames(au_matrix$Var1)[1] <- "category"
 #au_matrix <- colnames(au_matrix$Var2)[2] <- "author"
+
+au_matrix_simple
+
 
 
 
