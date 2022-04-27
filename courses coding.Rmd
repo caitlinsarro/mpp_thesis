@@ -63,6 +63,16 @@ library(quanteda.dictionaries)
 
 #plots
 library(GGally)
+library(ggstatsplot) #fisher's test included
+
+packages = c('vcd', 'vcdExtra', 'tidyverse')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
 
 ```
 
@@ -72,14 +82,16 @@ library(GGally)
 #Capacity Building https://www.unsdglearn.org/courses/?_sf_s=capacity%20building
 #Breaking the Silos https://www.unsdglearn.org/courses/?_sfm_sdg=5
 
-coursera <- read_csv("exports/coursera_c.csv")
-unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
-unsdglearn_systems <- read_csv("exports/unsdglearn_systems.csv")
-unsdglearn <- read_csv("exports/unsdglearn.csv")
-sdgacademy <- read_csv("exports/sdgacademy.csv")
-unpan <- read_csv("exports/unpan.csv")
-unssc <- read_csv("exports/unssc.csv")
-unfccc <- read_csv("exports/unfccc.csv")
+coursera <- read_csv("exports/coursera_c.csv") #1 
+unsdglearn <- read_csv("exports/unsdglearn.csv") #2 
+unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv") #3 
+unsdglearn_systems <- read_csv("exports/unsdglearn_systems.csv") #4 
+
+sdgacademy <- read_csv("exports/sdgacademy.csv") #5
+
+unpan <- read_csv("exports/unpan.csv") #6
+unssc <- read_csv("exports/unssc.csv") #7 
+unfccc <- read_csv("exports/unfccc.csv") #8
 unfccc
 #quick fixes
 coursera$description <- coursera$keywords
@@ -102,12 +114,29 @@ keywords_unfccc <- unfccc %>% select(titles,description)
 #combine into one set
 combined <- rbind(keywords_cour, keywords_unsdglearn_silos, keywords_unsdglearn, keywords_sdgacademy, keywords_unpan, keywords_unssc, keywords_unsdglearn_systems)
 
+
+write.csv(combined,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/combined.csv", row.names = TRUE)
+
+```
+```{r}
+#fix translations (4 translated, 3 duplicates, 2 NA's)
+combined <- read_csv("data/combined_for_coding_with_translated.csv")
+
+#import back in translated subset
+#translated_courses <- read_csv("data/combined_for_coding_translated.csv")
+
+#rename first col
+#colnames(translated_courses)[1] <- "id"
+#combine
+#combined <- rbind(combined, translated_courses)
+
+#combined$id <- seq.int(nrow(combined))
+
+
 ```
 
 ```{r}
-
-#standardize titles
-combined 
+#standardize titles 
 
 combined$titles <- iconv(combined$titles, 'utf-8', 'ascii', sub = '')
 
@@ -139,15 +168,7 @@ combined
 combined <- combined %>%
     mutate(description = str_remove_all(description, "participants"))
 
-#import back in translated subset
-translated_courses <- read_csv("data/combined_for_coding_translated.csv")
 
-#rename first col
-colnames(translated_courses)[1] <- "id"
-#combine
-combined <- rbind(combined, translated_courses)
-
-combined$id <- seq.int(nrow(combined))
 
 ```
 
@@ -586,66 +607,65 @@ descrip_comb
 
 ```
 ```{r}
-library(rvest)
-library(stringr)
-library(jsonlite)
-library(purrr)
+#combine with soft code
+soft_coded_long <- read_csv("data/soft_coded_long2.csv")
 
-descrip_comb
+#lowercase titles
+#text cleaning lowercase
+soft_coded_long$titles <- tolower(soft_coded_long$titles)
 
+#fix one entry that keeps breaking the code
 
-
-coursera <- read_csv("exports/coursera_c.csv")
-unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
-unsdglearn_systems <- read_csv("exports/unsdglearn_systems.csv")
-unsdglearn <- read_csv("exports/unsdglearn.csv")
-sdgacademy <- read_csv("exports/sdgacademy.csv")
-unpan <- read_csv("exports/unpan.csv")
-unssc <- read_csv("exports/unssc.csv")
-unfccc <- read_csv("exports/unfccc.csv")
-unfccc
+soft_coded_long$category[soft_coded_long$titles == "m.a. development studies and diplomacy"] <- "democratic institutions"
 
 
-weblink<- coursera$weblinks_coursera
-# Define the DATE worker function
-scraper <- function(weblink) {
-  read_html(weblink) %>% 
-   html_text() 
-data <- jsonlite::parse_json(str_match_all(p,'resultListModel: (.*\\})')[[1]][,2])
-results <- data$searchResponseModel$resultlist.resultlist$resultlistEntries[[1]]$resultlistEntry %>% 
-    enframe("id", "date")
-}
+hard_coded <- read_csv("exports/descrip_comb.csv")
+
+#add in new columns
+hard_coded$category <- "category"
+hard_coded$major_categ <- 4
+
+#transform info to columns
+hard_coded$category[hard_coded$max.col == "participation_keystems"] <- "participation"
+hard_coded$category[hard_coded$max.col == "policy_coh_keystems"] <- "policy coherence"
+hard_coded$category[hard_coded$max.col == "democratic_keystems"] <- "democratic institutions"
+hard_coded$category[hard_coded$max.col == "reflex_adpt_keystems"] <- "reflexivity and adaptation"
+
+hard_coded$major_categ[hard_coded$max.col == "participation_keystems"] <- 1
+hard_coded$major_categ[hard_coded$max.col == "policy_coh_keystems"] <- 2
+hard_coded$major_categ[hard_coded$max.col == "democratic_keystems"] <- 3
+hard_coded$major_categ[hard_coded$max.col == "reflex_adpt_keystems"] <- 4
+#convert to numeric
+as.numeric(hard_coded$major_categ)
+
+hard_coded$id <- seq.int(nrow(hard_coded))
+hard_coded <- hard_coded %>% select(id, titles, category,description, major_categ)
+soft_coded_long <- soft_coded_long %>% select(id, titles, category,description, major_categ)
+#combine them
+all_courses_coded <- rbind(soft_coded_long, hard_coded)
+all_courses_coded$id <- seq.int(nrow(all_courses_coded))
+#uniques
+all_courses_coded <- unique(all_courses_coded)
+
+#convert to numeric
+as.factor(all_courses_coded$major_categ)
 
 
-# Iterate
+#text cleaning punctuation
+all_courses_coded$description <- gsub('[[:punct:] ]+',' ',all_courses_coded$description)
+#text cleaning lowercase
+all_courses_coded$description <- tolower(all_courses_coded$description)
+#text cleaning symbols
+all_courses_coded$description <- gsub(',',' ',all_courses_coded$description)
 
-df <- map_df(results, function(item) {
-
-  data.frame(property = item$resultlist.realEstate$address$description$text,
-             datePublished = item$`@publishDate`,
-             stringsAsFactors=FALSE)
-})
-
-
-
-# Iterate over the urls, applying the function each time
-audience <- map_dfr(weblink, scraper, .id = "id")
-audience
+#remove stopwords
+all_courses_coded$description = removeWords(all_courses_coded$description, stopwords("english"))
 
 
+#export to fix problems
+#write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded.csv", row.names = TRUE)
 
-p <- read_html('https://www.immobilienscout24.de/Suche/S-2/Wohnung-Miete/Rheinland-Pfalz/Koblenz') %>% html_text()
-data <- jsonlite::parse_json(str_match_all(p,'resultListModel: (.*\\})')[[1]][,2])
-results <- data$searchResponseModel$resultlist.resultlist$resultlistEntries[[1]]$resultlistEntry
-
-df <- map_df(results, function(item) {
-
-  data.frame(property = item$resultlist.realEstate$address$description$text,
-             datePublished = item$`@publishDate`,
-             stringsAsFactors=FALSE)
-})
-
-View(df)
+all_courses_coded
 
 ```
 
@@ -717,14 +737,11 @@ df %>% filter(Freq >= 8) %>% arrange(desc(Freq))
 
 ###start to combine with authors
 
-
 ```{r}
 #try to combine with authors
 #descrip_comb
 #au_category_clean
 
-au_category_clean <- read_csv("exports/au_category_clean.csv")
-descrip_comb 
 
 #standardize the titles across the two sheets
 au_category_clean$titles <- iconv(au_category_clean$titles, 'utf-8', 'ascii', sub = '')
@@ -749,9 +766,7 @@ au_un_only <- au_un_only %>% select (titles, max.col)
 au_main <- read_csv("data/au_diff_coding_removed_un_only.csv")
 au_main <- merge(descrip_comb, au_main, by= "titles", all.y= TRUE)
 au_main <- au_main %>% select (titles, max.col)
-
-
-au_diff_coding
+unfccc
 
 au_diff_coding_export <- au_diff_coding %>%
  group_by(titles) %>%
@@ -811,10 +826,35 @@ au_diff_coding$titles <- iconv(au_diff_coding$titles, 'utf-8', 'ascii', sub = ''
 
 au_diff_coding$titles <- tolower(au_diff_coding$titles)
 au_diff_coding$titles <- gsub('sustainable development goals','sdgs',au_diff_coding$titles)
+```
+```{r}
+
+#adding in softcode
+soft_code <- read_csv("data/soft_code_auths_coded.csv")
+#fix titles
+soft_code$titles <- tolower(soft_code$titles)
+soft_code$titles <- trimws(soft_code$titles)
+
+au_diff_coding <- au_diff_coding %>%
+ group_by(titles) %>%
+ summarize(au_category = str_c(au_category, collapse = ", "))
+
+soft_code_au <- soft_code %>% select(titles, au_category)
+
+all_courses_au_coded <- merge(au_diff_coding,soft_code_au, by="titles", all=TRUE)
+
+all_courses_au_coded$au_category <- paste(all_courses_au_coded$au_category.x,',',all_courses_au_coded$au_category.y)
 
 
-write.csv(au_diff_coding,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_coding.csv", row.names = TRUE)
+write.csv(all_courses_au_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_au_coded.csv", row.names = TRUE)
 
+#you are here, need to combine the two lists in an intelligent way that still allows for messing with the dictionaries
+
+```
+```{r}
+#fixing nas
+new_DF <- au_diff_coding[rowSums(is.na(au_diff_coding)) > 0,]
+write.csv(new_DF,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/deletelater.csv", row.names = TRUE)
 
 ```
 
@@ -905,9 +945,18 @@ govern <- au_diff_allcourses$max.col
 
 #freq_table <- na.omit(freq_table)
 freq_table <- table(au_diff_allcourses$au_category, au_diff_allcourses$max.col)
+```
+
+```{r}
+#mosaic plot
+au_diff_allcourses
+mosaic(~ max.col + au_category, data = au_diff_allcourses,
+main = "Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings", shade = TRUE, legend = TRUE)
 
 mosaicplot(freq_table,
-  main = "Mosaic plot",
+  main = "\n Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings\n",
+  sub = paste0(
+    "Fisher's exact test p-value = < 0.001"),
   color = TRUE
 )
 
@@ -917,23 +966,26 @@ chisq.test(freq_table)$expected
 
 ```
 ```{r}
-
+# Fisher's exact test
 fishtest <- fisher.test(freq_table,simulate.p.value=TRUE,B=1e7)
 fishtest
 
 ```
 ```{r}
-# Fisher's exact test with raw data
-test <- fisher.test(table(df))
 
 # combine plot and statistical test with ggbarstats
-library(ggstatsplot)
+au_diff_allcourses_simple <- au_diff_allcourses %>% select(id.x, au_category, max.col)
+
+au_diff_allcourses_simple <- na.omit(au_diff_allcourses_simple)
+
+
+
 ggbarstats(
-  df, Smoking_habits, Sport_habits,
+  au_diff_allcourses_simple,au_category,max.col,
   results.subtitle = FALSE,
   subtitle = paste0(
     "Fisher's exact test", ", p-value = ",
-    ifelse(test$p.value < 0.001, "< 0.001", round(test$p.value, 3))
+    ifelse(fishtest$p.value < 0.001, "< 0.001", round(fish$p.value, 3))
   )
 )
 
@@ -1486,5 +1538,69 @@ df_ngo
 ```{r}
 #toolbox
 #soft_code$id <- seq.int(nrow(soft_code))
+
+```
+```{r}
+library(rvest)
+library(stringr)
+library(jsonlite)
+library(purrr)
+
+descrip_comb
+
+
+
+coursera <- read_csv("exports/coursera_c.csv")
+unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
+unsdglearn_systems <- read_csv("exports/unsdglearn_systems.csv")
+unsdglearn <- read_csv("exports/unsdglearn.csv")
+sdgacademy <- read_csv("exports/sdgacademy.csv")
+unpan <- read_csv("exports/unpan.csv")
+unssc <- read_csv("exports/unssc.csv")
+unfccc <- read_csv("exports/unfccc.csv")
+unfccc
+
+
+weblink<- coursera$weblinks_coursera
+# Define the DATE worker function
+scraper <- function(weblink) {
+  read_html(weblink) %>% 
+   html_text() 
+data <- jsonlite::parse_json(str_match_all(p,'resultListModel: (.*\\})')[[1]][,2])
+results <- data$searchResponseModel$resultlist.resultlist$resultlistEntries[[1]]$resultlistEntry %>% 
+    enframe("id", "date")
+}
+
+```
+```{r}
+# Iterate
+
+df <- map_df(results, function(item) {
+
+  data.frame(property = item$resultlist.realEstate$address$description$text,
+             datePublished = item$`@publishDate`,
+             stringsAsFactors=FALSE)
+})
+
+
+
+# Iterate over the urls, applying the function each time
+audience <- map_dfr(weblink, scraper, .id = "id")
+audience
+
+
+
+p <- read_html('https://www.immobilienscout24.de/Suche/S-2/Wohnung-Miete/Rheinland-Pfalz/Koblenz') %>% html_text()
+data <- jsonlite::parse_json(str_match_all(p,'resultListModel: (.*\\})')[[1]][,2])
+results <- data$searchResponseModel$resultlist.resultlist$resultlistEntries[[1]]$resultlistEntry
+
+df <- map_df(results, function(item) {
+
+  data.frame(property = item$resultlist.realEstate$address$description$text,
+             datePublished = item$`@publishDate`,
+             stringsAsFactors=FALSE)
+})
+
+View(df)
 
 ```

@@ -9,7 +9,7 @@
 "8","biosphere 2 science for the future of our planet","public university"
 "9","book club with jeffrey sachs","private university, private university"
 "10","calidad de registros administrativos",NA
-"11","changingmindsets in public institutions to implement the 2030 agenda for sustainable development<u+200b>",NA
+"11","changing<u+00a0>mindsets in public institutions to implement the 2030 agenda for sustainable development<u+200b>",NA
 "12","circular economy and the 2030 agenda","un, un, ngo, un"
 "13","cities and marine plastic pollution: building a circular economy","un"
 "14","cities and the challenge of sustainable development","private university"
@@ -24,12 +24,12 @@
 "23","communicating gender statistics",NA
 "24","communicating statistics on women's economic empowerment",NA
 "25","compilation and application of environmentally extended supply-use tables","un"
-"26","constructing producer price indexes and import and export price indexes",NA
+"26","constructing producer price indexes and import and export price indexes","government"
 "27","conversations with global leaders: leading on sustainable development","private university, business, government, government, un"
 "28","data planning with adapt",NA
 "29","designing a multidimensional poverty index","government, un"
 "30","digit4sd: digital government implementation",NA
-"31","e-government for womens empowerment <u+200b>",NA
+"31","e-government for women s empowerment <u+200b>",NA
 "32","e-learning on gender statistics","un"
 "33","e-learning series on public-private partnerships","un"
 "34","e-training on gdp re-basing","un"
@@ -38,173 +38,164 @@
 "37","e-training on the framework for development of environmental statistics (fdes)","un"
 "38","ecological and energy transitions in southern countries",NA
 "39","ecology: ecosystem dynamics and conservation","cultural institution, ngo"
-"40","economic indicators",NA
+"40","economic indicators","government"
 "41","effective national to local public governance for sdg implementation",NA
-"42","el snieg de mxico",NA
-"43","ensuring womens legal rights to land ownership and/or control",NA
-"44","environmental management & ethics","public university"
-"45","environmental sdg indicators","un, un"
-"46","environmental security and sustaining peace","private university, private university, ngo, un, public university"
-"47","equip","un"
-"48","essential reading and understanding dhs program tables","government"
-"49","ethics in action","private university, ngo"
-"50","evaluation of  public policies and programmes",NA
-"51","Extractive Sector: Sustainability and Development in Latin America and the Caribbean",NA
-"52","feeding a hungry planet","private university, private university, private university, private university, public university, business"
-"53","financing in health",NA
-"54","fisheries and aquaculture statistics","un"
-"55","follow-up and review (fur) and the voluntary national review (vnr)","un"
-"56","foresight for development, the 2030 agenda and the sdgs","un, un"
-"57","formation introductive sur la jeunesse, la paix et la scurit",NA
-"58","from climate science to action","government"
-"59","from the ground up: managing our terrestrial ecosystems","private university, public university, un, ngo, public university"
-"60","frozen in the ice: exploring the arctic","public university"
-"61","fundamental principles of the official statistics",NA
-"62","geospatial information technology in fragile contexts","research  policy institutes"
-"63","getting a good deal: negotiating extractive industry contracts","government, ngo, private university, research  policy institutes"
-"64","global energy and climate policy","public university, public university"
-"65","global environmental management","public university"
-"66","global public health","public university, research  policy institutes, private university, ngo"
-"67","global warming ii: create your own models in python","private university"
-"68","globalization: past and future","private university, un ngo"
-"69","governance for transboundary freshwater security","government, government, public university, public university, research  policy institutes, un, public university, research  policy institutes, research  policy institutes, business"
-"70","government innovation for social inclusion of vulnerable groups",NA
-"71","greening the economy: lessons from scandinavia","public university"
-"72","how to achieve the sdgs","private university, un"
-"73","human rights, environmental protection and climate change","research  policy institutes"
-"74","human rights, human wrongs","public university"
-"75","ilo labour market statistics and analysis academy","un"
-"76","industrial policy in the 21st century: the challenge for africa",NA
-"77","infrastructure asset management for sustainable development","un, un"
-"78","infrastructure, public-private partnerships, and fiscal management",NA
-"79","innovation and digital government for public service delivery <u+200b>",NA
-"80","integrated economic statistics to support 2008 sna implementation","research  policy institutes, un"
-"81","integrated policies and policy coherence for sdgs","un, un, un"
-"82","integrated policies and policy coherence for the sdgs",NA
-"83","integrated recovery planning and policy coherence towards the sdgs","un, un"
-"84","integrating climate risk information into naps","un, un, un"
-"85","integration of the sdgs into national planning",NA
-"86","international business alliance","un"
-"87","international criminal law and transitional justice","un, ngo"
-"88","international law in the 21st century","research  policy institutes"
-"89","introduction to big data for sustainable development","research  policy institutes"
-"90","introduction to data governance for monitoring the sdgs","un"
-"91","introduction to environmental law and policy","public university"
-"92","introduction to index insurance",NA
-"93","introduction to standards and sustainability",NA
-"94","introduction to sustainability","public university"
-"95","introduction to sustainable development goal indicators under fao custodianship","un"
-"96","introduction to the arctic: climate","public university"
-"97","introduction to the seea central framework","un"
-"98","Introductory training on youth, peace and security",NA
-"99","labor market information: business establishment surveys",NA
-"100","labor market information: household labor force surveys",NA
-"101","labour productivity and income of small-scale food producers","un"
-"102","laudato si<u+0092>: on care for our common home","private university, finance, cultural institution, cultural institution, ngo"
-"103","law of international organizations  extended edition",NA
-"104","law of treaties  extended edition",NA
-"105","leip","un, un"
-"106","living heritage and sustainable development","private university, private university, public university, public university, public university, public university, cultural institution, ngo, public university, un, public university"
-"107","m.a. development studies and diplomacy","un, un"
-"108","m.a. in international law and diplomacy","un, un"
-"109","ma development studies and diplomacy","un, un"
-"110","machine learning on satellite imagery","research  policy institutes"
-"111","macroeconomics for a sustainable planet","private university, government"
-"112","manual bsico sobre la juventud, la paz y la seguridad",NA
-"113","master in anti-corruption and diplomacy","research  policy institutes"
-"114","master in international affairs and diplomacy","un"
-"115","measuring productivity",NA
-"116","measuring sustainable development","un ngo, ngo"
-"117","national disaster risk reduction strategies","un"
-"118","national metadata for sdgs",NA
-"119","national system of statistical and geographic information of mexico",NA
-"120","natural resources for sustainable development","private university, ngo, un, public university, ngo, private university, research  policy institutes, ngo"
-"121","nature-based solutions for disaster and climate resilience","un"
-"122","normativa del snieg de mxico",NA
-"123","o guia de iniciao de juventude, paz e segurana",NA
-"124","official statistics for sdgs","un"
-"125","one planet, one ocean","ngo, public university, ngo"
-"126","online diploma in multilateral diplomacy 2022  edition 2",NA
-"127","our earth's future","cultural institution"
-"128","our earth: its climate, history, and processes","public university"
-"129","our energy future","public university"
-"130","Partnerships: a vehicle for sustainable development",NA
-"131","plan-cadre de coopration des nations unies pour le dveloppement durable",NA
-"132","planetary boundaries and human opportunities","public university, research  policy institutes, public university"
-"133","planning for climate change in african cities","public university, government, public university, government"
-"134","policy coherence and systems thinking for sustainable development",NA
-"135","policy coherence for sustainable development","private university, un, private university, government, un ngo"
-"136","policy cycle, integrated approaches and sdgs","un"
-"137","policy cycle, integrated approaches and sdgs for african ldcs","research  policy institutes, un"
-"138","poverty statistics for sdgs","un"
-"139","preparing for action national briefing package: the 2030 agenda and sdgs",NA
-"140","principles of sustainable finance","public university"
-"141","programming for child feeding",NA
-"142","public-private-partnerships (ppp)",NA
-"143","public-private partnerships",NA
-"144","public financial management",NA
-"145","questionnaire development and testing",NA
-"146","raising ambition - how to set science-based targets aligning with 1.5c pathways",NA
-"147","regulations of the national system of statistical and geographic information",NA
-"148","remote training on phone surveys",NA
-"149","risk-informed governance and innovative technology for disaster risk reduction and resilience <u+200b>",NA
-"150","sdg indicator 14.4.1 - fish stocks sustainability","un"
-"151","sdg indicator 14.b.1 - securing sustainable small-scale fisheries","un"
-"152","sdg indicator 2.1.1 - prevalence of undernourishment (pou)","un"
-"153","sdg indicator 2.1.2 - using the food insecurity experience scale (fies)","un"
-"154","sdg indicator 2.4.1 - sustainable agriculture","un"
-"155","sdg indicator 2.a.1  agriculture orientation index",NA
-"156","sdg indicator 2.c.1 - food price anomalies","un"
-"157","sdg indicator 5.a.1 - equal tenure rights for women on agricultural land","un"
-"158","sdg indicators 15.1.1 and 15.2.1 - forest area and sustainable forest management","un"
-"159","sdg indicators 2.5.1 and 2.5.2 - plant and animal genetic resources","un"
-"160","sdg lab toolkit","un, un, ngo"
-"161","sdg primer","un, un, ngo, un"
-"162","sdg sub-indicator 12.3.1.a  food loss index",NA
-"163","sector extractivo: sostenibilidad y desarrollo en am<e9>rica latina y el caribe","private university, ngo, public university, finance"
-"164","seea experimental ecosystem accounting","un"
-"165","seea for policy makers",NA
-"166","seea: in-depth training on water accounting","un"
-"167","seea: in depth training on energy accounting","un"
-"168","social indicators for public policies and programmes",NA
-"169","social protection for sustainable development","un, research  policy institutes, un"
-"170","statistical methods for correcting selection bias","research  policy institutes"
-"171","strategic planning for territorial development and the 2030 agenda","un"
-"172","strengthening institutional arrangements and governance capacities for policy coherence<u+200b>",NA
-"173","strengthening stakeholder engagement for the 2030 agenda","un, un"
-"174","survey skills development course",NA
-"175","sustainable business: big issues, big changes","public university"
-"176","sustainable cities","government, private university, public university, public university, private university, un, private university, research  policy institutes, government, public university, research  policy institutes, ngo"
-"177","sustainable development: the post-capitalist order","private university"
-"178","sustainable food systems: a mediterranean perspective","public university, public university, private university, public university, private university, research  policy institutes, public university, public university, public university, public university, public university, ngo"
-"179","system dynamics-based development planning","public university, research  policy institutes"
-"180","taking the entrepreneurship route",NA
-"181","tech for good: the role of ict in achieving the sdgs","private university, un, private university, un, public university, un, ngo, research  policy institutes, ngo, government, un, un"
-"182","the age of sustainable development","private university"
-"183","the best start in life: early childhood development for sustainable development","private university, private university"
-"184","the gender statistics toolkit","un, un"
-"185","the korean story: secrets of an economic miracle","research  policy institutes, private university, government, private university, public university, public university, government, government"
-"186","the paris agreement on climate change as a development agenda",NA
-"187","the sdg primer",NA
-"188","the sdgs  a global, transdisciplinary vision for the future",NA
-"189","the turn: from reactionary populism to a progressive alternative","private university, private university"
-"190","the un country team leadership course",NA
-"191","the un sustainable development cooperation framework",NA
-"192","the women ict frontier initiative (wifi)","un, un"
-"193","trainfortrade e-learn course on international merchandise trade statistics",NA
-"194","transforming development: the science and practice of resilience thinking","research  policy institutes, public university"
-"195","transforming our world: achieving the sdgs","private university"
-"196","transparency, accountability and ethics in public institutions",NA
-"197","un strategic communications for the 2030 agenda","un, un"
-"198","un summer academy",NA
-"199","un summer academy 2022","un"
-"200","understanding data and statistics better","un, un"
-"201","understanding poverty and inequality","research  policy institutes, ngo, public university, ngo, private university, un, public university, public university, finance, un ngo"
-"202","unece gender statistics toolkit","un"
-"203","unido iap","un"
-"204","United Nations Development Assistance Framework (UNDAF)",NA
-"205","unleashing the power of the private sector for the 2030 agenda",NA
-"206","unleashing the power of the private sector for the 2030 agenda - 2021","research  policy institutes"
-"207","water: addressing the global crisis","research  policy institutes, un, ngo, ngo, un"
-"208","web data collection and analysis","research  policy institutes"
-"209","work and employment for a sustainable future","private university, private university, private university, un, public university, public university, ngo"
+"42","ensuring women s legal rights to land ownership and/or control",NA
+"43","environmental sdg indicators","un, un"
+"44","environmental security and sustaining peace","private university, private university, ngo, un, public university"
+"45","equip","un"
+"46","essential reading and understanding dhs program tables","government"
+"47","ethics in action","private university, ngo"
+"48","evaluation of  public policies and programmes","government"
+"49","extractive sector: sustainability and development in latin america and the caribbean",NA
+"50","feeding a hungry planet","private university, private university, private university, private university, public university, business"
+"51","financing in health",NA
+"52","fisheries and aquaculture statistics","un"
+"53","follow-up and review (fur) and the voluntary national review (vnr)","un"
+"54","foresight for development, the 2030 agenda and the sdgs","un, un"
+"55","formation introductive sur la jeunesse, la paix et la s<e9>curit<e9>",NA
+"56","from the ground up: managing our terrestrial ecosystems","private university, public university, un, ngo, public university"
+"57","frozen in the ice: exploring the arctic","public university"
+"58","fundamental principles of the official statistics","government"
+"59","geospatial information technology in fragile contexts","research  policy institutes"
+"60","getting a good deal: negotiating extractive industry contracts","government, ngo, private university, research  policy institutes"
+"61","global energy and climate policy","public university, public university"
+"62","global environmental management","public university"
+"63","global public health","public university, research  policy institutes, private university, ngo"
+"64","global warming ii: create your own models in python","private university"
+"65","globalization: past and future","private university, un ngo"
+"66","governance for transboundary freshwater security","government, government, public university, public university, research  policy institutes, un, public university, research  policy institutes, research  policy institutes, business"
+"67","government innovation for social inclusion of vulnerable groups",NA
+"68","greening the economy: lessons from scandinavia","public university"
+"69","how to achieve the sdgs","private university, un"
+"70","human rights, environmental protection and climate change","research  policy institutes"
+"71","human rights, human wrongs","public university"
+"72","ilo labour market statistics and analysis academy","un"
+"73","industrial policy in the 21st century: the challenge for africa",NA
+"74","infrastructure asset management for sustainable development","un, un"
+"75","infrastructure, public-private partnerships, and fiscal management",NA
+"76","innovation and digital government for public service delivery <u+200b>",NA
+"77","integrated economic statistics to support 2008 sna implementation","research  policy institutes, un"
+"78","integrated policies and policy coherence for sdgs","un, un, un"
+"79","integrated policies and policy coherence for the sdgs",NA
+"80","integrated recovery planning and policy coherence towards the sdgs","un, un"
+"81","integrating climate risk information into naps","un, un, un"
+"82","integration of the sdgs into national planning",NA
+"83","international business alliance","un"
+"84","international criminal law and transitional justice","un, ngo"
+"85","international law in the 21st century","research  policy institutes"
+"86","introduction to big data for sustainable development","research  policy institutes"
+"87","introduction to data governance for monitoring the sdgs","un"
+"88","introduction to environmental law and policy","public university"
+"89","introduction to index insurance",NA
+"90","introduction to standards and sustainability",NA
+"91","introduction to sustainability","public university"
+"92","introduction to sustainable development goal indicators under fao custodianship","un"
+"93","introduction to the arctic: climate","public university"
+"94","introduction to the seea central framework","un"
+"95","introductory training on youth, peace and security",NA
+"96","labor market information: business establishment surveys","government"
+"97","labor market information: household labor force surveys","government"
+"98","labour productivity and income of small-scale food producers","un"
+"99","laudato si : on care for our common home",NA
+"100","law of international organizations   extended edition",NA
+"101","law of treaties   extended edition",NA
+"102","leip","un, un"
+"103","living heritage and sustainable development","private university, private university, public university, public university, public university, public university, cultural institution, ngo, public university, un, public university"
+"104","m.a. development studies and diplomacy","un, un"
+"105","m.a. in international law and diplomacy","un, un"
+"106","ma development studies and diplomacy","un, un"
+"107","machine learning on satellite imagery","research  policy institutes"
+"108","macroeconomics for a sustainable planet","private university, government"
+"109","master in anti-corruption and diplomacy","research  policy institutes"
+"110","master in international affairs and diplomacy","un"
+"111","measuring productivity","government"
+"112","measuring sustainable development","un ngo, ngo"
+"113","national disaster risk reduction strategies","un"
+"114","national metadata for sdgs",NA
+"115","national system of statistical and geographic information of mexico",NA
+"116","natural resources for sustainable development","private university, ngo, un, public university, ngo, private university, research  policy institutes, ngo"
+"117","nature-based solutions for disaster and climate resilience","un"
+"118","official statistics for sdgs","un"
+"119","one planet, one ocean","ngo, public university, ngo"
+"120","online diploma in multilateral diplomacy 2022   edition 2",NA
+"121","our earth's future","cultural institution"
+"122","our earth: its climate, history, and processes","public university"
+"123","our energy future","public university"
+"124","partnerships: a vehicle for sustainable development",NA
+"125","planetary boundaries and human opportunities","public university, research  policy institutes, public university"
+"126","planning for climate change in african cities","public university, government, public university, government"
+"127","policy coherence and systems thinking for sustainable development",NA
+"128","policy coherence for sustainable development","private university, un, private university, government, un ngo"
+"129","policy cycle, integrated approaches and sdgs","un"
+"130","policy cycle, integrated approaches and sdgs for african ldcs","research  policy institutes, un"
+"131","poverty statistics for sdgs","un"
+"132","preparing for action <u+0093>national briefing package: the 2030 agenda and sdgs<u+0094>","un"
+"133","principles of sustainable finance","public university"
+"134","programming for child feeding",NA
+"135","public-private-partnerships (ppp)",NA
+"136","public-private partnerships",NA
+"137","public financial management",NA
+"138","questionnaire development and testing",NA
+"139","raising ambition - how to set science-based targets aligning with 1.5<u+00b0>c pathways","un"
+"140","regulations of the national system of statistical and geographic information",NA
+"141","remote training on phone surveys",NA
+"142","risk-informed governance and innovative technology for disaster risk reduction and resilience <u+200b>",NA
+"143","sdg indicator 14.4.1 - fish stocks sustainability","un"
+"144","sdg indicator 14.b.1 - securing sustainable small-scale fisheries","un"
+"145","sdg indicator 2.1.1 - prevalence of undernourishment (pou)","un"
+"146","sdg indicator 2.1.2 - using the food insecurity experience scale (fies)","un"
+"147","sdg indicator 2.4.1 - sustainable agriculture","un"
+"148","sdg indicator 2.a.1   agriculture orientation index",NA
+"149","sdg indicator 2.c.1 - food price anomalies","un"
+"150","sdg indicators 15.1.1 and 15.2.1 - forest area and sustainable forest management","un"
+"151","sdg indicators 2.5.1 and 2.5.2 - plant and animal genetic resources","un"
+"152","sdg lab toolkit","un, un, ngo"
+"153","sdg primer","un, un, ngo, un"
+"154","sdg sub-indicator 12.3.1.a   food loss index",NA
+"155","sector extractivo: sostenibilidad y desarrollo en am<e9>rica latina y el caribe","private university, ngo, public university, finance"
+"156","seea experimental ecosystem accounting","un"
+"157","seea for policy makers",NA
+"158","seea: in-depth training on water accounting","un"
+"159","seea: in depth training on energy accounting","un"
+"160","social indicators for public policies and programmes","government"
+"161","social protection for sustainable development","un, research  policy institutes, un"
+"162","statistical methods for correcting selection bias","research  policy institutes"
+"163","strategic planning for territorial development and the 2030 agenda","un"
+"164","strengthening institutional arrangements and governance capacities for policy coherence<u+200b>",NA
+"165","strengthening stakeholder engagement for the 2030 agenda","un, un"
+"166","survey skills development course","government"
+"167","sustainable business: big issues, big changes","public university"
+"168","sustainable cities","government, private university, public university, public university, private university, un, private university, research  policy institutes, government, public university, research  policy institutes, ngo"
+"169","sustainable development: the post-capitalist order","private university"
+"170","sustainable food systems: a mediterranean perspective","public university, public university, private university, public university, private university, research  policy institutes, public university, public university, public university, public university, public university, ngo"
+"171","system dynamics-based development planning","public university, research  policy institutes"
+"172","taking the entrepreneurship route",NA
+"173","tech for good: the role of ict in achieving the sdgs","private university, un, private university, un, public university, un, ngo, research  policy institutes, ngo, government, un, un"
+"174","the age of sustainable development","private university"
+"175","the best start in life: early childhood development for sustainable development","private university, private university"
+"176","the gender statistics toolkit","un, un"
+"177","the korean story: secrets of an economic miracle","research  policy institutes, private university, government, private university, public university, public university, government, government"
+"178","the sdg primer",NA
+"179","the sdgs   a global, transdisciplinary vision for the future",NA
+"180","the turn: from reactionary populism to a progressive alternative","private university, private university"
+"181","the un country team leadership course",NA
+"182","the un sustainable development cooperation framework",NA
+"183","the women ict frontier initiative (wifi)","un, un"
+"184","trainfortrade e-learn course on international merchandise trade statistics","un, government"
+"185","transforming development: the science and practice of resilience thinking","research  policy institutes, public university"
+"186","transforming our world: achieving the sdgs","private university"
+"187","transparency, accountability and ethics in public institutions",NA
+"188","un strategic communications for the 2030 agenda","un, un"
+"189","un summer academy",NA
+"190","un summer academy 2022","un"
+"191","understanding data and statistics better","un, un"
+"192","understanding poverty and inequality","research  policy institutes, ngo, public university, ngo, private university, un, public university, public university, finance, un ngo"
+"193","unece gender statistics toolkit","un"
+"194","unido iap","un"
+"195","united nations development assistance framework (undaf)",NA
+"196","unleashing the power of the private sector for the 2030 agenda",NA
+"197","unleashing the power of the private sector for the 2030 agenda - 2021","research  policy institutes"
+"198","water: addressing the global crisis","research  policy institutes, un, ngo, ngo, un"
+"199","web data collection and analysis","research  policy institutes"
+"200","work and employment for a sustainable future","private university, private university, private university, un, public university, public university, ngo"

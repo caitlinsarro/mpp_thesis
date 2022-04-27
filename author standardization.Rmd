@@ -69,15 +69,12 @@ authors_cour <- coursera %>% select(titles, author)
 authors_unsdglearn_silos <- unsdglearn_silos %>% select(titles, authors) #fix this s
 authors_unsdglearn_systems <- unsdglearn_systems %>% select(titles, authors) #fix this s
 authors_unsdglearn <- unsdglearn %>% select(titles, authors) #fix this s
-authors_sdgacademy <- sdgacademy %>% select(titles_acad, author) #fix this standardize
+authors_sdgacademy <- sdgacademy %>% select(titles, author) #fix this standardize
 authors_unpan <- unpan %>% select(titles_unpan, authors_unpan)
 authors_unssc <- unssc %>% select(titles_unssc, authors)
 authors_unfccc <- unfccc %>% select(titles_unfccc, author)
 
 #fix nonstandard names to titles and authors
-authors_sdgacademy <- authors_sdgacademy %>%
-  rename(titles = titles_acad)
-
 authors_unpan <- authors_unpan %>%
   rename(titles = titles_unpan)
 
@@ -699,6 +696,15 @@ au_category_clean <- authors_list_A_comb[c("titles","authors","au_category")]
 
 ```
 
+
+```{r}
+#last min author cleanup
+au_category_clean <- read_csv("exports/au_category_clean.csv")
+au_category_clean$au_category[au_category_clean$authors=="Brazilian Institute of Geography and Statistics"] <- "government"
+au_category_clean$au_category[au_category_clean$authors=="U.S. Bureau of Labor Statistics"] <- "government"
+au_category_clean$au_category[au_category_clean$authors=="UNCTAD"] <- "un"
+au_category_clean
+```
 
 
 

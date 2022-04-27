@@ -161,6 +161,257 @@ write.csv(soft_code,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/soft_cod
 
 ```
 
+```{r}
+#add in author category
+soft_code
+#this category to transform
+soft_code$au_category
+
+soft_code_au <- soft_code %>% 
+  mutate(authors = strsplit(as.character(authors), ",")) %>%
+  unnest(authors)
+
+#trim leading and ending whitespaces
+soft_code_au$authors <- trimws(soft_code_au$authors)
+
+authors_list <- soft_code_au
+
+
+#making the website link for a google search
+#replace whitespace with + 
+authors_list$piece <- gsub(" ", "_", authors_list$authors)
+
+authors_list$weblink <- paste0("https://wikipedia.org/wiki/", authors_list$piece)
+#authors_list$weblink <- paste0("https://www.google.com/search?q=", authors_list$piece)
+
+weblink_au <- authors_list$weblink
+
+unique(weblink_au)
+url.exists("weblink_au")
+
+
+authors_list
+```
+```{r}
+#
+#start RSelenium
+
+system('docker kill $(docker ps -q)')
+Sys.sleep(2)
+system('docker run -d -p 4445:4444 selenium/standalone-chrome-debug:latest')
+Sys.sleep(2)
+system('docker container ls')
+
+#rstudioapi::terminalExecute('java -Dwebdriver.chrome.driver="C:/Users/caitl/Documents/R #Files/selenium/chromedriver.exe" -jar "C:/Users/caitl/Documents/R #Files/selenium/selenium-server-standalone-3.141.59.jar" -port 4567')
+#standalone-chrome-debug:latest
+
+
+remDr <- remoteDriver(
+        remoteServerAdd = "localhost",
+        port = 4445L,
+        browser = "chrome" 
+)
+
+remDr$open()
+
+
+
+```
+
+```{r}
+# Finding and fixing NOT-REAL-LINKS
+url.exists("weblink_au")
+
+scraper <- function(weblink_au) { tryCatch(
+  read_html(weblink_au) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "category"),
+    error = function(err) return(NULL))
+}
+
+```
+
+```{r}
+
+url_exists <- function(x, non_2xx_return_value = FALSE, quiet = FALSE,...) {
+
+  suppressPackageStartupMessages({
+    require("httr", quietly = FALSE, warn.conflicts = FALSE)
+  })
+
+  # you don't need thse two functions if you're alread using `purrr`
+  # but `purrr` is a heavyweight compiled pacakge that introduces
+  # many other "tidyverse" dependencies and this doesnt.
+
+  capture_error <- function(code, otherwise = NULL, quiet = TRUE) {
+    tryCatch(
+      list(result = code, error = NULL),
+      error = function(e) {
+        if (!quiet)
+          message("Error: ", e$message)
+
+        list(result = otherwise, error = e)
+      },
+      interrupt = function(e) {
+        stop("Terminated by user", call. = FALSE)
+      }
+    )
+  }
+
+  safely <- function(.f, otherwise = NULL, quiet = TRUE) {
+    function(...) capture_error(.f(...), otherwise, quiet)
+  }
+
+  sHEAD <- safely(httr::HEAD)
+  sGET <- safely(httr::GET)
+
+  # Try HEAD first since it's lightweight
+  res <- sHEAD(x, ...)
+
+  if (is.null(res$result) || 
+      ((httr::status_code(res$result) %/% 200) != 1)) {
+
+    res <- sGET(x, ...)
+
+    if (is.null(res$result)) return(NA) # or whatever you want to return on "hard" errors
+
+    if (((httr::status_code(res$result) %/% 200) != 1)) {
+      if (!quiet) warning(sprintf("Requests for [%s] responded but without an HTTP status code in the 200-299 range", x))
+      return(non_2xx_return_value)
+    }
+
+    return(TRUE)
+
+  } else {
+    return(TRUE)
+  }
+
+}
+
+results_urls <- data.frame(
+  exists = sapply(weblink_au, url_exists, USE.NAMES = FALSE),
+  weblink_au,
+  stringsAsFactors = FALSE
+) 
+
+#%>% dplyr::tbl_df() %>% print()
+
+results_urls
+
+results_urls_fix <- results_urls[results_urls$exists == 'FALSE',]
+results_urls_t <- results_urls[results_urls$exists == 'TRUE',]
+
+
+#export so don't have to do again
+write.csv(results_urls_t,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/softcode_urls_t.csv", row.names = TRUE)
+
+
+```
+
+```{r}
+#assign author categories for remaining 85
+results_urls_fix
+#export so don't have to do again
+write.csv(results_urls_fix,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/softcode_urls_fix.csv", row.names = TRUE)
+
+
+```
+
+```{r}
+#THIS IS THE RIGHT ONE - already exported, try to load it first
+weblink_au_t <- results_urls_t$weblink_au
+
+
+# Define the AUTHORS CATEGORY worker function
+scraper <- function(weblink_au_t) {read_html(weblink_au_t) %>% 
+    html_nodes(xpath = '//*[contains(concat( " ", @class, " " ), concat( " ", "infobox-data", " " ))] | //*[contains(concat( " ", @class, " " ), concat( " ", "infobox-label", " " ))]') %>% 
+    html_text() %>% 
+    enframe("id", "category")  %>%
+    mutate(weblink_au_t = weblink_au_t) 
+}
+
+
+# Iterate over the urls, applying the function each time
+au_category_t2 <- map_dfr(weblink_au_t, scraper, .id ="id") 
+
+au_category_t2
+
+
+
+#export so don't have to do again
+write.csv(au_category_t2,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_softcoded_category_t2.csv", row.names = TRUE)
+
+
+
+```
+
+```{r}
+
+#group and summarize
+au_softcode_clean <- au_category_t2 %>%
+ group_by(weblink_au_t) %>%
+ summarize(category = str_c(category, collapse = ", "))
+
+
+au_softcode_clean <- separate(data = au_softcode_clean, col = category, into = c("category", "text"), sep = "Type,")
+
+au_softcode_clean <- separate(data = au_softcode_clean, col = text, into = c("text", "remainder"), sep = ",")
+
+au_softcode_clean
+
+#remove redundant cols
+au_softcode_clean <- mutate(au_softcode_clean, category=NULL, remainder=NULL)
+
+au_softcode_clean$category <- au_softcode_clean$text
+
+au_softcode_clean <- mutate(au_softcode_clean, text=NULL)
+
+au_softcode_clean
+```
+
+```{r}
+#export and assign author categories for remaining 21
+au_softcode_clean
+#export so don't have to do again
+write.csv(au_softcode_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/softcode_urls_fix2.csv", row.names = TRUE)
+
+
+```
+
+
+
+```{r}
+#combine
+
+softcoded_category <- read_csv("data/softcode_urls_fix.csv")
+softcoded_category2 <- read_csv("data/softcode_urls_fix2.csv")
+
+softcoded_category <- softcoded_category %>% select(weblink_au, au_category)
+softcoded_category2 <- softcoded_category %>% select(weblink_au, au_category)
+
+softcoded_category_complete <- rbind(softcoded_category,softcoded_category2)
+
+softcoded_category_complete$weblink <- softcoded_category_complete$weblink_au
+authors_list
+
+softcoded <- merge(authors_list,softcoded_category_complete, by= "weblink")
+softcoded <- unique(softcoded)
+
+
+au_softcoded_clean <- softcoded %>%
+ group_by(titles, category, website) %>%
+ summarize(au_category = str_c(au_category, collapse = ", "))
+
+#export so don't have to do again
+write.csv(au_softcoded_clean,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/softcode_with_au.csv", row.names = TRUE)
+
+
+```
+
+
+
+
 
 ```{r}
 

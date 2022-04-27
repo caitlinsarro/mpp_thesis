@@ -238,7 +238,7 @@ nb_cvs_predictions %>%
   autoplot() +
   labs(
     color = NULL,
-    title = "Receiver operator curve for Congressional bills",
+    title = "Sustainable Governance Aspects Curve for SDG Trainings",
     subtitle = "Each resample fold is shown in a different color")
 
 ```
