@@ -459,7 +459,7 @@ reflex_adpt_keystems <- as.list(tidy_reflex_adapt)
 names(reflex_adpt_keystems)
 reflex_adpt_keystems
 
-wordStem("run")
+wordStem("integration")
 wordStem("running")
 wordStem("lover")
  
@@ -470,10 +470,10 @@ wordStem("lover")
 #All in one dictionary
 dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos","relev stakehold", "communiti associ","compet","represent","stakehold", "collabor","consensus","decis", "facilit dialogu", "aspect","form", "activ", "matter","indirect", "vote", "engag", "engag stakeholder","stakeholder engag", "multi stakehold","role stakehold", "cooper", "divers inclus","participatori mechan","vulner popul", "cultur heritag", "indigen", "youth indigen","young entrepreneur"  , "reduc inequ",  "build trust",  "stakehold priorit", "civil societi",  "social inclus", "cultur divers","outreach communic", "discuss forum","convers", "interact platform","live heritag", "stakehold analysi","peer peer exchang", "interdisciplinari issu", "interdisciplinari", "delib", "delib process", "citizen","citizen engag", "repres","deliber", "panel", "institution",  "juri", "trust", "participatori","participatori process", "involv","communiti organ","communiti engag","societi", "ballot","dialogu", "communiti discuss", "inclus","youth", "assembl", "confer","facilit method","develop communic","communic design","communic import","trainer", "confid","emot",  "listen","reflect", "relationship", "rapport", "deliveri","negoti", "techniqu","deleg", "behaviour","behavior","creativ", "frontlin", "indigen", "union", "disabl","elder", "marginla","marginlais"  
 ),
-                             policy_coh_keystems = c("coher", "extent", "coher structur", "foster", "coordin", "coordin implement", "interministeri", "systemat", "mutual"  ,"reinforc" ,"intern cooper",  "synergi"    , "integr", "overcom",  "silo", "unintend consequ" ,    "diverg", "interrel" , "trade off" ,  "feedback loop" , "across sector", "across various sector",      "institut chang", "strategi" ,     "polici develop",       "horizont framework" , "vertic" , "align"   ,"align polici", "balanc"  ,     "intersector interact", "intersector",  "scienc polici interfac",      "conceptu" , "coher polici plan",           "link"  , "system think",        "good practic promot",  "intersect factor",    "operationalis", "operation" ,           "prioriti"  , "approach across",  "integr coherent plan",  "assess govern institut capac",      "subnat"  ,   "aspir"  , "intergovernment partnership", "appropri polici option", "cooper framework",        "complement", "coordin offic",      "connect",  "contradictori",      "leverag point" ,      "integr plan" , "cross depart",   "strateg polici",          "comprehens system"     ,          "comprehens", "consist", "duplic" ,       "align strateg plan",       "exist resourc"   ,     "nation adapt plan"  ,      "interlink",            "lever" ,  "reiter", "contradict", "reaffirm" , "shift" , "symbiosi" ,    "transform polici pathway",   "polici pathway",     "reciproc",             "solidar"  , "polici coher" ,        "align polici decis",   "polici sequenc", "polici align" ,        "interconnect" ,        "increas coher",        "across govern depart", "institut structur" ,   "common goal" ,         "complex issu" ,        "govern depart", "transgovernance", "integr plan"),
+                             policy_coh_keystems = c("coher", "extent", "coher structur", "foster", "coordin", "coordin implement", "interministeri", "systemat", "mutual"  ,"reinforc" ,"intern cooper",  "synergi"    , "integr", "overcom",  "silo", "unintend consequ" ,    "diverg", "interrel" , "trade off" ,  "feedback loop" , "across sector", "across various sector",   "integr",   "institut chang", "strategi" ,     "polici develop",       "horizont framework" , "vertic" , "align"   ,"align polici", "balanc"  ,     "intersector interact", "intersector",  "scienc polici interfac",      "conceptu" , "coher polici plan",           "link"  , "system think",        "good practic promot",  "intersect factor",    "operationalis", "operation" ,           "prioriti"  , "approach across",  "integr coherent plan",  "assess govern institut capac",      "subnat"  ,   "aspir"  , "intergovernment partnership", "appropri polici option", "cooper framework",        "complement", "coordin offic",      "connect",  "contradictori",      "leverag point" ,      "integr plan" , "cross depart",   "strateg polici",          "comprehens system"     ,          "comprehens", "consist", "duplic" ,       "align strateg plan",       "exist resourc"   ,     "nation adapt plan"  ,      "interlink",            "lever" ,  "reiter", "contradict", "reaffirm" , "shift" , "symbiosi" ,    "transform polici pathway",   "polici pathway",     "reciproc",             "solidar"  , "polici coher" ,        "align polici decis",   "polici sequenc", "polici align" ,        "interconnect" ,        "increas coher",        "across govern depart", "institut structur" ,   "common goal" ,         "complex issu" ,        "govern depart", "transgovernance", "integr plan"),
                              
                              
-                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law", "govern", "transpar", "percept", "credibl",  "conflict", "corrupt", "express", "fair", "legislatur", "checks bal", "altern", "respect", "independ", "judiciari", "legitim", "liber", "diplomaci", "democrat", "democraci" , "voter" , "franchis"  ,"polit economi", "pluralist" ,  "competit" , "equal" , "autocraci" , "regim", "law student", "power imbal"   ,"repres","peac", "peacebuild",        "treati"  , "institut" ,"inclus process", "equal access" , "govern regul", "good govern", "polit" ,"account"  ,"effici govern"   ,"effect govern"   ,"countri"  , "reduc inequ"  ,      "collect action"  ,         "reduct"  ,          "transact" ,"public offic"  ,          "free elect"    ,           "inclus"    ,         "universal right"     ,         "franchi"  ,  "public servic",       "citizen"     , "civil liberti" ,    "democrat institut", "negoti skill" ,"ethic leadership",  "contract negoti",   "govern negoti" ,    "transact cost" ,    "human right"   ,"free elect", "polit philosoph"  , "polit polar"  ,       "repres democraci", "public account"),
+                               democratic_keystems = c("elector", "media", "freedom", "civil", "liberti", "rule", "law","transpar", "percept", "credibl",  "conflict", "corrupt", "express", "fair", "legislatur", "checks bal", "respect", "independ", "judiciari", "legitim", "liber", "diplomaci", "democrat", "democraci" , "voter" , "franchis"  ,"polit economi", "pluralist" ,  "competit" , "equal" , "autocraci" , "regim", "law student", "power imbal"   ,"repres","peac", "peacebuild", "govern", "treati"  , "institut" ,"inclus process", "equal access" , "govern regul", "good govern", "polit" ,"account"  ,"effici govern"   ,"effect govern"   ,"countri"  , "reduc inequ"  ,      "collect action"  ,         "reduct"  ,          "transact" ,"public offic"  ,          "free elect"    ,           "inclus"    ,         "universal right"     ,         "franchi"  ,  "public servic",       "citizen"     , "civil liberti" ,    "democrat institut", "negoti skill" ,"ethic leadership",  "contract negoti",   "govern negoti" ,    "transact cost" ,    "human right"   ,"free elect", "polit philosoph"  , "polit polar"  ,       "repres democraci", "public account"),
 
                              
                                 
@@ -518,6 +518,10 @@ d_descrip_ref$id <- seq.int(nrow(d_descrip_ref))
 d_descrip_ref
 
 descrp_list
+
+```
+
+```{r}
 ######
 
 
@@ -618,7 +622,8 @@ soft_coded_long$titles <- tolower(soft_coded_long$titles)
 
 soft_coded_long$category[soft_coded_long$titles == "m.a. development studies and diplomacy"] <- "democratic institutions"
 
-
+```
+```{r}
 hard_coded <- read_csv("exports/descrip_comb.csv")
 
 #add in new columns
@@ -662,9 +667,22 @@ all_courses_coded$description = removeWords(all_courses_coded$description, stopw
 
 
 #export to fix problems
-#write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded.csv", row.names = TRUE)
+write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded_export.csv", row.names = TRUE)
+```
 
+```{r}
 all_courses_coded
+#are the dupes from softcoding?
+recoded <- select(final_coded_dataset, -c("category", "major_categ"))
+all_courses_coded <- select(all_courses_coded, -c("description", "id"))
+
+recoded <- left_join(recoded, all_courses_coded, by = "titles", all.x=TRUE)
+
+recoded <- unique(recoded)
+
+recoded
+#export to fix problems
+write.csv(recoded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/recoded.csv", row.names = TRUE)
 
 ```
 
@@ -849,6 +867,14 @@ final_coded_dataset
 write.csv(final_coded_dataset,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/final_coded_dataset_.csv", row.names = TRUE)
 final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
 # 212 
+# Final coded dataset
+```
+
+
+```{r}
+
+#how many of each
+table(final_coded_dataset$category)
 
 ```
 
@@ -874,189 +900,54 @@ write.csv(au_un_only,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_un_o
 write.csv(au_main,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_main.csv", row.names = TRUE)
 ```
 
-```{r}
-
-try <- left_join(descrip_comb, au_category_clean, by= "titles")
-
-try <- try %>% select (titles, max.col, authors, au_category)
-quick_sum <- try %>%
-  group_by(au_category) %>%
-  count(max.col)
-
-try 
-write.csv(try,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/quick_sum.csv", row.names = TRUE)
-```
-
-
 
 ```{r}
 
-
-
-
-```
-
-```{r}
-#export file to fix the missing authors
-
-write.csv(au_diff_coding_export,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_coding_export.csv", row.names = TRUE)
-
-au_diff_coding_missing <- read_csv("data/au_diff_coding_export_fixed.csv")
-au_diff_coding_main <- read_csv("data/au_diff_coding_export_main.csv")
-
-colnames(au_diff_coding_missing)[1] <- "id"
-colnames(au_diff_coding_main)[1] <- "id"
-
-au_diff_coding_missing <- au_diff_coding_missing %>% select(id,titles,au_category)
-
-#combine back together
-au_diff_coding <- rbind(au_diff_coding_main, au_diff_coding_missing)
-au_diff_coding
-#fix/rename id col
-colnames(au_diff_coding)[1] <- "id"
-au_diff_coding <- au_diff_coding[order(au_diff_coding$id, decreasing = FALSE),]
-au_diff_coding
-
-
-au_diff_coding$titles <- iconv(au_diff_coding$titles, 'utf-8', 'ascii', sub = '')
-
-au_diff_coding$titles <- tolower(au_diff_coding$titles)
-au_diff_coding$titles <- gsub('sustainable development goals','sdgs',au_diff_coding$titles)
-```
-```{r}
-
-#adding in softcode
-soft_code <- read_csv("data/soft_code_auths_coded.csv")
-#fix titles
-soft_code$titles <- tolower(soft_code$titles)
-soft_code$titles <- trimws(soft_code$titles)
-
-au_diff_coding <- au_diff_coding %>%
- group_by(titles) %>%
- summarize(au_category = str_c(au_category, collapse = ", "))
-
-soft_code_au <- soft_code %>% select(titles, au_category)
-
-all_courses_au_coded <- merge(au_diff_coding,soft_code_au, by="titles", all=TRUE)
-
-all_courses_au_coded$au_category <- paste(all_courses_au_coded$au_category.x,',',all_courses_au_coded$au_category.y)
-
-
-write.csv(all_courses_au_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_au_coded.csv", row.names = TRUE)
-
-#you are here, need to combine the two lists in an intelligent way that still allows for messing with the dictionaries
-
-```
-```{r}
-#fixing nas
-new_DF <- au_diff_coding[rowSums(is.na(au_diff_coding)) > 0,]
-write.csv(new_DF,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/deletelater.csv", row.names = TRUE)
-
-```
-
-```{r}
-#in excel I added in unpan, unssc, unfccc
-all_courses_au_coded %>% select(all_courses_au_coded$au_category == "un | un,un | un,un,un | un,un,un,un")
-
-#in excel I separated out the UN ONLY courses
-au_diff_un_only <- read_csv("data/au_diff_coding_un_only.csv")
-au_diff_main <- read_csv("data/au_diff_coding_removed_un_only.csv")
-
-#there are some NAs - come back to figure out why
-au_diff_un_only
-
-au_diff_un_only <- left_join(au_diff_un_only, descrip_comb, by= "titles", x.all = "TRUE")
-au_diff_main <- left_join(au_diff_main, descrip_comb, by= "titles", x.all = "TRUE")
-
-au_diff_un_only
-
-
-#how many of each
-table(au_diff_un_only$max.col)
-
-au_matrix_un <- table(au_diff_un_only$max.col)
-au_matrix_un
-
-au_matrix_un <- as.data.frame(au_matrix_un)
-au_matrix_un
-
-
-#add in un only type
-au_matrix_un$Var2 <- "un only"
-au_matrix_un
-
-```
-
-```{r}
-table(au_diff_main$max.col)
-
-au_diff_main
+all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+table(all_courses_coded$category)
 #to long data
-au_diff_main_long <- au_diff_main %>% 
+all_courses_coded_long <- all_courses_coded %>% 
   mutate(au_category = strsplit(as.character(au_category), ",")) %>%
   unnest(au_category)
 
 
 #remove white spaces
-au_diff_main_long$au_category <- trimws(au_diff_main_long$au_category)
-au_diff_main_long
+all_courses_coded_long$au_category <- trimws(all_courses_coded_long$au_category)
 
-au_diff_main_long <- as.data.frame(au_diff_main_long, headers=TRUE)
 
-write.csv(au_diff_main_long,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_main_long.csv", row.names = TRUE)
+all_courses_coded_long<- as.data.frame(all_courses_coded_long, headers=TRUE)
 
-write.csv(au_diff_main,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_main.csv", row.names = TRUE)
+write.csv(all_courses_coded_long,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded_long.csv", row.names = TRUE)
 
-#remove duplicates
-#au_diff_main_long <- unique(au_diff_main_long)
-
-au_diff_main_long
-table(au_diff_main_long$max.col)
-
-au_diff_main_long
 
 #simply categories
-au_diff_main_long$au_category[au_diff_main_long$au_category == "cultural institution"] <- "civil society"
-au_diff_main_long$au_category[au_diff_main_long$au_category == "ngo"] <- "civil society"
-au_diff_main_long$au_category[au_diff_main_long$au_category == "business"] <- "research  business"
-au_diff_main_long$au_category[au_diff_main_long$au_category == "finance"] <- "research  business"
-au_diff_main_long$au_category[au_diff_main_long$au_category == "research policy institutes"] <- "research  business"
-au_diff_main_long$au_category[au_diff_main_long$au_category == "un ngo"] <- "civil society"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "cultural institution"] <- "civil society"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "ngo"] <- "civil society"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "business"] <- "research  business"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "finance"] <- "research  business"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "research  policy institutes"] <- "research  business"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "un ngo"] <- "civil society"
 
 # add in un only courses
 
-au_diff_allcourses <- rbind(au_diff_main_long, au_diff_un_only)
+#au_diff_allcourses <- rbind(au_diff_main_long, au_diff_un_only)
 
 
-table(au_diff_allcourses$au_category, au_diff_allcourses$max.col)
+table(all_courses_coded_long$au_category, all_courses_coded_long$category)
 
 
-chisq.test(au_diff_allcourses$au_category, au_diff_allcourses$max.col, correct=FALSE)
+chisq.test(all_courses_coded_long$au_category, all_courses_coded_long$category, correct=FALSE)
 
 #X-squared = 41.712, df = 15, p-value = 0.0002489
-authors <- au_diff_allcourses$au_category
-govern <- au_diff_allcourses$max.col
+authors <- all_courses_coded_long$au_category
+govern <- all_courses_coded_long$category
 
 #freq_table <- au_diff_allcourses %>% select(id.x, au_category, max.col)
 
 #freq_table <- na.omit(freq_table)
-freq_table <- table(au_diff_allcourses$au_category, au_diff_allcourses$max.col)
+freq_table <- table(all_courses_coded_long$au_category, all_courses_coded_long$category)
 ```
 
-```{r}
-#mosaic plot
-au_diff_allcourses
-mosaic(~ max.col + au_category, data = au_diff_allcourses,
-main = "Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings", shade = TRUE, legend = TRUE)
-
-mosaicplot(freq_table,
-  main = "\n Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings\n",
-  sub = paste0(
-    "Fisher's exact test p-value = < 0.001"),
-  color = TRUE
-)
-
-```
 ```{r}
 chisq.test(freq_table)$expected
 
@@ -1067,6 +958,25 @@ fishtest <- fisher.test(freq_table,simulate.p.value=TRUE,B=1e7)
 fishtest
 
 ```
+
+```{r}
+#mosaic plot
+all_courses_coded
+mosaic(~ category + au_category, data = all_courses_coded,
+main = "Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings", shade = TRUE, legend = TRUE)
+
+mosaicplot(freq_table,
+  main = "\n Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings\n",
+  sub = paste0(
+    "Fisher's exact test p-value = < 0.001"),
+  color = TRUE
+)
+
+```
+
+
+
+
 ```{r}
 
 # combine plot and statistical test with ggbarstats
@@ -1698,5 +1608,114 @@ df <- map_df(results, function(item) {
 })
 
 View(df)
+
+```
+
+
+
+```{r}
+
+try <- left_join(descrip_comb, au_category_clean, by= "titles")
+
+try <- try %>% select (titles, max.col, authors, au_category)
+quick_sum <- try %>%
+  group_by(au_category) %>%
+  count(max.col)
+
+try 
+write.csv(try,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/quick_sum.csv", row.names = TRUE)
+```
+
+
+
+```{r}
+
+
+
+
+```
+
+```{r}
+#export file to fix the missing authors
+
+write.csv(au_diff_coding_export,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_coding_export.csv", row.names = TRUE)
+
+au_diff_coding_missing <- read_csv("data/au_diff_coding_export_fixed.csv")
+au_diff_coding_main <- read_csv("data/au_diff_coding_export_main.csv")
+
+colnames(au_diff_coding_missing)[1] <- "id"
+colnames(au_diff_coding_main)[1] <- "id"
+
+au_diff_coding_missing <- au_diff_coding_missing %>% select(id,titles,au_category)
+
+#combine back together
+au_diff_coding <- rbind(au_diff_coding_main, au_diff_coding_missing)
+au_diff_coding
+#fix/rename id col
+colnames(au_diff_coding)[1] <- "id"
+au_diff_coding <- au_diff_coding[order(au_diff_coding$id, decreasing = FALSE),]
+au_diff_coding
+
+
+au_diff_coding$titles <- iconv(au_diff_coding$titles, 'utf-8', 'ascii', sub = '')
+
+au_diff_coding$titles <- tolower(au_diff_coding$titles)
+au_diff_coding$titles <- gsub('sustainable development goals','sdgs',au_diff_coding$titles)
+```
+```{r}
+
+#adding in softcode
+soft_code <- read_csv("data/soft_code_auths_coded.csv")
+#fix titles
+soft_code$titles <- tolower(soft_code$titles)
+soft_code$titles <- trimws(soft_code$titles)
+
+au_diff_coding <- au_diff_coding %>%
+ group_by(titles) %>%
+ summarize(au_category = str_c(au_category, collapse = ", "))
+
+soft_code_au <- soft_code %>% select(titles, au_category)
+
+all_courses_au_coded <- merge(au_diff_coding,soft_code_au, by="titles", all=TRUE)
+
+all_courses_au_coded$au_category <- paste(all_courses_au_coded$au_category.x,',',all_courses_au_coded$au_category.y)
+
+
+write.csv(all_courses_au_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_au_coded.csv", row.names = TRUE)
+
+#you are here, need to combine the two lists in an intelligent way that still allows for messing with the dictionaries
+
+```
+
+```{r}
+#in excel I added in unpan, unssc, unfccc
+all_courses_au_coded %>% select(all_courses_au_coded$au_category == "un | un,un | un,un,un | un,un,un,un")
+
+#in excel I separated out the UN ONLY courses
+au_diff_un_only <- read_csv("data/au_diff_coding_un_only.csv")
+au_diff_main <- read_csv("data/au_diff_coding_removed_un_only.csv")
+
+#there are some NAs - come back to figure out why
+au_diff_un_only
+
+au_diff_un_only <- left_join(au_diff_un_only, descrip_comb, by= "titles", x.all = "TRUE")
+au_diff_main <- left_join(au_diff_main, descrip_comb, by= "titles", x.all = "TRUE")
+
+au_diff_un_only
+
+
+#how many of each
+table(au_diff_un_only$max.col)
+
+au_matrix_un <- table(au_diff_un_only$max.col)
+au_matrix_un
+
+au_matrix_un <- as.data.frame(au_matrix_un)
+au_matrix_un
+
+
+#add in un only type
+au_matrix_un$Var2 <- "un only"
+au_matrix_un
 
 ```
