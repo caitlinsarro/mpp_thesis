@@ -10,7 +10,7 @@
 "9","digit4sd: digital government implementation","democratic_keystems"
 "10","e-government for womens empowerment <u+200b>",NA
 "11","e-learning on gender statistics","reflex_adpt_keystems"
-"12","e-learning series on public-private partnerships","participation_keystems"
+"12","e-learning series on public-private partnerships","policy_coh_keystems"
 "13","e-training on gdp re-basing","democratic_keystems"
 "14","e-training on gender statistics","reflex_adpt_keystems"
 "15","e-training on the compilation and application of supply-use tables (suts) in afr","democratic_keystems"
@@ -22,7 +22,7 @@
 "21","financing in health","participation_keystems"
 "22","fisheries and aquaculture statistics","reflex_adpt_keystems"
 "23","follow-up and review (fur) and the voluntary national review (vnr)","participation_keystems"
-"24","foresight for development, the 2030 agenda and the sdgs","reflex_adpt_keystems"
+"24","foresight for development, the 2030 agenda and the sdgs","participation_keystems"
 "25","formation introductive sur la jeunesse, la paix et la scurit",NA
 "26","government innovation for social inclusion of vulnerable groups","participation_keystems"
 "27","ilo labour market statistics and analysis academy","reflex_adpt_keystems"
@@ -75,15 +75,15 @@
 "74","sdg indicator 2.4.1 - sustainable agriculture","reflex_adpt_keystems"
 "75","sdg indicator 2.a.1  agriculture orientation index",NA
 "76","sdg indicator 2.c.1 - food price anomalies","reflex_adpt_keystems"
-"77","sdg indicator 5.a.1 - equal tenure rights for women on agricultural land",NA
+"77","sdg indicator 5.a.1 - equal tenure rights for women on agricultural land","reflex_adpt_keystems"
 "78","sdg indicators 15.1.1 and 15.2.1 - forest area and sustainable forest management","reflex_adpt_keystems"
 "79","sdg indicators 2.5.1 and 2.5.2 - plant and animal genetic resources","reflex_adpt_keystems"
 "80","sdg sub-indicator 12.3.1.a  food loss index",NA
 "81","seea experimental ecosystem accounting","democratic_keystems"
 "82","seea experimental ecosystem accounting","democratic_keystems"
 "83","seea for policy makers","democratic_keystems"
-"84","seea: in-depth training on water accounting","policy_coh_keystems"
-"85","seea: in-depth training on water accounting","policy_coh_keystems"
+"84","seea: in-depth training on water accounting","reflex_adpt_keystems"
+"85","seea: in-depth training on water accounting","reflex_adpt_keystems"
 "86","seea: in depth training on energy accounting","reflex_adpt_keystems"
 "87","seea: in depth training on energy accounting","reflex_adpt_keystems"
 "88","strategic planning for territorial development and the 2030 agenda","participation_keystems"
@@ -95,7 +95,7 @@
 "94","the gender statistics toolkit","reflex_adpt_keystems"
 "95","the paris agreement on climate change as a development agenda",NA
 "96","the un country team leadership course","democratic_keystems"
-"97","the un sustainable development cooperation framework","policy_coh_keystems"
+"97","the un sustainable development cooperation framework","participation_keystems"
 "98","the women ict frontier initiative (wifi)","participation_keystems"
 "99","trainfortrade e-learn course on international merchandise trade statistics","reflex_adpt_keystems"
 "100","transparency, accountability and ethics in public institutions","democratic_keystems"

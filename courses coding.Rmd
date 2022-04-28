@@ -646,7 +646,6 @@ all_courses_coded <- rbind(soft_coded_long, hard_coded)
 all_courses_coded$id <- seq.int(nrow(all_courses_coded))
 #uniques
 all_courses_coded <- unique(all_courses_coded)
-
 #convert to numeric
 as.factor(all_courses_coded$major_categ)
 
@@ -742,6 +741,14 @@ df %>% filter(Freq >= 8) %>% arrange(desc(Freq))
 #descrip_comb
 #au_category_clean
 
+au_category_clean <- read_csv("exports/au_category_clean.csv")
+
+#clean up a bit
+au_category_clean <- au_category_clean %>%
+ group_by(titles, au_category) %>%
+ summarize(authors = str_c(authors, collapse = ", ")) 
+
+
 
 #standardize the titles across the two sheets
 au_category_clean$titles <- iconv(au_category_clean$titles, 'utf-8', 'ascii', sub = '')
@@ -750,13 +757,102 @@ au_category_clean$titles <- tolower(au_category_clean$titles)
 au_category_clean$titles <- gsub('sustainable development goals','sdgs',au_category_clean$titles)
 #remove white spaces
 au_category_clean$titles <- trimws(au_category_clean$titles)
-descrip_comb$titles <- trimws(descrip_comb$titles)
+all_courses_coded$titles <- trimws(all_courses_coded$titles)
 
+
+#collapse au_category
+au_category_clean <- au_category_clean %>%
+ group_by(titles) %>%
+ summarize(au_category = str_c(au_category, collapse = ", ")) 
+```
+
+```{r}
 #join them together
-au_diff_coding <- left_join(descrip_comb, au_category_clean, by= "titles")
-au_diff_coding <- au_diff_coding %>% select (titles, max.col, authors, au_category)
+au_category_clean
+all_courses_coded
+
+au_diff_coding <- left_join(all_courses_coded, au_category_clean, by= "titles", all.x =TRUE)
+#au_diff_coding <- au_diff_coding %>% select (titles, category, description, au_category)
 
 
+#export out to investigate final problems (duplicates, coding error, nas)
+write.csv(au_diff_coding,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_coding.csv", row.names = TRUE)
+final_coded_dataset <- read_csv("data/final_coded_dataset_.csv")
+```
+
+
+```{r}
+
+#a lot of missing au_category for some reason --- reattach author list
+
+coursera <- read_csv("exports/coursera_c.csv")
+unsdglearn_silos <- read_csv("exports/unsdglearn_silos.csv")
+unsdglearn_systems <- read_csv("exports/unsdglearn_systems.csv")
+unsdglearn <- read_csv("exports/unsdglearn.csv")
+sdgacademy <- read_csv("exports/sdgacademy.csv")
+unpan <- read_csv("exports/unpan.csv")
+unssc <- read_csv("exports/unssc.csv")
+unfccc <- read_csv("exports/unfccc.csv")
+
+authors_cour <- coursera %>% select(titles, author)
+authors_unsdglearn_silos <- unsdglearn_silos %>% select(titles, authors) #fix this s
+authors_unsdglearn_systems <- unsdglearn_systems %>% select(titles, authors) #fix this s
+authors_unsdglearn <- unsdglearn %>% select(titles, authors) #fix this s
+authors_sdgacademy <- sdgacademy %>% select(titles, author) #fix this standardize
+authors_unpan <- unpan %>% select(titles_unpan, authors_unpan)
+authors_unssc <- unssc %>% select(titles_unssc, authors)
+authors_unfccc <- unfccc %>% select(titles_unfccc, author)
+
+#fix nonstandard names to titles and authors
+authors_unpan <- authors_unpan %>%
+  rename(titles = titles_unpan)
+
+authors_unssc <- authors_unssc %>%
+  rename(titles = titles_unssc)
+
+authors_unfccc <- authors_unfccc %>%
+  rename(titles = titles_unfccc)
+
+## authors
+
+authors_sdgacademy <- authors_sdgacademy %>%
+  rename(authors = author)
+
+authors_cour <- authors_cour %>%
+  rename(authors = author)
+
+authors_unpan <- authors_unpan %>%
+  rename(authors = authors_unpan)
+
+authors_unfccc <- authors_unfccc %>%
+  rename(authors = author)
+
+#combine into one set
+combined <- rbind(authors_cour, authors_unsdglearn_silos, authors_unsdglearn, authors_sdgacademy, authors_unpan, authors_unsdglearn_systems, authors_unssc, authors_unfccc)
+
+#standardize the titles across the two sheets
+combined$titles <- iconv(combined$titles, 'utf-8', 'ascii', sub = '')
+
+combined$titles <- tolower(combined$titles)
+combined$titles <- gsub('sustainable development goals','sdgs',combined$titles)
+#remove white spaces
+combined$titles <- trimws(combined$titles)
+combined$titles <- trimws(combined$titles)
+
+
+final_coded_dataset <- left_join(final_coded_dataset, combined, by= "titles", all.x =TRUE)
+
+final_coded_dataset
+
+
+#export out to fix au_category problem by author
+write.csv(final_coded_dataset,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/final_coded_dataset_.csv", row.names = TRUE)
+final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
+# 212 
+
+```
+
+```{r}
 #code out UN ONLY
 au_un_only <- read_csv("data/au_diff_coding_un_only.csv")
 au_un_only <- merge(descrip_comb, au_un_only, by= "titles", all.y = TRUE)
@@ -860,7 +956,7 @@ write.csv(new_DF,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/deletelater
 
 ```{r}
 #in excel I added in unpan, unssc, unfccc
-
+all_courses_au_coded %>% select(all_courses_au_coded$au_category == "un | un,un | un,un,un | un,un,un,un")
 
 #in excel I separated out the UN ONLY courses
 au_diff_un_only <- read_csv("data/au_diff_coding_un_only.csv")
