@@ -157,7 +157,7 @@ fold_counts
 set.seed(444)
 
 
-courses_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 20, repeats = 2)
+courses_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 10, repeats = 3)
 courses_folds
 
 #soft_code_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 10)
@@ -193,7 +193,7 @@ nb_cvs_predictions %>%
   autoplot() +
   labs(
     color = NULL,
-    title = "Sustainable Governance Aspects Curve for SDG Trainings",
+    title = "Performance of the Sustainable Governance \nCapacities Classification Model for \nSDG Trainings",
     subtitle = "Each resample fold is shown in a different color")  + theme_minimal()
 ```
 
