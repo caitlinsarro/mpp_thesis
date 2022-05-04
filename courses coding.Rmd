@@ -1,6 +1,6 @@
 ---
-title: "Web Scraping"
-subtitle: "Author Standardization"
+title: "Course Coding"
+subtitle: ""
 author: "Caitlin Sarro"
 date: "2/9/2022"
 output: 
@@ -64,8 +64,9 @@ library(quanteda.dictionaries)
 #plots
 library(GGally)
 library(ggstatsplot) #fisher's test included
+library(ggmosaic) #mosaic plot
 
-packages = c('vcd', 'vcdExtra', 'tidyverse')
+packages = c('vcd', 'vcdExtra', 'tidyverse', 'ggmosaic')
 
 for(p in packages){
   if(!require(p, character.only = T)){
@@ -459,16 +460,16 @@ reflex_adpt_keystems <- as.list(tidy_reflex_adapt)
 names(reflex_adpt_keystems)
 reflex_adpt_keystems
 
-wordStem("integration")
-wordStem("running")
+wordStem("funding")
+wordStem("templates")
 wordStem("lover")
- 
+ funding templates
  
 ```
 
 ```{r}
 #All in one dictionary
-dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos","relev stakehold", "communiti associ","compet","represent","stakehold", "collabor","consensus","decis", "facilit dialogu", "aspect","form", "activ", "matter","indirect", "vote", "engag", "engag stakeholder","stakeholder engag", "multi stakehold","role stakehold", "cooper", "divers inclus","participatori mechan","vulner popul", "cultur heritag", "indigen", "youth indigen","young entrepreneur"  , "reduc inequ",  "build trust",  "stakehold priorit", "civil societi",  "social inclus", "cultur divers","outreach communic", "discuss forum","convers", "interact platform","live heritag", "stakehold analysi","peer peer exchang", "interdisciplinari issu", "interdisciplinari", "delib", "delib process", "citizen","citizen engag", "repres","deliber", "panel", "institution",  "juri", "trust", "participatori","participatori process", "involv","communiti organ","communiti engag","societi", "ballot","dialogu", "communiti discuss", "inclus","youth", "assembl", "confer","facilit method","develop communic","communic design","communic import","trainer", "confid","emot",  "listen","reflect", "relationship", "rapport", "deliveri","negoti", "techniqu","deleg", "behaviour","behavior","creativ", "frontlin", "indigen", "union", "disabl","elder", "marginla","marginlais"  
+dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos","relev stakehold", "communiti associ","compet","represent","stakehold", "collabor","consensus","decis", "facilit dialogu", "aspect","form", "activ", "matter","indirect", "vote", "engag", "engag stakeholder","stakeholder engag", "multi stakehold","role stakehold", "cooper", "divers inclus","participatori mechan","vulner popul", "cultur heritag", "indigen", "youth indigen","young entrepreneur"  , "reduc inequ",  "build trust",  "stakehold priorit", "civil societi",  "social inclus", "cultur divers","outreach communic", "discuss forum","convers", "interact platform","live heritag", "stakehold analysi","peer peer exchang", "interdisciplinari issu", "interdisciplinari", "delib", "delib process", "citizen","citizen engag", "repres","deliber", "panel", "institution",  "juri", "trust", "participatori","participatori process", "involv","communiti organ","communiti engag","societi", "ballot","dialogu", "communiti discuss", "inclus","youth", "assembl", "confer","facilit method","develop communic","communic design","communic import","trainer", "confid","emot",  "listen","reflect", "relationship", "rapport", "deliveri","negoti", "techniqu","deleg", "behaviour","behavior","creativ", "frontlin", "indigen", "union", "disabl","elder", "margin"
 ),
                              policy_coh_keystems = c("coher", "extent", "coher structur", "foster", "coordin", "coordin implement", "interministeri", "systemat", "mutual"  ,"reinforc" ,"intern cooper",  "synergi"    , "integr", "overcom",  "silo", "unintend consequ" ,    "diverg", "interrel" , "trade off" ,  "feedback loop" , "across sector", "across various sector",   "integr",   "institut chang", "strategi" ,     "polici develop",       "horizont framework" , "vertic" , "align"   ,"align polici", "balanc"  ,     "intersector interact", "intersector",  "scienc polici interfac",      "conceptu" , "coher polici plan",           "link"  , "system think",        "good practic promot",  "intersect factor",    "operationalis", "operation" ,           "prioriti"  , "approach across",  "integr coherent plan",  "assess govern institut capac",      "subnat"  ,   "aspir"  , "intergovernment partnership", "appropri polici option", "cooper framework",        "complement", "coordin offic",      "connect",  "contradictori",      "leverag point" ,      "integr plan" , "cross depart",   "strateg polici",          "comprehens system"     ,          "comprehens", "consist", "duplic" ,       "align strateg plan",       "exist resourc"   ,     "nation adapt plan"  ,      "interlink",            "lever" ,  "reiter", "contradict", "reaffirm" , "shift" , "symbiosi" ,    "transform polici pathway",   "polici pathway",     "reciproc",             "solidar"  , "polici coher" ,        "align polici decis",   "polici sequenc", "polici align" ,        "interconnect" ,        "increas coher",        "across govern depart", "institut structur" ,   "common goal" ,         "complex issu" ,        "govern depart", "transgovernance", "integr plan"),
                              
@@ -478,13 +479,9 @@ dict_descrip <- dictionary(list(participation_keystems = c("particip", "propos",
                              
                                 
                              
-                               reflex_adpt_keystems = c("reflex", "monitor","regulatori","regulatori instrument", "interpret data", "trajectori", "perform","transdisciplinari","explor state art",  "process improv","self monitor", "strateg plan","impact assess","organiz reform","organiz adapt","use measur monitor", "evidence-bas", "self-awar", "develop strategi", "increas product" ,"long term", "reform", "assess", "share latest knowledg approach",   "identifi technic resourc", "latest develop","risk inform", "data analysi","big data","leverag big data","web data", "data collect","collect data","skill identifi act", "result base", "data applic","data design", "understand data","data inform","measur", "system chang","applic tool assess","assess valu add","structur chang","structur shift" , "polici instrument","inform manag","python","climat model","help compani", "scienc base", "program polici", "metric","plan cycl",  "strategic plan" ,"human resourc","guidelin", "daily practic", "long term",  "development plan", "domest","evidence bas", "progress report", "progress evalu",  "evalu", "statist","indic", "impact evalu", "evid",  "reflect","result","analysi") 
+                               reflex_adpt_keystems = c("reflex", "monitor","regulatori","regulatori instrument", "interpret data", "trajectori", "perform","transdisciplinari","explor state art",  "process improv","self monitor", "strateg plan","impact assess","organiz reform","organiz adapt","use measur monitor", "evidence-bas", "self-awar", "develop strategi", "increas product" ,"long term", "reform", "assess", "share latest knowledg approach",   "identifi technic resourc", "latest develop","risk inform", "data analysi","big data","leverag big data","web data", "data collect","collect data","skill identifi act", "result base", "data applic","data design", "understand data","data inform","measur", "system chang","applic tool assess","assess valu add","structur chang","structur shift" , "ineffici deliveri","polici instrument","inform manag","python","climat model","ineffici","help compani", "scienc base", "program polici", "metric","plan cycl",  "strategic plan" ,"human resourc","guidelin", "daily practic", "long term",  "development plan", "domest","evidence bas", "progress report", "progress evalu",  "evalu", "statist","indic", "impact evalu", "evid",  "reflect","result","analysi","latest knowledg","fund templat") 
    ))
-
-
-
-
-
+#wordStem("inefficient")
 
 
 dup <-data.frame(reflex_adpt_keystems)
@@ -672,6 +669,7 @@ write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/
 
 ```{r}
 all_courses_coded
+final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
 #are the dupes from softcoding?
 recoded <- select(final_coded_dataset, -c("category", "major_categ"))
 all_courses_coded <- select(all_courses_coded, -c("description", "id"))
@@ -945,13 +943,24 @@ govern <- all_courses_coded_long$category
 #freq_table <- au_diff_allcourses %>% select(id.x, au_category, max.col)
 
 #freq_table <- na.omit(freq_table)
-freq_table <- table(all_courses_coded_long$au_category, all_courses_coded_long$category)
+freq_table <- table(all_courses_coded_long$category, all_courses_coded_long$au_category)
+
+
+author_plots <- all_courses_coded_long %>%
+ group_by(titles, category) %>%
+ summarize(au_category = str_c(au_category, collapse = ", "))
+
+author_plots
+write.csv(author_plots,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/author_plots.csv", row.names = TRUE)
 ```
 
 ```{r}
 chisq.test(freq_table)$expected
 
 ```
+
+
+
 ```{r}
 # Fisher's exact test
 fishtest <- fisher.test(freq_table,simulate.p.value=TRUE,B=1e7)
@@ -962,11 +971,22 @@ fishtest
 ```{r}
 #mosaic plot
 all_courses_coded
-mosaic(~ category + au_category, data = all_courses_coded,
+#to long data
+all_courses_coded_long <- all_courses_coded %>%
+  mutate(category = category) %>%
+  mutate(au_category = strsplit(as.character(au_category), ",")) %>%
+  unnest(au_category)
+
+
+mosaic(~ au_category + category, data = all_courses_coded_long,
 main = "Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings", shade = TRUE, legend = TRUE)
 
+freq_table
+
+
+
 mosaicplot(freq_table,
-  main = "\n Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings\n",
+  main = "\n Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings\n", 
   sub = paste0(
     "Fisher's exact test p-value = < 0.001"),
   color = TRUE
@@ -974,24 +994,38 @@ mosaicplot(freq_table,
 
 ```
 
+```{r}
+all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+ggplot(data = all_courses_coded) +
+  geom_mosaic(aes(x = product(au_category, category), fill=au_category)) +
+  theme_mosaic()
+
+ggplot(data = all_courses_coded) +
+  geom_mosaic(aes(x=product(au_category, category), fill = category)) +
+  theme_mosaic()
+
+all_courses_coded
+
+```
+
 
 
 
 ```{r}
-
+all_courses_coded
 # combine plot and statistical test with ggbarstats
-au_diff_allcourses_simple <- au_diff_allcourses %>% select(id.x, au_category, max.col)
+au_diff_allcourses_simple <- all_courses_coded %>% select(id, au_category, category)
 
 au_diff_allcourses_simple <- na.omit(au_diff_allcourses_simple)
 
 
 
 ggbarstats(
-  au_diff_allcourses_simple,au_category,max.col,
+  au_diff_allcourses_simple,au_category,category,
   results.subtitle = FALSE,
   subtitle = paste0(
     "Fisher's exact test", ", p-value = ",
-    ifelse(fishtest$p.value < 0.001, "< 0.001", round(fish$p.value, 3))
+    ifelse(fishtest$p.value < 0.001, "< 0.001", round(fishtest$p.value, 3))
   )
 )
 
@@ -1717,5 +1751,42 @@ au_matrix_un
 #add in un only type
 au_matrix_un$Var2 <- "un only"
 au_matrix_un
+
+```
+
+
+
+```{r}
+final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
+all_courses_coded_adendum<- left_join(final_coded_dataset,descrip_comb, by = "titles", all.x=TRUE) 
+all_courses_coded
+
+all_courses_coded_adendum
+
+unsdglearn
+unsdglearn$source <- "unsdglearn"
+sdgacademy$source <- "sdgacad" 
+
+
+
+unsdglearn$titles <- iconv(unsdglearn$titles, 'utf-8', 'ascii', sub = '')
+
+unsdglearn$titles <- tolower(unsdglearn$titles)
+unsdglearn$titles <- gsub('sustainable development goals','sdgs',unsdglearn$titles)
+
+
+sdgacademy$titles <- iconv(sdgacademy$titles, 'utf-8', 'ascii', sub = '')
+
+sdgacademy$titles <- tolower(sdgacademy$titles)
+sdgacademy$titles <- gsub('sustainable development goals','sdgs',sdgacademy$titles)
+
+tags <- unsdglearn %>% select(titles, source)
+tags_2 <- sdgacademy %>% select(titles, source)
+
+tags <- rbind(tags, tags_2)
+
+all_courses_coded_adendum<- left_join(all_courses_coded_adendum,tags, by = "titles", all.x=TRUE)
+
+write.csv(all_courses_coded_adendum,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/unsdglearn_n_acad_coded.csv", row.names = TRUE)
 
 ```

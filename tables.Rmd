@@ -1,0 +1,98 @@
+---
+title: "tables"
+author: "Caitlin Sarro"
+date: "3/30/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#install.packages("groupdata2")
+
+#stargazer
+packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2', 'table1', 'sjPlot','kableExtra')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+```
+```{r}
+#tips to help remember: https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+```
+
+```{r}
+
+
+themes <- c("Participation", "Policy Coherence", "Democratic Institions", "Reflexivity & Adaptation")
+
+examples <- c("Facilitation training to lead community meetings, bringing other groups on board", "Identifying inter-linkages between policies, aligning local and national policies", "Diplomatic training on negotiation, identifying trends to grow governmental transparency", "Analytical techniques and methodologies to increase program impact and SDG monitoring")
+
+subthemes <- c("Increasing stakeholder engagement in SDG Governance", "Aligning to leverage synergies for SDG implementation", "Democracy increases social equity & access", "SDG goal setting to improve program delivery and measurement")
+
+indicators <- c("$\\bullet$  stakeholder engagement\n  $\\bullet$ Indigenous\n $\\bullet$ facilitation methods", "* integrated planning 1\n * horizontal alignment \n * policy integration", "* direct democracy 1\n * governmental oversight 1\n * diplomatic skills", "* strategic planning \n * evidence based policy 1\n * ig data")
+
+df <- data.frame(themes, examples, subthemes, indicators)
+
+
+df %>%   
+  kbl(caption = "Figure 3. Something Something", col.names=c("Themes","Examples","Sub themes","Example indicators")) %>%
+  kable_classic(full_width = F, html_font = "Open Sans") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"))
+
+
+```
+
+
+```{r}
+
+
+criteria <- c("One Category of Author", "Two Categories of Authors", "Three Categories of Authors", "Four Categories of Authors", "Five Categories of Authors", "Six Categories of Authors")
+
+examples_2 <- c("Civil Society, Civil Society", "UN, Civil Society", "UN, Civil Society, Private University", "UN, Civil Society, Private University, Public University", "UN, Civil Society, Private University, Public University, Government", "UN, Civil Society, Private University, Public University, Government, Research & Business")
+
+score <- c("1", "0.5", "0.33", "0.25", "0.2", "0.167")
+
+df_2 <- data.frame(criteria, examples_2, score)
+
+
+# Sample statistic health
+
+table1::label(df_2$criteria) <- "Criteria" 
+table1::label(df_2$examples_2) <- "Examples" 
+table1::label(df_2$score) <- "Author Score for Civil Society" 
+table_2 <- table1( ~ criteria + examples_2 + 
+                     score, data = df_2)
+table_2
+
+```
+```{r}
+df_2 %>%
+  kbl(col.names=linebreak(c('Criteria','Examples','Author Score\n for Civil Society'))) %>%
+  kable_styling()
+```
+```{r}
+df_2 %>%
+  kbl(caption = "Figure 3. Something Something", col.names=c("Criteria","Examples","Author Score\n for Civil Society")) %>%
+  kable_classic(full_width = F, html_font = "Open Sans") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"))
+
+```
+
+```{r}
+kbl(df_2) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"))
+
+
+
+```
+```{r}
+kable(df_2,booktabs=T,
+      align="l",
+      col.names=linebreak(c('Criteria','Examples','Author Score\n for Civil Society')),
+      row.names = T,escape=F) %>%
+  row_spec(0,align = "c")
+
+```

@@ -28,7 +28,16 @@ library(cvms)  # version >= 1.2.2
 library(groupdata2)  # version >= 1.4.1
 library(dplyr)
 library(ggplot2)
+```
+```{r}
+packages = c('plotROC')
 
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
 
 ```
 
@@ -42,7 +51,7 @@ When you click the **Knit** button a document will be generated that includes bo
 all_courses_coded <- read_csv("data/final_coded_dataset.csv")
 #all_courses_coded
 
-all_courses_coded <- na.omit(all_courses_coded)
+#all_courses_coded <- na.omit(all_courses_coded)
 ```
 
 
@@ -148,7 +157,7 @@ fold_counts
 set.seed(444)
 
 
-courses_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 10, repeats = 2)
+courses_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 20, repeats = 2)
 courses_folds
 
 #soft_code_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 10)
@@ -185,8 +194,7 @@ nb_cvs_predictions %>%
   labs(
     color = NULL,
     title = "Sustainable Governance Aspects Curve for SDG Trainings",
-    subtitle = "Each resample fold is shown in a different color")
-
+    subtitle = "Each resample fold is shown in a different color")  + theme_minimal()
 ```
 
 ```{r}
