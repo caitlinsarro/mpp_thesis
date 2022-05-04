@@ -157,7 +157,7 @@ fold_counts
 set.seed(444)
 
 
-courses_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 10, repeats = 3)
+courses_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 8, repeats = 2)
 courses_folds
 
 #soft_code_folds <- vfold_cv(data = courses_train, strata = major_categ, v = 10)
@@ -201,7 +201,7 @@ nb_cvs_predictions %>%
 conf_mat_resampled(x = nb_cv_s, tidy = FALSE) %>%
   autoplot(type = "heatmap") +
   scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
-  scale_x_discrete(labels = function(x) str_wrap(x, 20))
+  scale_x_discrete(labels = function(x) str_wrap(x, 20)) 
 
 ```
 
