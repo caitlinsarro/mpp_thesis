@@ -30,7 +30,7 @@ library(dplyr)
 library(ggplot2)
 ```
 ```{r}
-packages = c('plotROC')
+packages = c('plotROC','viridis','ggplot2','RColorBrewer')
 
 for(p in packages){
   if(!require(p, character.only = T)){
@@ -198,10 +198,23 @@ nb_cvs_predictions %>%
 ```
 
 ```{r}
-conf_mat_resampled(x = nb_cv_s, tidy = FALSE) %>%
+
+myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
+
+
+confusionplot<- conf_mat_resampled(x = nb_cv_s, tidy = FALSE) %>%
   autoplot(type = "heatmap") +
+  scale_fill_gradient2(low="yellow", mid="white", high="purple", 
+                       midpoint=0) +
   scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
-  scale_x_discrete(labels = function(x) str_wrap(x, 20)) 
+  scale_x_discrete(labels = function(x) str_wrap(x, 20)) +
+  labs(
+    x = "Truth", y = "Predictions",
+    title = "Classification Model Confusion Matrix",
+    subtitle = "for the Sustainable Governance Capacities Categories"
+  ) 
+
+confusionplot + scale_colour_gradientn(colours = rainbow(10))
 
 ```
 
