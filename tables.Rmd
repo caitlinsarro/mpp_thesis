@@ -32,15 +32,17 @@ examples <- c("Facilitation training to lead community meetings, bringing other 
 
 subthemes <- c("Increasing stakeholder engagement in SDG Governance", "Aligning to leverage synergies for SDG implementation", "Democracy increases social equity & access", "SDG goal setting to improve program delivery and measurement")
 
-indicators <- c("$\\bullet$  stakeholder engagement\n  $\\bullet$ Indigenous\n $\\bullet$ facilitation methods", "* integrated planning 1\n * horizontal alignment \n * policy integration", "* direct democracy 1\n * governmental oversight 1\n * diplomatic skills", "* strategic planning \n * evidence based policy 1\n * ig data")
+indicators <- c("* Stakeholder engagement\n  * Indigenous\n * Facilitation methods", "* Integrated planning \n * Horizontal alignment \n * Policy integration", "* Direct democracy \n * Governmental oversight \n * Diplomatic skills", "* Strategic planning \n * Evidence-based policy \n * Big data")
 
 df <- data.frame(themes, examples, subthemes, indicators)
 
 
 df %>%   
-  kbl(caption = "Figure 3. Something Something", col.names=c("Themes","Examples","Sub themes","Example indicators")) %>%
+  kbl(caption = "Table 1. Sustainable Governance Capacities (Author defined)", col.names=c("Themes","Examples","Sub themes","Example indicators")) %>%
   kable_classic(full_width = F, html_font = "Open Sans") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"))
+  kable_styling(bootstrap_options = c("striped", "condensed"))%>%
+  as_image(width = 8) %>%
+  save_kable("diagrams/table1.pdf")
 
 
 ```
@@ -70,12 +72,12 @@ table_2
 ```
 ```{r}
 df_2 %>%
-  kbl(col.names=linebreak(c('Criteria','Examples','Author Score\n for Civil Society'))) %>%
+  kbl(col.names=linebreak(c('Criteria','Examples','Author Score for Civil Society'))) %>%
   kable_styling()
 ```
 ```{r}
 df_2 %>%
-  kbl(caption = "Figure 3. Something Something", col.names=c("Criteria","Examples","Author Score\n for Civil Society")) %>%
+  kbl(caption = "Table 2. Authors of Training Courses Weighted Coding Schema", col.names=c("Criteria","Examples","Author Score\n for Civil Society")) %>%
   kable_classic(full_width = F, html_font = "Open Sans") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"))
 

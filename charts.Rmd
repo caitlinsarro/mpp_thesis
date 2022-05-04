@@ -1,0 +1,69 @@
+---
+title: "tables"
+author: "Caitlin Sarro"
+date: "3/30/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+#install.packages("")
+
+
+packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2','plyr')
+
+for(p in packages){
+  if(!require(p, character.only = T)){
+    install.packages(p)
+  }
+  library(p, character.only = T)
+}
+
+```
+```{r}
+#tips to help remember: https://r-charts.com/part-whole/donut-chart-ggplot2/
+```
+
+```{r}
+final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
+
+freq_table_charts <- count(final_coded_dataset, 'category')
+as.numeric(freq_table_charts$freq)
+freq_table_charts$perc <- freq_table_charts$freq / 211 *100
+
+hsize <- 2
+
+freq_table_charts %>% 
+  mutate(x = hsize)
+
+freq_table_charts$category[freq_table_charts$category == "democratic institutions"] <-"Democratic Institutions"
+freq_table_charts$category[freq_table_charts$category == "participation"] <-"Participation"
+freq_table_charts$category[freq_table_charts$category == "policy coherence"] <-"Policy Coherence"
+freq_table_charts$category[freq_table_charts$category == "reflexivity and adaptation"] <-"Reflexivity & Adaptation"
+
+freq_table_charts$category
+
+#ggplot(freq_table_charts, aes(x = category, y = freq, fill = category)) +
+#  geom_col(color = "black") +
+#  coord_polar(theta = "y") +
+#  guides(fill = guide_legend(title = "Title"))
+
+
+ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
+  geom_col(color = "black") +
+  geom_col() +
+  geom_text(aes(label = sprintf("%0.1f %%", perc)),
+             position = position_stack(vjust = 0.5),  size=6) +
+  coord_polar(theta = "y") +
+  scale_fill_brewer(palette = "GnBu") +
+  guides(fill = guide_legend(title = "Distribution of Sustainable \nGovernance Categories in \ntraining courses (N = 211)")) +
+  coord_polar(theta = "y") +
+  xlim(c(0.2, hsize + 0.5)) +
+  theme(panel.background = element_rect(color = "white"),
+        panel.grid = element_blank(),
+        axis.title = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank())
+
+```
+
+

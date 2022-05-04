@@ -66,7 +66,7 @@ library(GGally)
 library(ggstatsplot) #fisher's test included
 library(ggmosaic) #mosaic plot
 
-packages = c('vcd', 'vcdExtra', 'tidyverse', 'ggmosaic')
+packages = c('vcd', 'vcdExtra', 'tidyverse', 'ggmosaic','RColorBrewer')
 
 for(p in packages){
   if(!require(p, character.only = T)){
@@ -539,13 +539,6 @@ df <- words_as_tokens %>%
 
 df %>% filter(Freq >= 10)
 ```
-```{r}
-write.csv(df,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/deletelater.csv", row.names = TRUE)
-
-
-```
-
-
 
 ```{r}
 #quick check on which words are the matched per category 
@@ -930,7 +923,7 @@ all_courses_coded_long$au_category[all_courses_coded_long$au_category == "un ngo
 
 #au_diff_allcourses <- rbind(au_diff_main_long, au_diff_un_only)
 
-
+#table 3. Contingency table
 table(all_courses_coded_long$au_category, all_courses_coded_long$category)
 
 
@@ -1008,7 +1001,20 @@ all_courses_coded
 
 ```
 
+```{r}
+# The palette with purple:
+cbp1 <- c("#88CCEE", "#44AA99", "#117733", "#AA4499",
+          "#CC6677", "#661100")
 
+
+spineplot(freq_table, col = cbp1,
+          border = "#FFFFFF", main = "\n Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings\n", xlab= "test", ylab="test") +
+  theme(axis.text.y = element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.text.x = element_text(angle = 90),
+        legend.position = "right")
+
+```
 
 
 ```{r}
