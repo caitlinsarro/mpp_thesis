@@ -9,7 +9,7 @@ output: html_document
 #install.packages("")
 
 #choose which one to include, gridExtra, cowplot, or patchwork
-packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2','plyr','gridExtra','ggpubr','reshape2')
+packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2','plyr','gridExtra','ggpubr','reshape2', 'ggrepel')
 
 for(p in packages){
   if(!require(p, character.only = T)){
@@ -119,7 +119,7 @@ weighted_un
 p1_u <- ggplot(weighted_un, mapping=aes(x=Var2, 
       y=per_change)) +
         geom_col()  +
-  geom_bar(stat="identity",fill="brown") +
+  geom_bar(stat="identity",fill="#95ccba") +
            scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
   labs(
     title = "UN Collaborative Authorship by Capacity",
@@ -149,7 +149,7 @@ weighted_gov
 p2_g <- ggplot(weighted_gov, mapping=aes(x=Var2, 
       y=per_change)) +
         geom_col() +
-  geom_bar(stat="identity",fill="lightblue") +
+  geom_bar(stat="identity",fill="#e1b12d") +
            scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
   labs(
     title = "Government Authored Courses by Capacity",
@@ -189,7 +189,7 @@ df_long
 #plot
 p3_u <- ggplot(df_long, aes(fill=university, y=perchang, x=Var2)) + 
     geom_bar(position="stack", stat="identity") + 
-  scale_fill_manual(labels = c("Public \nUniversity", "Private &\nUniversity"), values = c("per_change_pu" = "#66CC99", "per_change_pr" = "purple")) +
+  scale_fill_manual(labels = c("Public \nUniversity", "Private &\nUniversity"), values = c("per_change_pu" = "#a7ba42", "per_change_pr" = "#a4d8ff")) +
            scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
   labs(
     title = "University Authored Courses by Capacity",
@@ -226,7 +226,7 @@ df_long
 #plot
 p4_c <- ggplot(df_long, aes(fill=org, y=perchang, x=Var2)) + 
     geom_bar(position="stack", stat="identity") + 
-  scale_fill_manual(labels = c("Civil \nSociety", "Research &\nBusiness"), values = c("per_change_ci" = "orange", "per_change_re" = "blue")) +
+  scale_fill_manual(labels = c("Civil \nSociety", "Research &\nBusiness"), values = c("per_change_ci" = "#629074", "per_change_re" = "#b9c0f6")) +
            scale_y_continuous(labels = scales::percent, limits = c(-.40,.20))+
   labs(
     title = "Civil Society, Research & Business \nAuthored Courses by Capacity",
@@ -248,11 +248,7 @@ grid.arrange(p3_u, p4_c, nrow = 1)
 #final plot export for Figure 7. A
  ggsave(filename = "diagrams/figure7A.png", grid.arrange(p1_u, p2_g, nrow = 1) ,
        width = 10, height = 5, dpi = 300, units = "in", device='png')
- 
- 
-#final plot export for Figure 7. B
-ggarrange(p3_u, p4_c, ncol=2, nrow=1, common.legend = FALSE, legend="bottom") %>%
-  ggexport(filename = "diagrams/figure7B.png")
+
 ```
 ```{r}
 #final plot export for Figure 7. B
@@ -339,24 +335,37 @@ all_courses_coded_long$category <- factor(all_courses_coded_long$category, level
 ```
 
 ```{r}
+#thanks to this guy: https://statsandr.com/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/
+
+all_courses_coded_long
 #plot Figure 6. 
-ggbarstats(
+plot6<- ggbarstats(
   all_courses_coded_long, x = au_category, y = category,
   results.subtitle = FALSE,
   subtitle = paste0(
     "Fisher's exact test", ", p-value = ",
     ifelse(fishtest$p.value < 0.001, "< 0.001", round(fishtest$p.value, 3))
   )
-) +
+) + 
+  scale_fill_manual(
+    values = c(
+      'un' = "#95ccba",
+      'government' = "#e1b12d",
+      'public university' = "#a7ba42",
+      'private university' = "#a4d8ff",
+      'civil society' = "#629074",
+      'research  business' = "#b9c0f6")) +
   labs(
     title = "Author Stakeholder Groups of SDG Trainings",
     subtitle = "per Sustainable Governance Capacity",
     x = "Sustainable Governance Capacities",
     y = "Contributing Author Institions per Group",
-    fill = NULL
-  ) + theme(legend.position = "none") + theme_minimal()
+    fill = "Author Group"
+  ) + theme(legend.position = "none") + theme_minimal()  
 
-all_courses_coded_long
+plot6
 
+ ggsave(filename = "diagrams/plot6.png", grid.arrange(plot6, nrow = 1) ,
+       width = 10, height = 5, dpi = 300, units = "in", device='png')
 
 ```

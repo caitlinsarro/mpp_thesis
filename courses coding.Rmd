@@ -1019,29 +1019,9 @@ spineplot(freq_table, col = cbp1,
           border = "#FFFFFF", main = "\n Percentage Distribution of Authors \n contributing to Sustainable Governance Trainings\n", xlab= "test", ylab="test") +
   theme(axis.text.y = element_blank(),
         axis.ticks.y=element_blank(),
-        axis.text.x = element_text(angle = 90),
         legend.position = "right")
 
 ```
-
-
-```{r}
-#comebackhere
-
-ggbarstats(
-  all_courses_coded_long, x = au_category, y = category,
-  results.subtitle = FALSE,
-  subtitle = paste0(
-    "Fisher's exact test", ", p-value = ",
-    ifelse(fishtest$p.value < 0.001, "< 0.001", round(fishtest$p.value, 3))
-  )
-)
-
-```
-
-
-
-
 
 ```{r}
 
