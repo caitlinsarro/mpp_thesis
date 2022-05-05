@@ -9,7 +9,7 @@ output: html_document
 #install.packages("")
 
 
-packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2','plyr')
+packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2','plyr','gridExtra')
 
 for(p in packages){
   if(!require(p, character.only = T)){
@@ -115,11 +115,17 @@ weighted_un
 
 ```{r}
 #un alone vs un with partners
-ggplot(weighted_un, mapping=aes(x=Var2, 
+p1_u <- ggplot(weighted_un, mapping=aes(x=Var2, 
       y=per_change)) +
         geom_col()  +
-  ylim(-0.40, 0.20)+
-           scale_y_continuous(labels = scales::percent) 
+  ylim(-0.40, 0.20) +
+           scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "% Change of UN collaborative authorship compared to the UN solo-authorship",
+    subtitle = "Distribution of Governance Category",
+    x = "Sustainable Governance Capacities",
+    y = "Number of training courses"
+  ) + theme(legend.position = "none")
 
 
 ```
@@ -137,11 +143,17 @@ weighted_gov <- weighted_gov %>%
 weighted_gov
 
 
-ggplot(weighted_gov, mapping=aes(x=Var2, 
+p2_g <- ggplot(weighted_gov, mapping=aes(x=Var2, 
       y=per_change)) +
         geom_col() +
   ylim(-0.40, 0.20)+
-           scale_y_continuous(labels = scales::percent) 
+           scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "% Change of Government Authorship compared to the UN",
+    subtitle = "Distribution of Governance Category",
+    x = "Sustainable Governance Capacities",
+    y = NULL
+  )
 
 
 ```
@@ -171,11 +183,16 @@ df_long
 
 
 #plot
-ggplot(df_long, aes(fill=university, y=perchang, x=Var2)) + 
-    geom_bar(position="stack", stat="identity") +
-  ylim(-0.40, 0.20)+
-           scale_y_continuous(labels = scales::percent) 
-
+p3_u <- ggplot(df_long, aes(fill=university, y=perchang, x=Var2)) + 
+    geom_bar(position="stack", stat="identity")+
+           scale_y_continuous(labels = scales::percent) +
+  labs(
+    title = "% Change of University Authorship \ncompared to the UN",
+    subtitle = "Distribution of Governance Category",
+    x = "Sustainable Governance Capacities",
+    y = "Number of training courses", legend=FALSE
+  ) + theme(legend.position = "none")
+p3_u
 ```
 
 
@@ -201,8 +218,19 @@ df_long
 
 
 #plot
-ggplot(df_long, aes(fill=org, y=perchang, x=Var2)) + 
+p4_c <- ggplot(df_long, aes(fill=org, y=perchang, x=Var2)) + 
     geom_bar(position="stack", stat="identity") +
-           scale_y_continuous(labels = scales::percent)
+           scale_y_continuous(labels = scales::percent)+
+  labs(
+    title = "% Change of Civil Society, Research & Business Authorship compared to the UN",
+    subtitle = "Distribution of Governance Category",
+    x = "Sustainable Governance Capacities",
+    y = NULL
+  ) + theme(legend.position = "none")
 
+```
+
+```{r}
+grid.arrange(p1_u, p2_g, nrow = 1)
+grid.arrange(p3_u, p4_c, nrow = 1)
 ```
