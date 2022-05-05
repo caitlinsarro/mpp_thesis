@@ -25,7 +25,6 @@ for(p in packages){
 
 ```{r}
 
-
 themes <- c("Participation", "Policy Coherence", "Democratic Institions", "Reflexivity & Adaptation")
 
 examples <- c("Facilitation training to lead community meetings, bringing other groups on board", "Identifying inter-linkages between policies, aligning local and national policies", "Diplomatic training on negotiation, identifying trends to grow governmental transparency", "Analytical techniques and methodologies to increase program impact and SDG monitoring")
@@ -96,5 +95,16 @@ kable(df_2,booktabs=T,
       col.names=linebreak(c('Criteria','Examples','Author Score\n for Civil Society')),
       row.names = T,escape=F) %>%
   row_spec(0,align = "c")
+
+```
+
+```{r}
+#Table 3. Contingency Table
+freq_table <- read_csv("exports/final_freq_table.csv")
+
+freq_table %>%
+  kbl(caption = "Table 3. Authors of Training Courses (Weighted) by Goverance Category", col.names=c("Sustainable Governance Category","Civil Society","Government","Private University","Public University","Research & Business","UN")) %>%
+  kable_classic(full_width = F, html_font = "Open Sans") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"))
 
 ```

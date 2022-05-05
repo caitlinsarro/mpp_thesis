@@ -924,19 +924,19 @@ all_courses_coded_long$au_category[all_courses_coded_long$au_category == "un ngo
 #au_diff_allcourses <- rbind(au_diff_main_long, au_diff_un_only)
 
 #table 3. Contingency table
-table(all_courses_coded_long$au_category, all_courses_coded_long$category)
+freq_table <- table(all_courses_coded_long$au_category, all_courses_coded_long$category)
 
-
+chisq.test(freq_table)
 chisq.test(all_courses_coded_long$au_category, all_courses_coded_long$category, correct=FALSE)
 
-#X-squared = 41.712, df = 15, p-value = 0.0002489
+#X-squared = 35.32, df = 15, p-value = 0.002214
 authors <- all_courses_coded_long$au_category
 govern <- all_courses_coded_long$category
 
 #freq_table <- au_diff_allcourses %>% select(id.x, au_category, max.col)
 
 #freq_table <- na.omit(freq_table)
-freq_table <- table(all_courses_coded_long$category, all_courses_coded_long$au_category)
+
 
 
 author_plots <- all_courses_coded_long %>%
@@ -951,6 +951,9 @@ write.csv(author_plots,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/autho
 chisq.test(freq_table)$expected
 
 ```
+```{r}
+write.csv(freq_table,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/final_freq_table.csv", row.names = TRUE)
+```
 
 
 
@@ -960,6 +963,11 @@ fishtest <- fisher.test(freq_table,simulate.p.value=TRUE,B=1e7)
 fishtest
 
 ```
+
+
+
+
+
 
 ```{r}
 #mosaic plot

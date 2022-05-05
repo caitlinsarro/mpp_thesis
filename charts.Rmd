@@ -21,10 +21,12 @@ for(p in packages){
 ```
 ```{r}
 #tips to help remember: https://r-charts.com/part-whole/donut-chart-ggplot2/
+#import final data
+final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
 ```
 
 ```{r}
-final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
+
 
 freq_table_charts <- count(final_coded_dataset, 'category')
 as.numeric(freq_table_charts$freq)
@@ -52,7 +54,7 @@ ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
   geom_col(color = "black") +
   geom_col() +
   geom_text(aes(label = sprintf("%0.1f %%", perc)),
-             position = position_stack(vjust = 0.5),  size=6) +
+             position = position_stack(vjust = 0.5),  size=5) +
   coord_polar(theta = "y") +
   scale_fill_brewer(palette = "GnBu") +
   guides(fill = guide_legend(title = "Distribution of Sustainable \nGovernance Categories in \ntraining courses (N = 211)")) +
@@ -67,3 +69,140 @@ ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
 ```
 
 
+```{r}
+#weighted_freq_table <- read_csv("data/weighted_freq_table.csv")
+
+
+un <- c(3.42, 2.17, 2.95, 2.25)
+public_university <- c(5.50, 4.17, 9.03, 8.75)
+private_university	<- c(4.08, 2.67, 6.62, 2.25)
+civil_society <- c(4.50, 1.67, 3.20, 2.75)
+research_business <- c(4.08, 1.17, 7.62, 8.00)
+government <- c(2.42, 2.17, 1.58, 13.00)
+UN_ONLY<- c(16.00,14.00,28.00,47.00)
+NO_UN	<- c(20.58,11.83,28.05,34.75)
+UN_UN_Partner	<- c(19.42,16.17,30.95,49.25)
+
+weighted_freq_table <- rbind(un, public_university, private_university, civil_society, research_business, government, UN_ONLY, UN_UN_Partner)
+
+colnames(weighted_freq_table)<- c("participation","policy coherence","democratic institutions","reflexivity adaptation")
+
+weighted_freq_table
+#weighted_UN_freq_table <- rbind(un, UN_ONLY, NO_UN, UN_UN_Partner)
+
+toberevised <- list("participation","policy coherence","democratic institutions","reflexivity adaptation")
+
+weighted_freq_table_perc <- round(prop.table(as.matrix(weighted_freq_table),1),2)
+
+
+plot(weighted_freq_table_perc)
+
+# transpose
+long <- melt(weighted_freq_table_perc)
+long
+
+weighted <- dcast(long, Var2 ~ Var1)
+
+weighted_un  <- weighted %>% select(Var2, UN_ONLY, un)
+
+weighted_un <- weighted_un %>% 
+  mutate(per_change = 
+  (un - UN_ONLY))
+
+weighted_un
+
+```
+
+```{r}
+#un alone vs un with partners
+ggplot(weighted_un, mapping=aes(x=Var2, 
+      y=per_change)) +
+        geom_col()  +
+  ylim(-0.40, 0.20)+
+           scale_y_continuous(labels = scales::percent) 
+
+
+```
+
+
+```{r}
+#un aggregate vs government
+weighted
+weighted_gov  <- weighted %>% select(Var2, UN_UN_Partner, government)
+
+weighted_gov <- weighted_gov %>% 
+  mutate(per_change = 
+  (government - UN_UN_Partner))
+
+weighted_gov
+
+
+ggplot(weighted_gov, mapping=aes(x=Var2, 
+      y=per_change)) +
+        geom_col() +
+  ylim(-0.40, 0.20)+
+           scale_y_continuous(labels = scales::percent) 
+
+
+```
+
+
+
+
+```{r}
+#un aggregate vs pub uni vs private uni
+weighted
+weighted_uni  <- weighted %>% select(Var2, UN_UN_Partner, public_university, private_university)
+
+weighted_uni <- weighted_uni %>% 
+  mutate(per_change_pu = 
+  (public_university - UN_UN_Partner)) %>% 
+  mutate(per_change_pr = 
+  (private_university - UN_UN_Partner))
+
+weighted_uni
+
+
+
+
+# Grouped
+df_long <- pivot_longer(weighted_uni, per_change_pu:per_change_pr, names_to = "university", values_to = "perchang")  
+df_long
+
+
+#plot
+ggplot(df_long, aes(fill=university, y=perchang, x=Var2)) + 
+    geom_bar(position="stack", stat="identity") +
+  ylim(-0.40, 0.20)+
+           scale_y_continuous(labels = scales::percent) 
+
+```
+
+
+```{r}
+#un aggregate vs research vs civil society
+weighted
+weighted_civ  <- weighted %>% select(Var2, UN_UN_Partner, civil_society, research_business)
+
+weighted_civ <- weighted_civ %>% 
+  mutate(per_change_ci = 
+  (civil_society - UN_UN_Partner)) %>% 
+  mutate(per_change_re = 
+  (research_business - UN_UN_Partner))
+
+weighted_civ
+
+
+
+
+# Grouped
+df_long <- pivot_longer(weighted_civ, per_change_ci:per_change_re, names_to = "org", values_to = "perchang")  
+df_long
+
+
+#plot
+ggplot(df_long, aes(fill=org, y=perchang, x=Var2)) + 
+    geom_bar(position="stack", stat="identity") +
+           scale_y_continuous(labels = scales::percent)
+
+```
