@@ -8,8 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 #install.packages("")
 
-
-packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2','plyr','gridExtra')
+#choose which one to include, gridExtra, cowplot, or patchwork
+packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2','plyr','gridExtra','ggpubr','reshape2')
 
 for(p in packages){
   if(!require(p, character.only = T)){
@@ -85,12 +85,12 @@ UN_UN_Partner	<- c(19.42,16.17,30.95,49.25)
 
 weighted_freq_table <- rbind(un, public_university, private_university, civil_society, research_business, government, UN_ONLY, UN_UN_Partner)
 
-colnames(weighted_freq_table)<- c("participation","policy coherence","democratic institutions","reflexivity adaptation")
+colnames(weighted_freq_table)<- c("Participation","Policy\nCoherence","Democratic\nInstitutions","Reflexivity\n& Adaptation")
 
 weighted_freq_table
 #weighted_UN_freq_table <- rbind(un, UN_ONLY, NO_UN, UN_UN_Partner)
 
-toberevised <- list("participation","policy coherence","democratic institutions","reflexivity adaptation")
+toberevised <- list("Participation","Policy\nCoherence","Democratic\nInstitutions","Reflexivity\n& Adaptation")
 
 weighted_freq_table_perc <- round(prop.table(as.matrix(weighted_freq_table),1),2)
 
@@ -121,10 +121,10 @@ p1_u <- ggplot(weighted_un, mapping=aes(x=Var2,
   ylim(-0.40, 0.20) +
            scale_y_continuous(labels = scales::percent) +
   labs(
-    title = "% Change of UN collaborative authorship compared to the UN solo-authorship",
-    subtitle = "Distribution of Governance Category",
-    x = "Sustainable Governance Capacities",
-    y = "Number of training courses"
+    title = "UN Collaborative Authorship by Capacity",
+    subtitle = "% of change from United Nations solo-authorshio",
+    x = NULL,
+    y = "Training courses by author group"
   ) + theme(legend.position = "none")
 
 
@@ -147,11 +147,11 @@ p2_g <- ggplot(weighted_gov, mapping=aes(x=Var2,
       y=per_change)) +
         geom_col() +
   ylim(-0.40, 0.20)+
-           scale_y_continuous(labels = scales::percent) +
+           scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
   labs(
-    title = "% Change of Government Authorship compared to the UN",
-    subtitle = "Distribution of Governance Category",
-    x = "Sustainable Governance Capacities",
+    title = "Government Authored Courses by Capacity",
+    subtitle = "% of change from United Nations level",
+    x = NULL,
     y = NULL
   )
 
@@ -184,14 +184,16 @@ df_long
 
 #plot
 p3_u <- ggplot(df_long, aes(fill=university, y=perchang, x=Var2)) + 
-    geom_bar(position="stack", stat="identity")+
-           scale_y_continuous(labels = scales::percent) +
+    geom_bar(position="stack", stat="identity") + 
+  scale_fill_manual(labels = c("Public \nUniversity", "Private &\nUniversity"), values = c("per_change_pu" = "#66CC99", "per_change_pr" = "purple")) +
+           scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
   labs(
-    title = "% Change of University Authorship \ncompared to the UN",
-    subtitle = "Distribution of Governance Category",
+    title = "University Authored Courses by Capacity",
+    subtitle = "% of change from United Nations level",
     x = "Sustainable Governance Capacities",
-    y = "Number of training courses", legend=FALSE
-  ) + theme(legend.position = "none")
+    y = "Training courses by author group",
+    fill = "Author Group"
+  ) + theme(legend.position = "none") + theme_minimal()
 p3_u
 ```
 
@@ -216,21 +218,59 @@ weighted_civ
 df_long <- pivot_longer(weighted_civ, per_change_ci:per_change_re, names_to = "org", values_to = "perchang")  
 df_long
 
-
+df_long
 #plot
 p4_c <- ggplot(df_long, aes(fill=org, y=perchang, x=Var2)) + 
-    geom_bar(position="stack", stat="identity") +
-           scale_y_continuous(labels = scales::percent)+
+    geom_bar(position="stack", stat="identity") + 
+  scale_fill_manual(labels = c("Civil \nSociety", "Research &\nBusiness"), values = c("per_change_ci" = "orange", "per_change_re" = "blue")) +
+           scale_y_continuous(labels = scales::percent, limits = c(-.40,.20))+
   labs(
-    title = "% Change of Civil Society, Research & Business Authorship compared to the UN",
-    subtitle = "Distribution of Governance Category",
+    title = "Civil Society, Research & Business \nAuthored Courses by Capacity",
+    subtitle = "% of change from United Nations level",
     x = "Sustainable Governance Capacities",
-    y = NULL
-  ) + theme(legend.position = "none")
+    y = NULL,
+    fill = NULL
+  ) + theme(legend.position = "none") + theme_minimal()
+p4_c
 
 ```
 
 ```{r}
 grid.arrange(p1_u, p2_g, nrow = 1)
 grid.arrange(p3_u, p4_c, nrow = 1)
+
+ggarrange(p3_u, p4_c, ncol=2, nrow=1, common.legend = FALSE, legend="bottom")
+```
+
+```{r}
+# Make three plots.
+# We set left and right margins to 0 to remove unnecessary spacing in the
+# final plot arrangement.
+p1 <- qplot(carat, price, data=dsamp, colour=clarity) +
+   theme(plot.margin = unit(c(6,0,6,0), "pt"))
+p2 <- qplot(depth, price, data=dsamp, colour=clarity) +
+   theme(plot.margin = unit(c(6,0,6,0), "pt")) + ylab("")
+p3 <- qplot(color, price, data=dsamp, colour=clarity) +
+   theme(plot.margin = unit(c(6,0,6,0), "pt")) + ylab("")
+
+# arrange the three plots in a single row
+prow <- plot_grid( p1_u + theme(legend.position="none"),
+           p2_g + theme(legend.position="none"),
+           p3_u + theme(legend.position="none"),
+           p4_c + theme(legend.position="none"),
+           align = 'vh',
+           labels = c("A", "B", "C", "D"),
+           hjust = -1,
+           nrow = 2
+           )
+
+# extract the legend from one of the plots
+# (clearly the whole thing only makes sense if all plots
+# have the same legend, so we can arbitrarily pick one.)
+legend_b <- get_legend(p4_c + theme(legend.position="bottom"))
+
+# add the legend underneath the row we made earlier. Give it 10% of the height
+# of one plot (via rel_heights).
+p <- plot_grid( prow, legend_b, ncol = 2, rel_heights = c(1, .2))
+p
 ```

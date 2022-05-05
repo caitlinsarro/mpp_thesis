@@ -21,6 +21,9 @@ for(p in packages){
 ```
 ```{r}
 #tips to help remember: https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
+
+#import final data
+final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
 ```
 
 ```{r}
@@ -107,4 +110,7 @@ freq_table %>%
   kable_classic(full_width = F, html_font = "Open Sans") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"))
 
+freq_table <- table(final_coded_dataset$category, final_coded_dataset$au_category)
+chisq.test(freq_table)$expected
+final_coded_dataset
 ```
