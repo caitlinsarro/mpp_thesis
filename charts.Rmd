@@ -292,3 +292,71 @@ legend_b <- get_legend(p4_c + theme(legend.position="bottom"))
 p <- plot_grid( prow, legend_b, ncol = 2, rel_heights = c(1, .2))
 p
 ```
+
+```{r}
+
+all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+table(all_courses_coded$category)
+#to long data
+all_courses_coded_long <- all_courses_coded %>% 
+  mutate(au_category = strsplit(as.character(au_category), ",")) %>%
+  unnest(au_category)
+
+
+#remove white spaces
+all_courses_coded_long$au_category <- trimws(all_courses_coded_long$au_category)
+
+
+all_courses_coded_long<- as.data.frame(all_courses_coded_long, headers=TRUE)
+
+write.csv(all_courses_coded_long,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded_long.csv", row.names = TRUE)
+
+
+#simply categories
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "cultural institution"] <- "civil society"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "ngo"] <- "civil society"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "business"] <- "research  business"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "finance"] <- "research  business"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "research  policy institutes"] <- "research  business"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "un ngo"] <- "civil society"
+
+# add in un only courses
+
+#au_diff_allcourses <- rbind(au_diff_main_long, au_diff_un_only)
+
+```
+
+```{r}
+#cleanup before plotting
+all_courses_coded_long$category[all_courses_coded_long$category == "participation"] <- "Participation"
+all_courses_coded_long$category[all_courses_coded_long$category == "policy coherence"] <- "Policy\nCoherence"
+all_courses_coded_long$category[all_courses_coded_long$category == "democratic institutions"] <- "Democratic\nInstitutions"
+all_courses_coded_long$category[all_courses_coded_long$category == "reflexivity and adaptation"] <- "Reflexivity &\nAdaptation"
+
+
+all_courses_coded_long
+all_courses_coded_long$category <- factor(all_courses_coded_long$category, levels = c("Participation", "Policy\nCoherence", "Democratic\nInstitutions", "Reflexivity &\nAdaptation"))
+```
+
+```{r}
+#plot Figure 6. 
+ggbarstats(
+  all_courses_coded_long, x = au_category, y = category,
+  results.subtitle = FALSE,
+  subtitle = paste0(
+    "Fisher's exact test", ", p-value = ",
+    ifelse(fishtest$p.value < 0.001, "< 0.001", round(fishtest$p.value, 3))
+  )
+) +
+  labs(
+    title = "Author Stakeholder Groups of SDG Trainings",
+    subtitle = "per Sustainable Governance Capacity",
+    x = "Sustainable Governance Capacities",
+    y = "Contributing Author Institions per Group",
+    fill = NULL
+  ) + theme(legend.position = "none") + theme_minimal()
+
+all_courses_coded_long
+
+
+```

@@ -1026,23 +1026,16 @@ spineplot(freq_table, col = cbp1,
 
 
 ```{r}
-all_courses_coded
-# combine plot and statistical test with ggbarstats
-au_diff_allcourses_simple <- all_courses_coded %>% select(id, au_category, category)
-
-au_diff_allcourses_simple <- na.omit(au_diff_allcourses_simple)
-
-
+#comebackhere
 
 ggbarstats(
-  au_diff_allcourses_simple,au_category,category,
+  all_courses_coded_long, x = au_category, y = category,
   results.subtitle = FALSE,
   subtitle = paste0(
     "Fisher's exact test", ", p-value = ",
     ifelse(fishtest$p.value < 0.001, "< 0.001", round(fishtest$p.value, 3))
   )
 )
-
 
 ```
 
