@@ -49,7 +49,8 @@ freq_table_charts$category
 #  coord_polar(theta = "y") +
 #  guides(fill = guide_legend(title = "Title"))
 
-
+freq_table_charts$category <- factor(freq_table_charts$category, levels = c("Participation", "Policy Coherence", "Democratic Institutions", "Reflexivity & Adaptation"))
+freq_table_charts
 ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
   geom_col(color = "black") +
   geom_col() +
@@ -60,11 +61,11 @@ ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
   guides(fill = guide_legend(title = "Distribution of Sustainable \nGovernance Categories in \ntraining courses (N = 211)")) +
   coord_polar(theta = "y") +
   xlim(c(0.2, hsize + 0.5)) +
-  theme(panel.background = element_rect(color = "white"),
+  theme(panel.background = element_rect(fill = 'white', colour = 'white'),
         panel.grid = element_blank(),
         axis.title = element_blank(),
         axis.ticks = element_blank(),
-        axis.text = element_blank())
+        axis.text = element_blank()) 
 
 ```
 
@@ -118,16 +119,18 @@ weighted_un
 p1_u <- ggplot(weighted_un, mapping=aes(x=Var2, 
       y=per_change)) +
         geom_col()  +
-  ylim(-0.40, 0.20) +
-           scale_y_continuous(labels = scales::percent) +
+  geom_bar(stat="identity",fill="brown") +
+           scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
   labs(
     title = "UN Collaborative Authorship by Capacity",
-    subtitle = "% of change from United Nations solo-authorshio",
+    subtitle = "% of change from United Nations solo-authorship",
     x = NULL,
     y = "Training courses by author group"
-  ) + theme(legend.position = "none")
+  ) + theme(legend.position = "none") + theme_minimal()
 
 
+
+p1_u
 ```
 
 
@@ -146,15 +149,16 @@ weighted_gov
 p2_g <- ggplot(weighted_gov, mapping=aes(x=Var2, 
       y=per_change)) +
         geom_col() +
-  ylim(-0.40, 0.20)+
+  geom_bar(stat="identity",fill="lightblue") +
            scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
   labs(
     title = "Government Authored Courses by Capacity",
     subtitle = "% of change from United Nations level",
     x = NULL,
     y = NULL
-  )
+  )+ theme_minimal()
 
+p2_g 
 
 ```
 
@@ -239,7 +243,21 @@ p4_c
 grid.arrange(p1_u, p2_g, nrow = 1)
 grid.arrange(p3_u, p4_c, nrow = 1)
 
-ggarrange(p3_u, p4_c, ncol=2, nrow=1, common.legend = FALSE, legend="bottom")
+
+
+#final plot export for Figure 7. A
+ ggsave(filename = "diagrams/figure7A.png", grid.arrange(p1_u, p2_g, nrow = 1) ,
+       width = 10, height = 5, dpi = 300, units = "in", device='png')
+ 
+ 
+#final plot export for Figure 7. B
+ggarrange(p3_u, p4_c, ncol=2, nrow=1, common.legend = FALSE, legend="bottom") %>%
+  ggexport(filename = "diagrams/figure7B.png")
+```
+```{r}
+#final plot export for Figure 7. B
+ ggsave(filename = "diagrams/figure7B.png", ggarrange(p3_u, p4_c, ncol=2, nrow=1, common.legend = FALSE, legend="bottom") ,
+       width = 10, height = 5, dpi = 300, units = "in", device='png')
 ```
 
 ```{r}
