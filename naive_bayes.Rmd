@@ -77,6 +77,16 @@ all_courses_coded$major_categ <- as.factor(all_courses_coded$major_categ)
 
 
 all_courses_coded
+#cleanup before plotting
+all_courses_coded$category[all_courses_coded$category == "participation"] <- "Participation"
+all_courses_coded$category[all_courses_coded$category == "policy coherence"] <- "Policy\nCoherence"
+all_courses_coded$category[all_courses_coded$category == "democratic institutions"] <- "Democratic\nInstitutions"
+all_courses_coded$category[all_courses_coded$category == "reflexivity and adaptation"] <- "Reflexivity &\nAdaptation"
+
+
+all_courses_coded$category <- factor(all_courses_coded$category, levels = c("Participation", "Policy\nCoherence", "Democratic\nInstitutions", "Reflexivity &\nAdaptation"))
+
+
 ```
 
 
@@ -187,14 +197,17 @@ nb_cvs_predictions
 ```{r}
 #receiver operator curve plot that shows the sensitivity at different thresholds. It demonstrates how well a classification model can distinguish between classes.
 
-nb_cvs_predictions %>%
+plot9 <- nb_cvs_predictions %>%
   group_by(id) %>%
   roc_curve(truth = category, c(starts_with(".pred"), -.pred_class)) %>%
   autoplot() +
   labs(
     color = NULL,
-    title = "Performance of the Sustainable Governance \nCapacities Classification Model for \nSDG Trainings",
-    subtitle = "Each resample fold is shown in a different color")  + theme_minimal()
+    title = "Figure 9. Performance of the Sustainable\nGovernance Capacities Classification Model\nfor SDG Trainings",
+    subtitle = "Eight resample folds and two repeats")  + theme_minimal()
+
+ ggsave(filename = "diagrams/figure9.png", grid.arrange(plot9, nrow = 1) ,
+       width = 5, height = 5, dpi = 300, units = "in", device='png')
 ```
 
 ```{r}
@@ -208,7 +221,7 @@ confusionplot <- conf_mat_resampled(x = nb_cv_s, tidy = FALSE) %>%
   scale_x_discrete(labels = function(x) str_wrap(x, 20)) +
   labs(
     x = "Truth", y = "Predictions",
-    title = "Classification Model Confusion Matrix",
+    title = "Figure 10. Classification Model Confusion Matrix",
     subtitle = "for the Sustainable Governance Capacities Categories"
   ) 
 
@@ -218,7 +231,7 @@ confusionplot <- confusionplot +
 
 
  ggsave(filename = "diagrams/figure10.png", grid.arrange(confusionplot, nrow = 1) ,
-       width = 10, height = 5, dpi = 300, units = "in", device='png')
+       width = 6, height = 6, dpi = 300, units = "in", device='png')
 ```
 
 

@@ -53,7 +53,7 @@ df %>%
 ```{r}
 
 
-criteria <- c("One Category of Author", "Two Categories of Authors", "Three Categories of Authors", "Four Categories of Authors", "Five Categories of Authors", "Six Categories of Authors")
+criteria <- c("One Author Group", "Two Author Groups", "Three Author Groups", "Four Author Groups", "Five Author Groups", "Six Author Groups")
 
 examples_2 <- c("Civil Society, Civil Society", "UN, Civil Society", "UN, Civil Society, Private University", "UN, Civil Society, Private University, Public University", "UN, Civil Society, Private University, Public University, Government", "UN, Civil Society, Private University, Public University, Government, Research & Business")
 
@@ -79,11 +79,43 @@ df_2 %>%
 ```
 ```{r}
 df_2 %>%
-  kbl(caption = "Table 2. Authors of Training Courses Weighted Coding Schema", col.names=c("Criteria","Examples","Author Score\n for Civil Society")) %>%
+  kbl(caption = "Table 2. Authors of Training Courses Weighted Coding Schema", col.names=c("Criteria","Examples","Score for\n Civil Society")) %>%
+   column_spec(column = 1, width = "1in")  %>%
+   column_spec(column = 2, width = "3.5in") %>%
+   column_spec(column = 3, width = ".75in") %>%
   kable_classic(full_width = F, html_font = "Open Sans") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"))
 
+
 ```
+
+
+```{r}
+#table 4
+tb4_part <- c("15.2%", "(16)", "31.7%", "(9)", "↑ 16.4%")
+tb4_pol <- c("13.3%", "(14)", "20.1%", "(6)", "↑ 6.8%")
+tb4_dem <- c("26.7%", "(28)", "27.4%", "(10)", "↑ 0.7%")
+tb4_ref <- c("44.8%", "(47)", "20.9%", "(6)", "↓ -23.9%")
+
+table4 <- rbind(tb4_part,tb4_pol,tb4_dem,tb4_ref)
+table4
+rownames(table4) <- c("Participation","Policy\nCoherence","Democratic\nInstitutions","Reflexivity & \n Adaptation")
+colnames(table4) <- c("UN Only \n Authored Trainings","(N=105)","UN Partnered with\nother Stakeholder Authors","(N= 31)\nweighted","% Change")
+
+
+table4 %>%
+  kbl(caption = "Table 4. Sustainable Governance Capacities for trainings by UN Author Groups") %>%
+   column_spec(column = 1, width = ".35in")  %>%
+   column_spec(column = 2, width = ".35in") %>%
+   column_spec(column = 3, width = ".35in") %>%
+   column_spec(column = 4, width = ".55in") %>%
+   column_spec(column = 5, width = ".35in") %>%
+  kable_classic(html_font = "Open Sans") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  save_kable(file = 'diagrams/table4.png')
+```
+
+
 
 ```{r}
 kbl(df_2) %>%
@@ -92,14 +124,7 @@ kbl(df_2) %>%
 
 
 ```
-```{r}
-kable(df_2,booktabs=T,
-      align="l",
-      col.names=linebreak(c('Criteria','Examples','Author Score\n for Civil Society')),
-      row.names = T,escape=F) %>%
-  row_spec(0,align = "c")
 
-```
 
 ```{r}
 #Table 3. Contingency Table

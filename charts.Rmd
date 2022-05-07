@@ -51,14 +51,14 @@ freq_table_charts$category
 
 freq_table_charts$category <- factor(freq_table_charts$category, levels = c("Participation", "Policy Coherence", "Democratic Institutions", "Reflexivity & Adaptation"))
 freq_table_charts
-ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
+plot5 <- ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
   geom_col(color = "black") +
   geom_col() +
   geom_text(aes(label = sprintf("%0.1f %%", perc)),
              position = position_stack(vjust = 0.5),  size=5) +
   coord_polar(theta = "y") +
   scale_fill_brewer(palette = "GnBu") +
-  guides(fill = guide_legend(title = "Distribution of Sustainable \nGovernance Categories in \ntraining courses (N = 211)")) +
+  guides(fill = guide_legend(title = "Figure 5. Distribution of Sustainable \nGovernance Categories in \ntraining courses (N = 211)")) +
   coord_polar(theta = "y") +
   xlim(c(0.2, hsize + 0.5)) +
   theme(panel.background = element_rect(fill = 'white', colour = 'white'),
