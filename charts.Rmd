@@ -9,7 +9,7 @@ output: html_document
 #install.packages("")
 
 #choose which one to include, gridExtra, cowplot, or patchwork
-packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2','plyr','gridExtra','ggpubr','reshape2', 'ggrepel')
+packages = c('tidyverse', 'tidytext', 'dplyr', 'ggplot2','plyr','gridExtra','ggpubr','reshape2', 'ggrepel','ggstatsplot')
 
 for(p in packages){
   if(!require(p, character.only = T)){
@@ -74,7 +74,7 @@ ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
 #weighted_freq_table <- read_csv("data/weighted_freq_table.csv")
 
 
-un <- c(3.42, 2.17, 2.95, 2.25)
+un <- c(3.4166666, 2.16666666, 2.94999999, 2.25)
 public_university <- c(5.50, 4.17, 9.03, 8.75)
 private_university	<- c(4.08, 2.67, 6.62, 2.25)
 civil_society <- c(4.50, 1.67, 3.20, 2.75)
@@ -82,7 +82,7 @@ research_business <- c(4.08, 1.17, 7.62, 8.00)
 government <- c(2.42, 2.17, 1.58, 13.00)
 UN_ONLY<- c(16.00,14.00,28.00,47.00)
 NO_UN	<- c(20.58,11.83,28.05,34.75)
-UN_UN_Partner	<- c(19.42,16.17,30.95,49.25)
+UN_UN_Partner	<- c(19.4166667,16.1666667,30.95,49.25)
 
 weighted_freq_table <- rbind(un, public_university, private_university, civil_society, research_business, government, UN_ONLY, UN_UN_Partner)
 
@@ -91,9 +91,10 @@ colnames(weighted_freq_table)<- c("Participation","Policy\nCoherence","Democrati
 weighted_freq_table
 #weighted_UN_freq_table <- rbind(un, UN_ONLY, NO_UN, UN_UN_Partner)
 
-toberevised <- list("Participation","Policy\nCoherence","Democratic\nInstitutions","Reflexivity\n& Adaptation")
+#toberevised <- list("Participation","Policy\nCoherence","Democratic\nInstitutions","Reflexivity\n& Adaptation")
 
-weighted_freq_table_perc <- round(prop.table(as.matrix(weighted_freq_table),1),2)
+weighted_freq_table_perc <- round(prop.table(as.matrix(weighted_freq_table),1),4)
+#weighted_freq_table_perc <- round(prop.table(as.matrix(weighted_freq_table),1),2)
 
 
 plot(weighted_freq_table_perc)
@@ -120,7 +121,7 @@ p1_u <- ggplot(weighted_un, mapping=aes(x=Var2,
       y=per_change)) +
         geom_col()  +
   geom_bar(stat="identity",fill="#95ccba") +
-           scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
+           scale_y_continuous(labels = scales::percent, limits = c(-.40,.40)) +
   labs(
     title = "UN Collaborative Authorship by Capacity",
     subtitle = "% of change from United Nations solo-authorship",
@@ -140,17 +141,17 @@ weighted
 weighted_gov  <- weighted %>% select(Var2, UN_UN_Partner, government)
 
 weighted_gov <- weighted_gov %>% 
-  mutate(per_change = 
+  mutate(per_change_g = 
   (government - UN_UN_Partner))
 
 weighted_gov
 
 
 p2_g <- ggplot(weighted_gov, mapping=aes(x=Var2, 
-      y=per_change)) +
+      y=per_change_g)) +
         geom_col() +
   geom_bar(stat="identity",fill="#e1b12d") +
-           scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
+           scale_y_continuous(labels = scales::percent, limits = c(-.40,.40)) +
   labs(
     title = "Government Authored Courses by Capacity",
     subtitle = "% of change from United Nations level",
@@ -190,7 +191,7 @@ df_long
 p3_u <- ggplot(df_long, aes(fill=university, y=perchang, x=Var2)) + 
     geom_bar(position="stack", stat="identity") + 
   scale_fill_manual(labels = c("Public \nUniversity", "Private &\nUniversity"), values = c("per_change_pu" = "#a7ba42", "per_change_pr" = "#a4d8ff")) +
-           scale_y_continuous(labels = scales::percent, limits = c(-.40,.20)) +
+           scale_y_continuous(labels = scales::percent, limits = c(-.40,.40)) +
   labs(
     title = "University Authored Courses by Capacity",
     subtitle = "% of change from United Nations level",
@@ -227,7 +228,7 @@ df_long
 p4_c <- ggplot(df_long, aes(fill=org, y=perchang, x=Var2)) + 
     geom_bar(position="stack", stat="identity") + 
   scale_fill_manual(labels = c("Civil \nSociety", "Research &\nBusiness"), values = c("per_change_ci" = "#629074", "per_change_re" = "#b9c0f6")) +
-           scale_y_continuous(labels = scales::percent, limits = c(-.40,.20))+
+           scale_y_continuous(labels = scales::percent, limits = c(-.40,.40))+
   labs(
     title = "Civil Society, Research & Business \nAuthored Courses by Capacity",
     subtitle = "% of change from United Nations level",
@@ -323,6 +324,8 @@ all_courses_coded_long$au_category[all_courses_coded_long$au_category == "un ngo
 ```
 
 ```{r}
+all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+
 #cleanup before plotting
 all_courses_coded_long$category[all_courses_coded_long$category == "participation"] <- "Participation"
 all_courses_coded_long$category[all_courses_coded_long$category == "policy coherence"] <- "Policy\nCoherence"
@@ -337,17 +340,63 @@ all_courses_coded_long$category <- factor(all_courses_coded_long$category, level
 ```{r}
 #thanks to this guy: https://statsandr.com/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/
 
-all_courses_coded_long
+all_courses_coded_long <- read_csv("data/final_coded_dataset.csv")
+```
+
+```{r}
+table(all_courses_coded$category)
+#to long data
+all_courses_coded_long <- all_courses_coded %>% 
+  mutate(au_category = strsplit(as.character(au_category), ",")) %>%
+  unnest(au_category)
+
+
+#remove white spaces
+all_courses_coded_long$au_category <- trimws(all_courses_coded_long$au_category)
+
+
+all_courses_coded_long<- as.data.frame(all_courses_coded_long, headers=TRUE)
+
+write.csv(all_courses_coded_long,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/all_courses_coded_long.csv", row.names = TRUE)
+
+
+#simply categories
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "cultural institution"] <- "civil society"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "ngo"] <- "civil society"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "business"] <- "research  business"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "finance"] <- "research  business"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "research  policy institutes"] <- "research  business"
+all_courses_coded_long$au_category[all_courses_coded_long$au_category == "un ngo"] <- "civil society"
+
+# add in un only courses
+
+#au_diff_allcourses <- rbind(au_diff_main_long, au_diff_un_only)
+
+#table 3. Contingency table
+final_freq_table <- table(all_courses_coded_long$au_category, all_courses_coded_long$category)
+
+chisq.test(final_freq_table)
+```
+```{r}
+# Fisher's exact test
+fishtest <- fisher.test(final_freq_table,simulate.p.value=TRUE,B=1e7)
+fishtest
+
+```
+
+```{r}
 #plot Figure 6. 
+
 plot6<- ggbarstats(
   all_courses_coded_long, x = au_category, y = category,
   results.subtitle = FALSE,
+  legend.title = "Author Stakeholder Group",
   subtitle = paste0(
     "Fisher's exact test", ", p-value = ",
     ifelse(fishtest$p.value < 0.001, "< 0.001", round(fishtest$p.value, 3))
   )
 ) + 
-  scale_fill_manual(
+  scale_fill_manual(labels = c("UN", "Government","Public University","Private University","Civil Society", "Research & Business"),
     values = c(
       'un' = "#95ccba",
       'government' = "#e1b12d",
@@ -356,16 +405,16 @@ plot6<- ggbarstats(
       'civil society' = "#629074",
       'research  business' = "#b9c0f6")) +
   labs(
-    title = "Author Stakeholder Groups of SDG Trainings",
-    subtitle = "per Sustainable Governance Capacity",
+    title = "Multidisciplinary Authors of Sustainable Governance Capacities",
+    subtitle = "for 211 training courses",
     x = "Sustainable Governance Capacities",
-    y = "Contributing Author Institions per Group",
+    y = "Author Group per Total Authors by Capacity",
     fill = "Author Group"
   ) + theme(legend.position = "none") + theme_minimal()  
 
 plot6
 
  ggsave(filename = "diagrams/plot6.png", grid.arrange(plot6, nrow = 1) ,
-       width = 10, height = 5, dpi = 300, units = "in", device='png')
+       width = 10, height = 10, dpi = 300, units = "in", device='png')
 
 ```

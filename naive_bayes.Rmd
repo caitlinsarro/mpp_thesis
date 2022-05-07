@@ -202,10 +202,8 @@ nb_cvs_predictions %>%
 myPalette <- colorRampPalette(rev(brewer.pal(11, "Spectral")))
 
 
-confusionplot<- conf_mat_resampled(x = nb_cv_s, tidy = FALSE) %>%
+confusionplot <- conf_mat_resampled(x = nb_cv_s, tidy = FALSE) %>%
   autoplot(type = "heatmap") +
-  scale_fill_gradient2(low="yellow", mid="white", high="navy", 
-                       midpoint=0) +
   scale_y_discrete(labels = function(x) str_wrap(x, 20)) +
   scale_x_discrete(labels = function(x) str_wrap(x, 20)) +
   labs(
@@ -214,7 +212,13 @@ confusionplot<- conf_mat_resampled(x = nb_cv_s, tidy = FALSE) %>%
     subtitle = "for the Sustainable Governance Capacities Categories"
   ) 
 
+confusionplot <- confusionplot +
+  scale_fill_gradient(low = "white", high = "lightblue") 
 
+
+
+ ggsave(filename = "diagrams/figure10.png", grid.arrange(confusionplot, nrow = 1) ,
+       width = 10, height = 5, dpi = 300, units = "in", device='png')
 ```
 
 
