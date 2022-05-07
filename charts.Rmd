@@ -55,7 +55,7 @@ plot5 <- ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
   geom_col(color = "black") +
   geom_col() +
   geom_text(aes(label = sprintf("%0.1f %%", perc)),
-             position = position_stack(vjust = 0.5),  size=5) +
+             position = position_stack(vjust = 0.5),  size=3) +
   coord_polar(theta = "y") +
   scale_fill_brewer(palette = "GnBu") +
   guides(fill = guide_legend(title = "Figure 5. Distribution of Sustainable \nGovernance Categories in \ntraining courses (N = 211)")) +
@@ -66,6 +66,12 @@ plot5 <- ggplot(freq_table_charts, aes(x = hsize, y = perc, fill = category)) +
         axis.title = element_blank(),
         axis.ticks = element_blank(),
         axis.text = element_blank()) 
+
+
+
+#final plot export for Figure 5
+ ggsave(filename = "diagrams/figure5.png", grid.arrange(plot5, nrow = 1) ,
+       width = 6, height = 3, dpi = 300, units = "in", device='png')
 
 ```
 
@@ -340,7 +346,7 @@ all_courses_coded_long$category <- factor(all_courses_coded_long$category, level
 ```{r}
 #thanks to this guy: https://statsandr.com/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/
 
-all_courses_coded_long <- read_csv("data/final_coded_dataset.csv")
+all_courses_coded <- read_csv("data/final_coded_dataset.csv")
 ```
 
 ```{r}
@@ -376,7 +382,9 @@ all_courses_coded_long$au_category[all_courses_coded_long$au_category == "un ngo
 final_freq_table <- table(all_courses_coded_long$au_category, all_courses_coded_long$category)
 
 chisq.test(final_freq_table)
+
 ```
+
 ```{r}
 # Fisher's exact test
 fishtest <- fisher.test(final_freq_table,simulate.p.value=TRUE,B=1e7)
@@ -405,7 +413,7 @@ plot6<- ggbarstats(
       'civil society' = "#629074",
       'research  business' = "#b9c0f6")) +
   labs(
-    title = "Multidisciplinary Authors of Sustainable Governance Capacities",
+    title = "Figure 6. Multidisciplinary Authors of Sustainable\nGovernance Capacities",
     subtitle = "for 211 training courses",
     x = "Sustainable Governance Capacities",
     y = "Author Group per Total Authors by Capacity",
@@ -415,6 +423,6 @@ plot6<- ggbarstats(
 plot6
 
  ggsave(filename = "diagrams/plot6.png", grid.arrange(plot6, nrow = 1) ,
-       width = 10, height = 10, dpi = 300, units = "in", device='png')
+       width = 6, height = 8, dpi = 300, units = "in", device='png')
 
 ```

@@ -204,7 +204,7 @@ plot9 <- nb_cvs_predictions %>%
   labs(
     color = NULL,
     title = "Figure 9. Performance of the Sustainable\nGovernance Capacities Classification Model\nfor SDG Trainings",
-    subtitle = "Eight resample folds and two repeats")  + theme_minimal()
+    subtitle = "Eight resample folds and two repeats")  + theme_minimal() + theme(plot.title = element_text(size = 11))   
 
  ggsave(filename = "diagrams/figure9.png", grid.arrange(plot9, nrow = 1) ,
        width = 5, height = 5, dpi = 300, units = "in", device='png')

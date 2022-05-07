@@ -114,7 +114,30 @@ table4 %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
   save_kable(file = 'diagrams/table4.png')
 ```
+```{r}
+#table 6
+tb6_part <- c("16.8%", "20.0%", "26.1%", "12.6%", "19.6%", "37.1%")
+tb6_pol <- c("14.0%", "15.2%", "17.1%", "11.3%", "5.6%", "13.8%")
+tb6_dem <- c("26.7%", "32.9%", "42.4%", "8.3%", "36.5%", "26.4%")
+tb6_ref <- c("42.5%", "31.9%", "14.4%", "67.8%", "38.3%", "22.7%")
 
+table6 <- rbind(tb6_part,tb6_pol,tb6_dem,tb6_ref)
+table6
+rownames(table6) <- c("Participation","Policy\nCoherence","Democratic\nInstitutions","Reflexivity & \n Adaptation")
+colnames(table6) <- c("UN Aggregate","Public University","Private University","Government","Research & Business","Civil Society")
+
+
+table6 %>%
+  kbl(caption = "Table 6. Sustainable Governance Capacities for trainings by UN Author Groups") %>%
+   column_spec(column = 1, width = ".35in")  %>%
+   column_spec(column = 2, width = ".35in") %>%
+   column_spec(column = 3, width = ".35in") %>%
+   column_spec(column = 4, width = ".55in") %>%
+   column_spec(column = 5, width = ".35in") %>%
+  kable_classic(html_font = "Open Sans") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
+  save_kable(file = 'diagrams/table6.png')
+```
 
 
 ```{r}
