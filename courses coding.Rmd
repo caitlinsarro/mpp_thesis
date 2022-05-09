@@ -49,8 +49,6 @@ library(ggplot2)
 
 library(RCurl)
 
-library(quanteda)
-
 #for categorization
 library(quanteda)
 library(tidytext)
@@ -662,7 +660,7 @@ write.csv(all_courses_coded,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/
 
 ```{r}
 all_courses_coded
-final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
+final_coded_dataset <- read_csv("data/final/final_coded_dataset.csv")
 #are the dupes from softcoding?
 recoded <- select(final_coded_dataset, -c("category", "major_categ"))
 all_courses_coded <- select(all_courses_coded, -c("description", "id"))
@@ -786,7 +784,7 @@ au_diff_coding <- left_join(all_courses_coded, au_category_clean, by= "titles", 
 
 #export out to investigate final problems (duplicates, coding error, nas)
 write.csv(au_diff_coding,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_diff_coding.csv", row.names = TRUE)
-final_coded_dataset <- read_csv("data/final_coded_dataset_.csv")
+final_coded_dataset <- read_csv("data/final/final_coded_dataset_.csv")
 ```
 
 
@@ -856,7 +854,7 @@ final_coded_dataset
 
 #export out to fix au_category problem by author
 write.csv(final_coded_dataset,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/final_coded_dataset_.csv", row.names = TRUE)
-final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
+final_coded_dataset <- read_csv("data/final/final_coded_dataset.csv")
 # 212 
 # Final coded dataset
 ```
@@ -894,13 +892,19 @@ write.csv(au_main,"C:/Users/caitl/Documents/GitHub/mpp_thesis/exports/au_main.cs
 
 ```{r}
 
-all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+all_courses_coded <- read_csv("data/final/final_coded_dataset.csv")
 table(all_courses_coded$category)
 #to long data
 all_courses_coded_long <- all_courses_coded %>% 
   mutate(au_category = strsplit(as.character(au_category), ",")) %>%
   unnest(au_category)
 
+all_courses_coded_long$category[all_courses_coded_long$category == "democratic institutions"] <-"Democratic Institutions"
+all_courses_coded_long$category[all_courses_coded_long$category == "participation"] <-"Participation"
+all_courses_coded_long$category[all_courses_coded_long$category == "policy coherence"] <-"Policy Coherence"
+all_courses_coded_long$category[all_courses_coded_long$category == "reflexivity and adaptation"] <-"Reflexivity & Adaptation"
+
+all_courses_coded_long$category <- factor(all_courses_coded_long$category, levels = c("Participation", "Policy Coherence", "Democratic Institutions", "Reflexivity & Adaptation"))
 
 #remove white spaces
 all_courses_coded_long$au_category <- trimws(all_courses_coded_long$au_category)
@@ -924,7 +928,7 @@ all_courses_coded_long$au_category[all_courses_coded_long$au_category == "un ngo
 #au_diff_allcourses <- rbind(au_diff_main_long, au_diff_un_only)
 
 #table 3. Contingency table
-freq_table <- table(all_courses_coded_long$au_category, all_courses_coded_long$category)
+freq_table <- table(all_courses_coded_long$category, all_courses_coded_long$au_category)
 
 chisq.test(freq_table)
 chisq.test(all_courses_coded_long$au_category, all_courses_coded_long$category, correct=FALSE)
@@ -996,7 +1000,7 @@ mosaicplot(freq_table,
 ```
 
 ```{r}
-all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+all_courses_coded <- read_csv("data/final/final_coded_dataset.csv")
 ggplot(data = all_courses_coded) +
   geom_mosaic(aes(x = product(au_category, category), fill=au_category)) +
   theme_mosaic()
@@ -1744,7 +1748,7 @@ au_matrix_un
 
 
 ```{r}
-final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
+final_coded_dataset <- read_csv("data/final/final_coded_dataset.csv")
 all_courses_coded_adendum<- left_join(final_coded_dataset,descrip_comb, by = "titles", all.x=TRUE) 
 all_courses_coded
 

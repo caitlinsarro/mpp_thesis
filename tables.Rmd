@@ -23,7 +23,7 @@ for(p in packages){
 #tips to help remember: https://cran.r-project.org/web/packages/kableExtra/vignettes/awesome_table_in_html.html
 
 #import final data
-final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
+final_coded_dataset <- read_csv("data/final/final_coded_dataset.csv")
 ```
 
 ```{r}
@@ -100,7 +100,7 @@ tb4_ref <- c("44.8%", "(47)", "20.9%", "(6)", "↓ -23.9%")
 table4 <- rbind(tb4_part,tb4_pol,tb4_dem,tb4_ref)
 table4
 rownames(table4) <- c("Participation","Policy\nCoherence","Democratic\nInstitutions","Reflexivity & \n Adaptation")
-colnames(table4) <- c("UN Only \n Authored Trainings","(N=105)","UN Partnered with\nother Stakeholder Authors","(N= 31)\nweighted","% Change")
+colnames(table4) <- c("UN Only \n Authored Trainings","(N=105)","UN Partnered with\nother Stakeholder Authors","weighted\n(N= 31)","% Change")
 
 
 table4 %>%
@@ -116,10 +116,18 @@ table4 %>%
 ```
 ```{r}
 #table 6
-tb6_part <- c("16.8%", "20.0%", "26.1%", "12.6%", "19.6%", "37.1%")
-tb6_pol <- c("14.0%", "15.2%", "17.1%", "11.3%", "5.6%", "13.8%")
-tb6_dem <- c("26.7%", "32.9%", "42.4%", "8.3%", "36.5%", "26.4%")
-tb6_ref <- c("42.5%", "31.9%", "14.4%", "67.8%", "38.3%", "22.7%")
+UN Aggregate	public university	private university	civil society	business/finance/research	government
+19	5	4	4	4	2
+16	4	3	2	1	2
+31	9	7	3	8	2
+49	9	2	3	8	13
+
+
+
+tb6_part <- c("19 (16.8%)", "5 (20.0%)", "4 (26.1%)", "4 (12.6%)", "4 (19.6%)", " 2 (37.1%)")
+tb6_pol <- c("16 (14.0%)", "4 (15.2%)", "3 (17.1%)", "2 (11.3%)", "1 (5.6%)", "2 (13.8%)")
+tb6_dem <- c("31 (26.7%)", "9 (32.9%)", "7 (42.4%)", "3 (8.3%)", "8 (36.5%)", "2 (26.4%)")
+tb6_ref <- c("49 (42.5%)", "9 (31.9%)", "2 (14.4%)", "3 (67.8%)", "8 (38.3%)", "13 (22.7%)")
 
 table6 <- rbind(tb6_part,tb6_pol,tb6_dem,tb6_ref)
 table6
@@ -128,15 +136,17 @@ colnames(table6) <- c("UN Aggregate","Public University","Private University","G
 
 
 table6 %>%
-  kbl(caption = "Table 6. Sustainable Governance Capacities for trainings by UN Author Groups") %>%
-   column_spec(column = 1, width = ".35in")  %>%
-   column_spec(column = 2, width = ".35in") %>%
+  kbl(caption = "Table 6. Summary Distribution of 211 training courses across Sustainable Governance Capacities and Authors") %>%
+   column_spec(column = 1, width = "0.55 in")  %>%
+   column_spec(column = 2, width = ".75 in") %>%
    column_spec(column = 3, width = ".35in") %>%
    column_spec(column = 4, width = ".55in") %>%
    column_spec(column = 5, width = ".35in") %>%
+   column_spec(column = 6, width = ".35in") %>%
   kable_classic(html_font = "Open Sans") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) %>%
-  save_kable(file = 'diagrams/table6.png')
+  kable_styling(bootstrap_options = c("striped", "condensed"), full_width = FALSE) 
+
+#%>% save_kable(file = 'diagrams/table6.png')
 ```
 
 
@@ -152,13 +162,24 @@ kbl(df_2) %>%
 ```{r}
 #Table 3. Contingency Table
 freq_table <- read_csv("exports/final_freq_table.csv")
+freq_table
+
+
 
 freq_table %>%
-  kbl(caption = "Table 3. Authors of Training Courses (Weighted) by Goverance Category", col.names=c("Sustainable Governance Category","Civil Society","Government","Private University","Public University","Research & Business","UN")) %>%
-  kable_classic(full_width = F, html_font = "Open Sans") %>%
+  kbl(caption = "Table 3. Authors of Training Courses by Goverance Category", col.names=c("Civil Society","Government","Private University","Public University","Research & Business","UN"))%>%
+   column_spec(column = 1, width = ".35in")  %>%
+   column_spec(column = 2, width = ".35in") %>%
+   column_spec(column = 3, width = ".35in") %>%
+   column_spec(column = 4, width = ".55in") %>%
+   column_spec(column = 5, width = ".35in") %>%
+   column_spec(column = 6, width = ".35in") %>%
+   column_spec(column = 7, width = ".35in") %>%
+  kable_classic(full_width = FALSE, html_font = "Open Sans") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"))
 
 freq_table <- table(final_coded_dataset$category, final_coded_dataset$au_category)
 chisq.test(freq_table)$expected
 final_coded_dataset
+#"Sustainable Governance Category",
 ```

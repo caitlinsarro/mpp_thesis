@@ -22,7 +22,7 @@ for(p in packages){
 ```{r}
 #tips to help remember: https://r-charts.com/part-whole/donut-chart-ggplot2/
 #import final data
-final_coded_dataset <- read_csv("data/final_coded_dataset.csv")
+final_coded_dataset <- read_csv("data/final/final_coded_dataset.csv")
 ```
 
 ```{r}
@@ -298,7 +298,7 @@ p
 
 ```{r}
 
-all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+all_courses_coded <- read_csv("data/final/final_coded_dataset.csv")
 table(all_courses_coded$category)
 #to long data
 all_courses_coded_long <- all_courses_coded %>% 
@@ -330,7 +330,7 @@ all_courses_coded_long$au_category[all_courses_coded_long$au_category == "un ngo
 ```
 
 ```{r}
-all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+all_courses_coded <- read_csv("data/final/final_coded_dataset.csv")
 
 #cleanup before plotting
 all_courses_coded_long$category[all_courses_coded_long$category == "participation"] <- "Participation"
@@ -346,7 +346,7 @@ all_courses_coded_long$category <- factor(all_courses_coded_long$category, level
 ```{r}
 #thanks to this guy: https://statsandr.com/blog/fisher-s-exact-test-in-r-independence-test-for-a-small-sample/
 
-all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+all_courses_coded <- read_csv("data/final/final_coded_dataset.csv")
 ```
 
 ```{r}
