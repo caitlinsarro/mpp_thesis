@@ -1,6 +1,6 @@
 ---
-title: "Web Scraping"
-subtitle: "Author Standardization"
+title: "Soft Coding"
+subtitle: ""
 author: "Caitlin Sarro"
 date: "2/9/2022"
 output: 
@@ -193,7 +193,6 @@ url.exists("weblink_au")
 authors_list
 ```
 ```{r}
-#
 #start RSelenium
 
 system('docker kill $(docker ps -q)')
