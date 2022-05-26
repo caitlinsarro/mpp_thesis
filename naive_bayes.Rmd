@@ -1,5 +1,5 @@
 ---
-title: "test"
+title: "Naive Bayes"
 author: "Caitlin Sarro"
 date: "3/30/2022"
 output: html_document
@@ -41,16 +41,11 @@ for(p in packages){
 
 ```
 
-## R Markdown
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
 ```{r}
-all_courses_coded <- read_csv("data/final_coded_dataset.csv")
+all_courses_coded <- read_csv("data/final/final_coded_dataset.csv")
 #all_courses_coded
-
+citation("quanteda")
 #all_courses_coded <- na.omit(all_courses_coded)
 ```
 
@@ -59,8 +54,6 @@ all_courses_coded <- read_csv("data/final_coded_dataset.csv")
 
 
 ```{r}
-#need to add in (at least) three new subsets before doing the model test
-
 #TEST of this https://cfss.uchicago.edu/notes/supervised-text-classification/
 #soft_coded_long <- read_csv("data/soft_coded_long2.csv")
 #soft_coded_long <- read_csv("data/soft_hard_codes_combined.csv")
